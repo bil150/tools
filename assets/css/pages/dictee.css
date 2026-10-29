@@ -1,0 +1,25 @@
+/* Dictée : styles propres à la page. S'appuie sur base.css et arabe.css. */
+
+.prompt { font: 600 20px/1.25 var(--body); text-wrap: balance; }
+#quiz { display: flex; flex-direction: column; gap: 20px; }
+.result { gap: 16px; }
+
+/* Ligne d'écriture : de droite à gauche */
+.line {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 88px; padding: 10px;
+  border: 1px dashed var(--line); border-radius: 8px; background: var(--paper);
+}
+.line.good { border: 1px solid var(--good); background: var(--good-bg); }
+.line.bad { border: 1px solid var(--bad); background: var(--bad-bg); }
+.placeholder { color: var(--muted); font: 14px var(--body); direction: ltr; }
+
+/* Morceaux à assembler */
+.bank { display: flex; flex-wrap: wrap; gap: 8px; }
+.tile {
+  min-width: 64px; min-height: 64px; padding: 4px 14px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper-2); color: var(--ink);
+}
+.tile:hover:not(:disabled) { border-color: var(--ink); }
+.tile .ar { font-size: 38px; line-height: 1.5; }
+.tile.used { opacity: .3; }
+.tile:disabled { cursor: default; }

@@ -1,0 +1,34 @@
+/* Calculateur de réseau : styles propres à la page. S'appuie sur base.css. */
+
+.card > .field { flex: none; }
+.inputs { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.muted { color: var(--muted); font-size: 14px; }
+.mono { font-family: var(--mono); }
+
+/* Résultats : libellé / valeur */
+.facts { display: grid; grid-template-columns: minmax(130px, max-content) 1fr; gap: 0 20px; margin: 0; }
+.facts dt, .facts dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.facts dt { color: var(--muted); font-size: 14px; }
+.facts dd { font-family: var(--mono); font-size: 15px; overflow-wrap: anywhere; }
+.facts dt:last-of-type, .facts dd:last-of-type { border-bottom: 0; }
+
+/* Binaire : octets séparés, bits du réseau en gras */
+.bin { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.octet { letter-spacing: .06em; color: var(--muted); }
+.octet b { color: var(--ink); font-weight: 700; }
+
+/* Tableau des sous-réseaux */
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+
+/* Verdict */
+.verdict { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 15px; }
+.verdict.yes { border-color: var(--good); background: var(--good-bg); color: var(--good); }
+.verdict.no { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+
+@media (max-width: 480px) {
+  .facts { grid-template-columns: 1fr; }
+  .facts dt { padding-bottom: 0; border-bottom: 0; }
+}

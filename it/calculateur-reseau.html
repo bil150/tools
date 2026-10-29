@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Calculateur de réseau</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/reseau.css">
+<script src="../assets/js/pages/reseau.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Calculateur de réseau</li></ol></nav>
+
+  <header>
+    <h1 class="title">Calculateur de réseau</h1>
+    <p class="sub">Saisissez une adresse IPv4 et un masque : le réseau, la plage d’adresses et les sous-réseaux se calculent en direct.</p>
+  </header>
+
+  <section class="card" aria-label="Saisie">
+    <div class="inputs">
+      <div class="field">
+        <label for="ip">Adresse IPv4</label>
+        <input type="text" id="ip" value="192.168.1.10" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.1.10">
+      </div>
+      <div class="field">
+        <label for="mask">Masque ou CIDR</label>
+        <input type="text" id="mask" value="24" autocomplete="off" spellcheck="false" placeholder="24 ou 255.255.255.0">
+      </div>
+    </div>
+    <p class="err" id="err" role="alert" hidden></p>
+  </section>
+
+  <section class="card" id="result" aria-label="Résultat" aria-live="polite">
+    <h2>Résultat</h2>
+    <dl class="facts" id="facts"></dl>
+
+    <h2>Découper en sous-réseaux</h2>
+    <div class="field">
+      <label for="split">Nouveau préfixe</label>
+      <select id="split"></select>
+    </div>
+    <div id="splitOut"></div>
+
+    <h2>Une adresse est-elle dans ce réseau ?</h2>
+    <div class="field">
+      <label for="other">Adresse à vérifier</label>
+      <input type="text" id="other" autocomplete="off" spellcheck="false" placeholder="192.168.1.200">
+    </div>
+    <p id="inOut" class="verdict" hidden></p>
+  </section>
+</main>
+</body>
+</html>

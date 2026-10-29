@@ -1,0 +1,26 @@
+/* Aide à la syntaxe cron : styles propres à la page. S'appuie sur base.css. */
+
+.card > .field { flex: none; }
+.muted { color: var(--muted); font-size: 14px; }
+.mono, code { font-family: var(--mono); }
+input#expr { font: 18px var(--mono); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { color: var(--muted); font-weight: 500; white-space: nowrap; }
+td:first-child { white-space: nowrap; font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+
+.runs { padding-left: 22px; list-style: decimal; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+.runs li::first-letter { text-transform: uppercase; }
+
+.syntax { display: grid; grid-template-columns: minmax(110px, max-content) 1fr; gap: 6px 20px; margin: 0; font-size: 14px; }
+.syntax dt, .syntax dd { margin: 0; }
+.syntax code { font-size: 14px; }
+.syntax dd { color: var(--muted); }
+
+@media (max-width: 480px) {
+  .syntax { grid-template-columns: 1fr; }
+}

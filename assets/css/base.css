@@ -2,38 +2,26 @@
    Minimaliste et neutre. Les feuilles imprimables sont dans memento.css,
    les styles propres à une page dans assets/css/pages/. */
 
+/* Couleurs : light-dark() choisit selon le thème. Le thème suit l'appareil par défaut ;
+   le bouton clair/sombre (app.js) le force via data-theme sur <html>. */
 :root {
-  --paper: #FAFAF8;
-  --paper-2: #FFFFFF;
-  --ink: #14213D;
-  --muted: #5F6980;
-  --line: #DADDE3;
-  --accent: #C8372D;
-  --hi: #FFF1B0;
-  --good: #17794A;
-  --good-bg: #E6F4EC;
-  --bad: #B3261E;
-  --bad-bg: #FBE9E7;
+  color-scheme: light dark;
+  --paper: light-dark(#FAFAF8, #0F141D);
+  --paper-2: light-dark(#FFFFFF, #171E2B);
+  --ink: light-dark(#14213D, #E8ECF4);
+  --muted: light-dark(#5F6980, #9AA5BC);
+  --line: light-dark(#DADDE3, #2A3445);
+  --accent: light-dark(#C8372D, #FF7366);
+  --hi: light-dark(#FFF1B0, #3A3517);
+  --good: light-dark(#17794A, #6FD6A0);
+  --good-bg: light-dark(#E6F4EC, #12352A);
+  --bad: light-dark(#B3261E, #FF8F86);
+  --bad-bg: light-dark(#FBE9E7, #3D1B1A);
   --body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
-  color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0F141D;
-    --paper-2: #171E2B;
-    --ink: #E8ECF4;
-    --muted: #9AA5BC;
-    --line: #2A3445;
-    --accent: #FF7366;
-    --hi: #3A3517;
-    --good: #6FD6A0;
-    --good-bg: #12352A;
-    --bad: #FF8F86;
-    --bad-bg: #3D1B1A;
-    color-scheme: dark;
-  }
-}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 /* Reset */
 * { box-sizing: border-box; }
@@ -56,7 +44,16 @@ button { cursor: pointer; }
 /* Mise en page */
 .wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-.topbar { padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.topbar .crumbs { margin-right: auto; }
+.tbtn {
+  min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--paper-2); font-size: 13px; font-weight: 500;
+}
+.tbtn:hover { border-color: var(--ink); }
+.tbtn.icon { width: 32px; padding: 0; display: inline-grid; place-items: center; }
+.tbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+header { display: flex; flex-direction: column; gap: 8px; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 2px 8px; }
 .crumbs li { color: var(--ink); font-weight: 600; }
 .crumbs li + li::before { content: "/"; margin-right: 8px; color: var(--muted); font-weight: 400; }
@@ -106,6 +103,9 @@ select, input[type="text"] {
   background: var(--paper-2); width: 100%; text-overflow: ellipsis;
 }
 
+textarea { padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); width: 100%; font: 14px/1.5 var(--mono); resize: vertical; }
+textarea:focus, input:focus, select:focus { border-color: var(--ink); }
+
 /* Panneau et messages */
 .card {
   background: var(--paper-2); border: 1px solid var(--line); border-radius: 8px;
@@ -115,6 +115,11 @@ select, input[type="text"] {
 
 .notice { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); font-size: 14px; }
 .err { padding: 10px 12px; border: 1px solid var(--bad); border-radius: 6px; background: var(--bad-bg); color: var(--bad); font-size: 14px; }
+
+@media print {
+  :root { color-scheme: light; }
+  .topbar { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

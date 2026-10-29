@@ -1,163 +1,15 @@
 (function () {
   'use strict';
 
-  /* ---------- Données : le tableau du livre ---------- */
-  var F = 'َ', D = 'ُ', K = 'ِ', FT = 'ً', DT = 'ٌ', KT = 'ٍ', SU = 'ْ', SH = 'ّ';
-  var ALIF = 'ا', WAW = 'و', YA = 'ي';
-  var LETTERS = [
-    { ch: 'ب', tr: 'b', n: 'bâ' },
-    { ch: 'ت', tr: 't', n: 'tâ' },
-    { ch: 'ث', tr: 'th', n: 'thâ' }
-  ];
-  var ROWS = [
-    { id: 'fatha', name: 'Fatha', hint: '« a » bref', mk: function (l) { return { parts: [[l.ch + F]], tr: l.tr + 'a' }; } },
-    { id: 'damma', name: 'Damma', hint: '« ou » bref', mk: function (l) { return { parts: [[l.ch + D]], tr: l.tr + 'ou' }; } },
-    { id: 'kasra', name: 'Kasra', hint: '« i » bref', mk: function (l) { return { parts: [[l.ch + K]], tr: l.tr + 'i' }; } },
-    { id: 'tfatha', name: 'Tanwîn fatha', hint: '« an »', mk: function (l) { return { parts: [[l.ch + (l.noAlif ? '' : ALIF) + FT]], tr: l.tr + 'an' }; } },
-    { id: 'tdamma', name: 'Tanwîn damma', hint: '« oun »', mk: function (l) { return { parts: [[l.ch + DT]], tr: l.tr + 'oun' }; } },
-    { id: 'tkasra', name: 'Tanwîn kasra', hint: '« in »', mk: function (l) { return { parts: [[l.ch + KT]], tr: l.tr + 'in' }; } },
-    { id: 'alif', name: 'Alif', hint: '« â » long', mk: function (l) { return { parts: [[l.ch + F], [ALIF, 1]], tr: l.tr + 'â' }; } },
-    { id: 'waw', name: 'Waw', hint: '« oû » long', mk: function (l) { return { parts: [[l.ch + D], [WAW, 1]], tr: l.tr + 'oû' }; } },
-    { id: 'ya', name: 'Ya', hint: '« î » long', mk: function (l) { return { parts: [[l.ch + K], [YA, 1]], tr: l.tr + 'î' }; } },
-    { id: 'sukun', name: 'Soukoun', hint: 'sans voyelle', mk: function (l) { return { parts: [[l.ch + SU]], tr: l.tr }; } },
-    { id: 'shadda', name: 'Chadda', hint: 'lettre doublée', mk: function (l) { return { parts: [[l.ch + SH + F]], tr: l.tr + l.tr + 'a' }; } }
-  ];
-  var WORDS = [
-    { parts: [['ب' + F], [ALIF, 1], ['ت' + F]], tr: 'bâta', fr: 'il a passé la nuit' },
-    { parts: [['ت' + F], [ALIF, 1], ['ب' + F]], tr: 'tâba', fr: 'il s’est repenti' },
-    { parts: [['ث' + D + 'ب' + D], [WAW, 1], ['ت' + DT]], tr: 'thouboût', fr: 'la preuve, la fermeté' }
-  ];
-
-  function textOf(parts) { return parts.map(function (p) { return p[0]; }).join(''); }
-
-  var GRID = [];      // GRID[r][c]
-  var SYLS = [];      // toutes les syllabes
-  ROWS.forEach(function (row, r) {
-    GRID[r] = [];
-    LETTERS.forEach(function (l, c) {
-      var m = row.mk(l);
-      var item = { kind: 'syl', parts: m.parts, tr: m.tr, text: textOf(m.parts), r: r, c: c, rowId: row.id, desc: row.name + ' · ' + row.hint };
-      GRID[r][c] = item;
-      SYLS.push(item);
-    });
-  });
-  GRID[ROWS.length] = WORDS.map(function (w, c) {
-    return { kind: 'word', parts: w.parts, tr: w.tr, text: textOf(w.parts), r: ROWS.length, c: c, rowId: 'word', fr: w.fr, desc: w.fr };
-  });
-  var WORD_ITEMS = GRID[ROWS.length];
-
-  /* Mots d'entraînement en plus du tableau : uniquement les lettres du livre (ب ت ث)
-     avec les voyelles, tanwîn, chadda et lettres de prolongation déjà étudiés. */
-  var MORE_WORDS = [
-    { parts: [['ب' + F], [ALIF, 1], ['ب' + DT]], tr: 'bâb', fr: 'la porte' },
-    { parts: [['ت' + D], [WAW, 1], ['ت' + DT]], tr: 'toût', fr: 'la mûre' },
-    { parts: [['أ' + F + 'ث' + F], [ALIF, 1], ['ث' + DT]], tr: 'athâth', fr: 'les meubles' },
-    { parts: [['أ' + F + 'ب' + DT]], tr: 'ab', fr: 'le père' },
-    { parts: [['ث' + F + 'ب' + F], [ALIF, 1], ['ت' + DT]], tr: 'thabât', fr: 'la stabilité' },
-    { parts: [['ب' + F + 'ث' + SH + F]], tr: 'baththa', fr: 'il a diffusé' },
-    { parts: [['ث' + F + 'ب' + F + 'ت' + F]], tr: 'thabata', fr: 'il est resté ferme' },
-    { parts: [['ث' + F], [ALIF, 1], ['ب' + K + 'ت' + DT]], tr: 'thâbit', fr: 'stable, ferme' }
-  ];
-  var QUIZ_WORDS = WORD_ITEMS.concat(MORE_WORDS.map(function (w) {
-    return { kind: 'word', parts: w.parts, tr: w.tr, text: textOf(w.parts), rowId: 'word', fr: w.fr, desc: w.fr };
-  }));
-  var NROWS = ROWS.length + 1;
-
-  /* Alphabet complet (ordre arabe). ch = base des variations, nj = ne se lie pas à la lettre suivante */
-  var ZWJ = '‍';
-  var ALPHA = [
-    { disp: 'ا', ch: 'أ', tr: 'ʾ', n: 'alif', noAlif: true, nj: true },
-    { disp: 'ب', tr: 'b', n: 'bâ' },
-    { disp: 'ت', tr: 't', n: 'tâ' },
-    { disp: 'ث', tr: 'th', n: 'thâ' },
-    { disp: 'ج', tr: 'dj', n: 'djîm' },
-    { disp: 'ح', tr: 'ḥ', n: 'ḥâ' },
-    { disp: 'خ', tr: 'kh', n: 'khâ' },
-    { disp: 'د', tr: 'd', n: 'dâl', nj: true },
-    { disp: 'ذ', tr: 'dh', n: 'dhâl', nj: true },
-    { disp: 'ر', tr: 'r', n: 'râ', nj: true },
-    { disp: 'ز', tr: 'z', n: 'zây', nj: true },
-    { disp: 'س', tr: 's', n: 'sîn' },
-    { disp: 'ش', tr: 'ch', n: 'chîn' },
-    { disp: 'ص', tr: 'ṣ', n: 'ṣâd' },
-    { disp: 'ض', tr: 'ḍ', n: 'ḍâd' },
-    { disp: 'ط', tr: 'ṭ', n: 'ṭâ' },
-    { disp: 'ظ', tr: 'ẓ', n: 'ẓâ' },
-    { disp: 'ع', tr: 'ʿ', n: 'ʿayn' },
-    { disp: 'غ', tr: 'gh', n: 'ghayn' },
-    { disp: 'ف', tr: 'f', n: 'fâ' },
-    { disp: 'ق', tr: 'q', n: 'qâf' },
-    { disp: 'ك', tr: 'k', n: 'kâf' },
-    { disp: 'ل', tr: 'l', n: 'lâm' },
-    { disp: 'م', tr: 'm', n: 'mîm' },
-    { disp: 'ن', tr: 'n', n: 'noûn' },
-    { disp: 'ه', tr: 'h', n: 'hâ' },
-    { disp: 'و', tr: 'w', n: 'wâw', nj: true },
-    { disp: 'ي', tr: 'y', n: 'yâ' }
-  ];
-  ALPHA.forEach(function (l) { if (!l.ch) l.ch = l.disp; });
-
-  function variationsFor(l) {
-    return ROWS.map(function (row, r) {
-      var m = row.mk(l);
-      return { kind: 'syl', parts: m.parts, tr: m.tr, text: textOf(m.parts), r: r, rowId: row.id, desc: row.name + ' · ' + row.hint };
-    });
-  }
-
-  /* ---------- Outils ---------- */
-  var synth = window.speechSynthesis;
-  var canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+  /* Données et voix : voir arabe-core.js */
+  var A = window.Arabe;
+  var LETTERS = A.LETTERS, ROWS = A.ROWS, GRID = A.GRID, SYLS = A.SYLS, WORD_ITEMS = A.WORD_ITEMS, QUIZ_WORDS = A.QUIZ_WORDS;
+  var NROWS = A.NROWS, ALPHA = A.ALPHA, ZWJ = A.ZWJ;
+  var variationsFor = A.variationsFor, h = A.h, arEl = A.arEl, shuffle = A.shuffle;
   var $ = function (id) { return document.getElementById(id); };
-  var state = { mode: 'study', queue: [], i: 0, score: 0, answered: false, mistakes: [], voice: null, interacted: false, current: null, reading: false, sel: null };
+  var state = { mode: 'study', queue: [], i: 0, score: 0, answered: false, mistakes: [], interacted: false, reading: false, sel: null };
 
-  function h(tag, cls, text) {
-    var el = document.createElement(tag);
-    if (cls) el.className = cls;
-    if (text != null) el.textContent = text;
-    return el;
-  }
-  function arEl(item, cls) {
-    var s = h('span', 'ar' + (cls ? ' ' + cls : ''));
-    s.lang = 'ar';
-    s.dir = 'rtl';
-    item.parts.forEach(function (p) { s.appendChild(h('span', p[1] ? 'lv' : null, p[0])); });
-    return s;
-  }
-  function shuffle(a) {
-    a = a.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
-  }
-
-  /* ---------- Voix ---------- */
   function setSpeaking(on) { $('player').classList.toggle('speaking', on); }
-
-  function loadVoices() {
-    if (!canSpeak) return;
-    var all = synth.getVoices();
-    if (!all.length) return;
-    var vs = all.filter(function (v) { return /^ar([-_]|$)/i.test(v.lang); });
-    var sel = $('voiceSel');
-    var keep = state.voice ? state.voice.voiceURI : null;
-    sel.innerHTML = '';
-    $('noArabic').hidden = vs.length > 0;
-    if (!vs.length) { $('voiceField').hidden = true; return; }
-    vs.sort(function (a, b) { return a.name.localeCompare(b.name); });
-    vs.forEach(function (v) {
-      var o = document.createElement('option');
-      o.value = v.voiceURI;
-      o.textContent = v.name + ' (' + v.lang + ')';
-      sel.appendChild(o);
-    });
-    var chosen = vs.filter(function (v) { return v.voiceURI === keep; })[0] || vs[0];
-    sel.value = chosen.voiceURI;
-    state.voice = chosen;
-    $('voiceField').hidden = false;
-  }
-
   function showErr(msg) {
     ['errStudy', 'errQuiz', 'errAlpha'].forEach(function (id) {
       var el = $(id);
@@ -165,42 +17,11 @@
       el.hidden = !msg;
     });
   }
-  var ERR = {
-    'language-unavailable': 'Cet appareil n’a pas de voix arabe. Installez-en une dans les réglages de synthèse vocale, ou ouvrez le fichier dans Chrome ou Safari.',
-    'voice-unavailable': 'La voix choisie n’est pas disponible. Choisissez une autre voix arabe dans la liste.',
-    'not-allowed': 'Le navigateur a bloqué le son. Touchez de nouveau le bouton.',
-    'synthesis-unavailable': 'La synthèse vocale est indisponible ici. Ouvrez le fichier dans Chrome ou Safari.',
-    'synthesis-failed': 'La synthèse vocale a échoué. Ouvrez le fichier dans Chrome ou Safari.',
-    'silent': 'Pas de son ? Vérifiez le volume et le mode silencieux, puis qu’une voix arabe est installée. Sinon, ouvrez le fichier dans Chrome ou Safari.',
-    'other': 'Le son n’a pas pu démarrer. Ouvrez le fichier dans Chrome ou Safari.'
-  };
+  var voice = A.createVoice({ onSpeaking: setSpeaking, onError: showErr, onVoiceChange: onVoiceChange });
+  var canSpeak = voice.canSpeak;
+  function speak(text, rate, done) { voice.speak(text, rate, done); }
+  function speakItem(item, rate) { voice.speak(item.text, rate, null); }
 
-  function speak(text, rate, done) {
-    if (!canSpeak) { if (done) done(); return; }
-    try { synth.cancel(); } catch (e) {}
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = state.voice ? state.voice.lang : 'ar-SA';
-    if (state.voice) u.voice = state.voice;
-    u.rate = rate || 0.75;
-    state.current = u;
-    var started = false;
-    u.onstart = function () { started = true; showErr(''); if (state.current === u) setSpeaking(true); };
-    u.onend = function () { if (state.current === u) { setSpeaking(false); if (done) done(true); } };
-    u.onerror = function (ev) {
-      if (state.current !== u) return;
-      setSpeaking(false);
-      var code = ev && ev.error;
-      if (code !== 'canceled' && code !== 'interrupted') showErr(ERR[code] || ERR.other);
-      if (done) done(false);
-    };
-    setTimeout(function () {
-      if (state.current !== u) return;
-      try { synth.resume(); } catch (e) {}
-      synth.speak(u);
-    }, 40);
-    setTimeout(function () { if (state.current === u && !started) showErr(ERR.silent); }, 2500);
-  }
-  function speakItem(item, rate) { speak(item.text, rate, null); }
 
   /* ---------- Mode tableau ---------- */
   function buildGrid() {
@@ -261,9 +82,7 @@
   function stopReading() {
     if (!state.reading) return;
     setReading(false);
-    state.current = null;
-    setSpeaking(false);
-    try { synth && synth.cancel(); } catch (e) {}
+    voice.stop();
   }
   function readSequence(seq) {
     if (!canSpeak) return;
@@ -484,8 +303,7 @@
   }
 
   function showResult() {
-    try { synth && synth.cancel(); } catch (e) {}
-    setSpeaking(false);
+    voice.stop();
     $('stage').hidden = true;
     $('result').hidden = false;
     var total = state.queue.length;
@@ -524,8 +342,7 @@
   /* ---------- Modes ---------- */
   function setMode(m) {
     stopReading();
-    try { synth && synth.cancel(); } catch (e) {}
-    setSpeaking(false);
+    voice.stop();
     state.mode = m;
     $('mStudy').setAttribute('aria-pressed', String(m === 'study'));
     $('mAlpha').setAttribute('aria-pressed', String(m === 'alpha'));
@@ -554,15 +371,13 @@
   $('next').addEventListener('click', function () { state.interacted = true; goNext(); });
   $('again').addEventListener('click', function () { state.interacted = true; startRound(buildQuiz()); });
   $('retry').addEventListener('click', function () { state.interacted = true; startRound(shuffle(state.mistakes)); });
-  $('voiceSel').addEventListener('change', function () {
-    var id = $('voiceSel').value;
-    var vs = synth.getVoices();
-    for (var k = 0; k < vs.length; k++) if (vs[k].voiceURI === id) state.voice = vs[k];
+  /* Après un changement de voix : on la fait entendre sur l'élément courant */
+  function onVoiceChange() {
     state.interacted = true;
     if (state.mode === 'study' && state.sel) speakItem(GRID[state.sel.r][state.sel.c], 0.7);
     else if (state.mode === 'alpha') speak(ALPHA[state.letter].disp, 0.7, null);
     else if ((state.mode === 'syl' || state.mode === 'word') && cur()) speakItem(cur(), 0.75);
-  });
+  }
 
   document.addEventListener('keydown', function (e) {
     state.interacted = true;
@@ -588,8 +403,6 @@
     $('readRows').disabled = true;
     $('aRead').disabled = true;
   } else {
-    loadVoices();
-    if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', loadVoices);
-    else synth.onvoiceschanged = loadVoices;
+    voice.bind({ select: $('voiceSel'), field: $('voiceField'), notice: $('noArabic') });
   }
 })();

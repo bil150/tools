@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Aide à la syntaxe cron</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/cron.css">
+<script src="../assets/js/pages/cron.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Aide à la syntaxe cron</li></ol></nav>
+
+  <header>
+    <h1 class="title">Aide à la syntaxe cron</h1>
+    <p class="sub">Saisissez une expression à 5 champs : chaque champ est expliqué et les prochaines exécutions sont calculées.</p>
+  </header>
+
+  <section class="card" aria-label="Expression">
+    <div class="field">
+      <label for="expr">Expression cron</label>
+      <input type="text" id="expr" value="*/15 9-17 * * 1-5" autocomplete="off" spellcheck="false" placeholder="*/15 9-17 * * 1-5">
+    </div>
+    <p class="muted fields">minute · heure · jour du mois · mois · jour de la semaine</p>
+    <div class="presets" role="group" aria-label="Exemples">
+      <button type="button" class="btn ghost" data-expr="* * * * *">Chaque minute</button>
+      <button type="button" class="btn ghost" data-expr="*/5 * * * *">Toutes les 5 minutes</button>
+      <button type="button" class="btn ghost" data-expr="0 * * * *">Chaque heure</button>
+      <button type="button" class="btn ghost" data-expr="0 0 * * *">Chaque jour à minuit</button>
+      <button type="button" class="btn ghost" data-expr="30 8 * * 1-5">Jours ouvrés à 8 h 30</button>
+      <button type="button" class="btn ghost" data-expr="0 0 1 * *">Le 1er du mois</button>
+      <button type="button" class="btn ghost" data-expr="@weekly">@weekly</button>
+    </div>
+    <p class="err" id="err" role="alert" hidden></p>
+  </section>
+
+  <section class="card" id="out" aria-label="Explication" aria-live="polite">
+    <h2>Explication</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Champ</th><th>Valeur</th><th>Signification</th><th>Autorisé</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <h2>Prochaines exécutions</h2>
+    <p class="muted">Heure locale de cet appareil.</p>
+    <ol class="runs" id="runs"></ol>
+  </section>
+
+  <section class="card" aria-label="Rappel de syntaxe">
+    <h2>Rappel</h2>
+    <dl class="syntax">
+      <dt><code>*</code></dt><dd>toutes les valeurs</dd>
+      <dt><code>5,10,15</code></dt><dd>une liste de valeurs</dd>
+      <dt><code>9-17</code></dt><dd>une plage, bornes comprises</dd>
+      <dt><code>*/15</code></dt><dd>un pas : toutes les 15 unités</dd>
+      <dt><code>10-40/10</code></dt><dd>un pas dans une plage</dd>
+      <dt><code>jan, mon</code></dt><dd>noms de mois et de jours en anglais abrégé (jan à dec, sun à sat)</dd>
+      <dt><code>0 et 7</code></dt><dd>dimanche, dans le champ jour de la semaine</dd>
+      <dt><code>@daily</code></dt><dd>raccourcis : @hourly, @daily, @weekly, @monthly, @yearly</dd>
+    </dl>
+    <p class="muted">Quand le jour du mois et le jour de la semaine sont tous deux précisés, la tâche s’exécute si l’un des deux correspond.</p>
+  </section>
+</main>
+</body>
+</html>

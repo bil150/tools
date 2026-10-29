@@ -4,19 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="assets/js/app.js"></script>
 <title>Tools</title>
 <link rel="stylesheet" href="assets/css/base.css">
 </head>
 <body>
 <main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li aria-current="page">Tools</li></ol></nav>
   <header>
     <h1 class="title">Tools</h1>
-    <p class="sub">Petits outils perso. Chacun a sa page, sans compte.</p>
+    <p class="sub">Compilation de petits outils pour la maison et les proches, intégrés un à un et au style commun. Chacun a sa page, sans compte.</p>
   </header>
 
   <ul class="tiles">
     <li><a class="tile" href="langues/langues.html"><span class="tile-name">Langues</span><span class="tile-desc">Lire l’arabe avec le son, et s’entraîner à l’écoute.</span></a></li>
-    <li><a class="tile" href="it/it.html"><span class="tile-name">IT</span><span class="tile-desc">Mémentos imprimables : GNU/Linux, Windows, Git, Docker et outils de développement.</span></a></li>
+    <li><a class="tile" href="it/it.html"><span class="tile-name">IT</span><span class="tile-desc">Mémentos imprimables (GNU/Linux, Windows, Dev) et outils : manette, réseau, convertisseurs, cron, comparateur.</span></a></li>
   </ul>
 
   <footer>Page web statique. Aucune donnée n’est collectée ni stockée sur un serveur.</footer>

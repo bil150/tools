@@ -1,0 +1,44 @@
+/* Écriture à la main : styles propres à la page. S'appuie sur base.css et arabe.css. */
+
+.wrap { max-width: 900px; }
+.muted { color: var(--muted); font-size: 14px; }
+.card > .field { flex: none; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.label { font-size: 13px; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Choix de la lettre : l'alphabet, de droite à gauche */
+.letters { display: grid; direction: rtl; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px; }
+.lbtn {
+  display: flex; flex-direction: column; align-items: center; padding: 2px 2px 6px; min-height: 64px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); color: var(--ink);
+}
+.lbtn .ar { font-size: 30px; line-height: 1.5; }
+.lbtn small { font: 500 11px/1 var(--mono); color: var(--muted); direction: ltr; }
+.lbtn:hover { border-color: var(--ink); }
+.lbtn[aria-pressed="true"] { background: var(--hi); border-color: var(--ink); }
+
+.info { display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+
+/* Feuille d'écriture : deux canevas superposés */
+.sheet { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--paper-2); }
+.stack { position: relative; width: 100%; line-height: 0; }
+.stack canvas { display: block; max-width: none; }
+#ink { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
+
+/* Légende des lignes */
+.legend ul { display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.legend li { display: flex; gap: 12px; align-items: baseline; }
+.sw { flex: none; width: 36px; height: 0; border-top: 2px dotted var(--muted); transform: translateY(-3px); }
+.sw.marks { border-top: 1px dashed var(--muted); opacity: .6; }
+.sw.base { border-top: 2px solid var(--muted); }
+
+/* Impression : seule la feuille, en noir sur blanc */
+@page { margin: 10mm; }
+@media print {
+  .noprint, .card { display: none !important; }
+  body { padding: 0; }
+  .wrap { max-width: none; gap: 0; }
+  .sheet { border: 0; border-radius: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
