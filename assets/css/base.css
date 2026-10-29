@@ -76,7 +76,6 @@ footer { font-size: 13px; color: var(--muted); }
   background: var(--paper-2); border: 1px solid var(--line); border-radius: 8px;
 }
 a.tile:hover { border-color: var(--ink); }
-.tile.soon { color: var(--muted); border-style: dashed; }
 .tile-name { font-size: 20px; font-weight: 600; }
 .tile-desc { color: var(--muted); }
 
