@@ -21,7 +21,6 @@ langues/
 it/
   it.html                      menu informatique
   memento-linux.html  memento-windows.html  memento-applicatifs.html
-  out/  legacy/                PDF exportés et anciennes versions
 ```
 
 ## Conventions
@@ -32,3 +31,14 @@ it/
 - Un mémento = `<header class="toolbar">` + des `<div class="sheet" id data-face data-cols>`.
   `memento.js` construit les barres de réglage et peut répartir le contenu sur 1 à 8 pages.
 - Couleurs et rayons viennent des variables de `base.css` ; les feuilles imprimées restent blanches.
+
+## Ajouter une page
+
+1. Créer le fichier dans le bon dossier, nommé d'après son contenu (pas `index.html`).
+2. Copier l'en-tête d'une page existante : `base.css`, puis sa feuille dédiée si besoin.
+3. Ajouter le fil d'Ariane, puis une tuile (`<a class="tile">`) dans le menu parent.
+4. Pour un mémento : ajouter les `.sheet` ; `memento.js` fournit les réglages (pages, colonnes, échelle).
+
+## Licence
+
+Mémentos IT : CC BY-NC-SA 4.0 — bil150, 2026.
