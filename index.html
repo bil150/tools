@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,700..900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Tools — feuille de style commune
+   Idée : un cahier d'écolier français. Papier réglé, marge rouge, encre bleu nuit, surligneur jaune.
+   Chaque page ajoute son propre <style> pour ce qui lui est propre. */
+
+:root {
+  --paper: #FAFAF6;
+  --paper-2: #FFFFFF;
+  --ink: #14213D;
+  --muted: #566178;
+  --rule: #D3E3F1;
+  --grid: #86B5DC;
+  --margin: #E59A9A;
+  --red: #D6362D;
+  --hi: #FFE45E;
+  --hi-ink: #14213D;
+  --lv-hi: #C42B22;
+  --shadow: #14213D;
+  --good: #17794A;
+  --good-bg: #DDF3E7;
+  --bad: #B3261E;
+  --bad-bg: #FBE1DE;
+  --step: 32px;
+  --display: 'Archivo', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+  --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --ar: 'Noto Naskh Arabic', 'Geeza Pro', 'Traditional Arabic', Tahoma, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0F141D;
+    --paper-2: #171E2B;
+    --ink: #E8ECF4;
+    --muted: #9AA5BC;
+    --rule: #192332;
+    --grid: #3C5F88;
+    --margin: #6A3036;
+    --red: #FF7366;
+    --hi: #F0D44A;
+    --hi-ink: #14213D;
+    --lv-hi: #B3261E;
+    --shadow: #000000;
+    --good: #6FD6A0;
+    --good-bg: #12352A;
+    --bad: #FF8F86;
+    --bad-bg: #3D1B1A;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+/* Papier réglé : une ligne bleue tous les 32 px, une marge rouge à gauche du contenu */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--paper);
+  background-image: linear-gradient(to bottom, transparent calc(var(--step) - 1px), var(--rule) calc(var(--step) - 1px));
+  background-size: 100% var(--step);
+  color: var(--ink);
+  font: 400 16px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 56px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - min(340px, 50% - 16px) - 10px);
+  width: 1.5px;
+  background: var(--margin);
+  pointer-events: none;
+}
+
+.wrap { position: relative; max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* Barre du haut */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); }
+.mark {
+  font: 700 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  background: var(--ink); color: var(--paper); padding: 8px 10px; text-decoration: none;
+}
+a.mark:hover { background: var(--red); }
+.crumb { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Titres */
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.title {
+  margin: 0; font: 900 clamp(34px, 10vw, 56px)/1.02 var(--display); font-stretch: 125%;
+  letter-spacing: -.01em; text-wrap: balance;
+}
+.hl { background: linear-gradient(transparent 58%, var(--hi) 58%, var(--hi) 92%, transparent 92%); padding: 0 .06em; }
+.sub { margin: 0; color: var(--muted); max-width: 54ch; line-height: var(--step); }
+
+/* Boutons */
+.ghost, .primary {
+  font: 600 13px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
+  border: 1.5px solid var(--ink); border-radius: 0;
+  min-height: 44px; padding: 0 16px; background: var(--paper-2); color: var(--ink);
+}
+.ghost:hover:not(:disabled) { background: var(--hi); color: var(--hi-ink); }
+.ghost:disabled { opacity: .4; cursor: default; }
+.primary { background: var(--ink); color: var(--paper); min-height: 48px; }
+.primary:hover:not(:disabled) { background: var(--red); border-color: var(--red); color: var(--paper); }
+
+.seg { display: inline-flex; border: 1.5px solid var(--ink); background: var(--paper-2); max-width: 100%; }
+.seg button {
+  border: 0; border-right: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+  padding: 0 12px; min-height: 44px; font: 600 13px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
+}
+.seg button:last-child { border-right: 0; }
+.seg button:hover { background: var(--hi); color: var(--hi-ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 180px; }
+.field label { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.field select { min-height: 44px; padding: 0 10px; border: 1.5px solid var(--ink); border-radius: 0; background: var(--paper-2); width: 100%; text-overflow: ellipsis; }
+
+/* Panneau */
+.card {
+  background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 0; box-shadow: 5px 5px 0 var(--shadow);
+  padding: 20px; display: flex; flex-direction: column; gap: 20px; min-width: 0;
+}
+.card h2 { margin: 0; font: 800 20px/1.2 var(--display); font-stretch: 112%; text-wrap: balance; }
+
+/* Messages */
+.notice { margin: 0; padding: 10px 12px; border: 1.5px dashed var(--muted); background: var(--paper-2); font-size: 14px; }
+.err { margin: 0; padding: 10px 12px; border: 1.5px solid var(--bad); background: var(--bad-bg); color: var(--bad); font-size: 14px; font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+<style>
+  .intro { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+  .toolist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; }
+
+  .tool {
+    display: grid; gap: 6px 16px; grid-template-columns: minmax(0, 1fr) auto;
+    padding: 18px 20px; text-decoration: none; color: var(--ink);
+    background: var(--paper-2); border: 1.5px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow);
+  }
+  .tool:hover { box-shadow: 5px 5px 0 var(--red); }
+  .tool:hover .go { background: var(--hi); color: var(--hi-ink); }
+  .t-name { grid-column: 1 / -1; font: 800 clamp(22px, 6vw, 28px)/1.15 var(--display); font-stretch: 118%; }
+  .t-desc { grid-column: 1 / -1; color: var(--muted); max-width: 52ch; }
+  .t-tags { align-self: center; font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .go { font: 700 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; border: 1.5px solid var(--ink); padding: 10px 12px; white-space: nowrap; }
+
+  .slot { padding: 18px 20px; border: 1.5px dashed var(--muted); color: var(--muted); font: 500 13px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+  footer { font: 500 12px/1.5 var(--mono); letter-spacing: .04em; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Navigation">
+    <span class="mark">Tools</span>
+    <span class="crumb">Dans le navigateur</span>
+  </nav>
+
+  <header class="intro">
+    <h1 class="title"><span class="hl">Tools</span></h1>
+    <p class="sub">Petits outils perso. Chacun a sa page, sans compte, et tout reste sur votre appareil.</p>
+  </header>
+
+  <!-- Pour ajouter un outil : copier un <li> ci-dessous, changer le lien, le nom, la description et les mots-clés. -->
+  <ul class="toolist">
+    <li>
+      <a class="tool" href="arabe-autonome.html">
+        <span class="t-name">Syllabes arabes</span>
+        <span class="t-desc">Lire et écouter les lettres arabes, leurs voyelles, tanwîn, soukoun et chadda, avec des jeux d'écoute. La voix vient de l'appareil.</span>
+        <span class="t-tags">arabe · lecture · audio</span>
+        <span class="go">Ouvrir →</span>
+      </a>
+    </li>
+    <li class="slot">Prochain outil</li>
+  </ul>
+
+  <footer>Aucune donnée n'est envoyée. Le son utilise la synthèse vocale de votre système.</footer>
+</main>
+</body>
+</html>
