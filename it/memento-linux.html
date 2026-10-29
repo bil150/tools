@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Mémento GNU/Linux</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/memento.css">
+<script src="../assets/js/memento.js" defer></script>
+</head>
+<body class="dense">
+<nav class="topbar wide" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">GNU/Linux</li></ol></nav>
+<header class="toolbar"><h1>Mémento GNU/Linux</h1></header>
+		<div class="sheet" id="sheet1" data-face="Recto — page 1" data-cols="5">
+			<div class="doc-title"><span class="doc-name">Mémento GNU/Linux</span><span class="doc-sub">Recto</span></div>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Fichiers, navigation &amp; shell</span
+					><span class="sub-desc">ls · cd · cp · rm · redirections · alias · historique</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>ls — list segment</h2>
+						<div class="entry">
+							<span class="cmd">ls -d</span><span class="desc">Permet de lister les répertoires</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -l</span><span class="desc">Lister avec détails (permissions, taille, ...)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -h</span><span class="desc">Afficher les tailles, avec suffixe K M G</span>
+						</div>
+						<div class="entry"><span class="cmd">ls -r</span><span class="desc">Tri inversé</span></div>
+						<div class="entry">
+							<span class="cmd">ls -a · ls --all</span
+							><span class="desc">Afficher les fichiers et répertoires cachés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -t</span><span class="desc">Trier les fichiers du plus récent au plus ancien</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -s</span><span class="desc">Trier par taille décroissante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -la</span
+							><span class="desc">Afficher tous les fichiers dont les cachés, avec détails</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls -lct</span><span class="desc">Trier par date de modification croissante</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>mv — move</h2>
+						<div class="entry">
+							<span class="cmd">mv foo/texte.txt rep/</span
+							><span class="desc">Déplacer le fichier « texte.txt » dans le répertoire « rep »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mv textz.txt texte.txt</span
+							><span class="desc">Renommer le fichier « textz.txt » en « texte.txt »</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>cp — copy</h2>
+						<div class="entry">
+							<span class="cmd">cp foo/file.txt rep/</span
+							><span class="desc">Copier « file.txt » dans « rep » (copie multiple possible)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cp -r foo/ baz/</span
+							><span class="desc">Copier le répertoire « foo » dans « baz »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cp monRep/{*.cpp,*.h} foo/</span
+							><span class="desc">Copier les fichiers cités du répertoire « monRep » dans « foo »</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>rm — remove</h2>
+						<div class="entry">
+							<span class="cmd">rm texte.txt</span><span class="desc">Supprimer les fichiers cités</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm texte.txt info.txt</span
+							><span class="desc">Supprimer plusieurs fichiers d'un coup</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm *.txt</span
+							><span class="desc">Supprimer tous les fichiers .txt du dossier courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm rep/*</span
+							><span class="desc">Supprimer le contenu du dossier (pas les sous-dossiers)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm -r rep/*</span
+							><span class="desc">Supprimer tout le contenu, sous-dossiers inclus</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm fichier[1-3].txt</span
+							><span class="desc">Supprimer fichier1, fichier2 et fichier3</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm -r rep/ · --recursive</span
+							><span class="desc">Suppression récursive — dossier et contenu</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm -i · --interactive</span
+							><span class="desc">Suppression interactive, demande une confirmation</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm -rf /tmp/rep</span
+							><span class="desc">Suppression sans confirmation, avec récursion</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls *.txt (avant rm)</span
+							><span class="desc">⚠ Vérifier ce que le motif sélectionne AVANT de supprimer</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">⚠ rm -rf /* · rm -rf ~</span
+							><span class="desc">Détruit tout le système / le home — ne jamais lancer</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>mkdir — make directory</h2>
+						<div class="entry">
+							<span class="cmd">mkdir photos</span><span class="desc">Créer le répertoire « photos »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mkdir photos textes</span
+							><span class="desc">Créer les répertoires « photos » et « textes »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mkdir -p rm/rmBis/rmTer</span
+							><span class="desc">Créer le répertoire, avec ses parents s'ils n'existent pas</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mkdir -v</span
+							><span class="desc">Créer un répertoire, avec informations sur la création</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>rmdir — remove directory</h2>
+						<div class="entry">
+							<span class="cmd">rmdir photos</span><span class="desc">Supprimer le répertoire « photos »</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>file</h2>
+						<div class="entry">
+							<span class="cmd">file monImage.jpg</span><span class="desc">Déterminer un type de fichier</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>touch</h2>
+						<div class="entry">
+							<span class="cmd">touch fichier.txt</span
+							><span class="desc">Modifier l'horodatage d'un fichier, à temps actuel</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>cd — change directory</h2>
+						<div class="entry">
+							<span class="cmd">cd</span><span class="desc">Permet de revenir au répertoire /home/user</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd /</span><span class="desc">Permet de remonter à la racine du système</span>
+						</div>
+						<div class="entry"><span class="cmd">cd ~</span><span class="desc">Idem que cd seul</span></div>
+						<div class="entry">
+							<span class="cmd">cd ..</span><span class="desc">Permet de remonter au répertoire parent</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd /usr/bin/</span><span class="desc">Se placer dans le répertoire /usr/bin</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd -</span><span class="desc">Revenir au répertoire précédent</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>pwd — print working directory</h2>
+						<div class="entry">
+							<span class="cmd">pwd</span><span class="desc">Affiche le répertoire de travail</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>cat</h2>
+						<div class="entry">
+							<span class="cmd">cat list1.txt</span><span class="desc">Visualiser un fichier txt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cat list1.txt list2.txt</span><span class="desc">Combiner des fichiers textes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cat list1.txt list2.txt &gt; todo.txt</span
+							><span class="desc">Combiner deux fichiers et insérer dans un autre</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>more / less</h2>
+						<div class="entry">
+							<span class="cmd">more fichier.txt</span><span class="desc">Afficher un fichier page par page</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">less fichier.txt</span
+							><span class="desc">Naviguer + fonctionnalités vi (recherche, ...)</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>ln — lien dur (physique)</h2>
+						<div class="entry">
+							<span class="cmd">ln fichier.txt docs/fichierdur.txt</span
+							><span class="desc">Créer un lien dur (pointe sur un inode)</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>ln -s — lien symbolique</h2>
+						<div class="entry">
+							<span class="cmd">ln -s fichier.txt docs/fichiersym.txt</span
+							><span class="desc"
+								>Créer un lien symbolique — fonctionnel en réseau ; disparaît si la source est détruite</span
+							>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Opérateurs de redirection</h2>
+						<div class="entry">
+							<span class="cmd">echo "Hello" &gt; message</span><span class="desc">Rediriger echo vers un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">&gt; fichier</span><span class="desc">Redirection de néant → crée un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ls &gt; resultat_ls</span
+							><span class="desc">Sortie console vers fichier, peuplé par énumération</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cat f1 &gt;&gt; f2</span><span class="desc">Rediriger en concaténant à la fin</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sort &lt; rpms_vrac.txt</span
+							><span class="desc">Redirection d'entrée — info récupérée depuis la source</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd 2&gt; erreurs.txt</span
+							><span class="desc">Rediriger uniquement les erreurs (stderr)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd &gt; sortie.txt 2&gt;&amp;1</span
+							><span class="desc">Rediriger sortie et erreurs vers le même fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd &gt; /dev/null 2&gt;&amp;1</span
+							><span class="desc">Tout jeter (aucune sortie affichée)</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Enchaînement de commandes</h2>
+						<div class="entry">
+							<span class="cmd">cmd1 | cmd2 | cmd3</span
+							><span class="desc">Pipe — la sortie de la 1ʳᵉ sert d'entrée à la suivante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">echo "Hello!" | tr "[:lower:]" "[:upper:]"</span
+							><span class="desc">Affiche → HELLO !</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 &amp;&amp; cmd2</span><span class="desc">ET — cmd2 seulement si cmd1 réussit</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 || cmd2</span><span class="desc">OU — cmd2 seulement si cmd1 échoue</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 ; cmd2</span><span class="desc">Enchaîner quoi qu'il arrive</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd &amp;</span><span class="desc">Lancer la commande en arrière-plan</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 | tee fichier</span><span class="desc">Afficher ET écrire dans un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">$(cmd)</span><span class="desc">Substitution — insérer le résultat d'une commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd ~ &amp;&amp; ls /etc &gt; /labo/lsetc.txt</span
+							><span class="desc">Exemple combiné : succession + redirection</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>echo</h2>
+						<div class="entry">
+							<span class="cmd">echo "dormir"</span><span class="desc">Affiche dormir à la console</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>test</h2>
+						<div class="entry">
+							<span class="cmd">test -f fichier</span><span class="desc">Tester l'existence d'un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">test -d /home/videos</span><span class="desc">Tester si c'est un répertoire</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>diff</h2>
+						<div class="entry">
+							<span class="cmd">diff fichier1.txt fichier2.txt</span
+							><span class="desc">Mettre en évidence les différences</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">diff fichier1.txt fichier2.txt -i</span
+							><span class="desc">Idem en ignorant la casse</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Les alias</h2>
+						<div class="entry"><span class="cmd">alias</span><span class="desc">Lister les alias</span></div>
+						<div class="entry">
+							<span class="cmd">alias upd='sudo apt-get update'</span
+							><span class="desc">Créer un alias — disparaît à la fermeture du terminal</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">~/.bashrc → source ~/.bashrc</span
+							><span class="desc">Rendre l'alias permanent : l'ajouter au fichier puis le recharger</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>assistance</h2>
+						<div class="entry">
+							<span class="cmd">Tab Tab</span><span class="desc">Suggère les opérations possibles</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">↑ (flèche haut)</span><span class="desc">Réutiliser la commande précédente</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">man rm · man ls · man cd</span
+							><span class="desc">Informations concernant une commande</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Historique des commandes</h2>
+						<div class="entry">
+							<span class="cmd">history</span><span class="desc">Afficher l'historique des commandes tapées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">history -c</span><span class="desc">Effacer tout l'historique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">!!</span><span class="desc">Réexécuter la toute dernière commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">!1545</span><span class="desc">Réexécuter la commande n° 1545 de l'historique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">!texte</span
+							><span class="desc">Réexécuter la dernière commande commençant par « texte »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+R</span><span class="desc">Recherche interactive dans l'historique</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Répertoires clés</h2>
+						<div class="entry">
+							<span class="cmd">/etc/passwd</span><span class="desc">Liste des utilisateurs du système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/shadow</span><span class="desc">Mots de passe chiffrés des utilisateurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/hosts</span><span class="desc">Résolution de noms locale (IP ↔ nom)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/fstab</span><span class="desc">Points de montage automatiques au démarrage</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/ssh/sshd_config</span><span class="desc">Configuration du serveur SSH</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/sudoers.d/user</span><span class="desc">Privilèges de l'utilisateur (sudo)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/etc/systemd/system</span><span class="desc">Services systemd personnalisés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/var/log</span><span class="desc">Journaux systèmes et applicatifs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">~/.bashrc</span
+							><span class="desc">Personnaliser son shell (alias, variables, ...)</span>
+						</div>
+						<div class="entry"><span class="cmd">~/.ssh/</span><span class="desc">Clés SSH de l'utilisateur</span></div>
+						<div class="entry">
+							<span class="cmd">/home</span><span class="desc">Répertoires personnels des utilisateurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/root</span><span class="desc">Répertoire personnel du super-utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/tmp</span><span class="desc">Fichiers temporaires (effacés au redémarrage)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/proc</span><span class="desc">Infos système et processus (virtuel)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/mnt</span><span class="desc">Point de montage pour les systèmes de fichiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/media</span
+							><span class="desc">Montage automatique des supports amovibles (USB, CD)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/dev</span><span class="desc">Fichiers représentant les périphériques</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/opt</span><span class="desc">Logiciels tiers installés manuellement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/usr/bin · /usr/local/bin</span
+							><span class="desc">Exécutables système / installés localement</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Système, réseau &amp; droits</span
+					><span class="sub-desc">ssh · scp · grep · find · utilisateurs · permissions</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>scp</h2>
+						<div class="entry">
+							<span class="cmd">scp foo.txt user@host:</span
+							><span class="desc">Transfère le fichier vers le home de la machine distante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">scp login@host:foo.txt ./</span
+							><span class="desc">Récupérer le fichier et le copier dans le répertoire courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">scp -r mails/ user@host:</span
+							><span class="desc">Transférer l'intégralité d'un répertoire vers la destination</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>terminal</h2>
+						<div class="entry">
+							<span class="cmd">su - username2</span><span class="desc">Changer d'utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sudo -i</span><span class="desc">Passer en mode super-utilisateur</span>
+						</div>
+						<div class="entry"><span class="cmd">shutdown</span><span class="desc">Arrêt du système</span></div>
+						<div class="entry">
+							<span class="cmd">setxkbmap be</span><span class="desc">Basculer vers un autre type de clavier</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>uname / df</h2>
+						<div class="entry">
+							<span class="cmd">uname -a</span><span class="desc">Afficher toutes les informations système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">df -h</span><span class="desc">Afficher l'espace disque utilisé, lisible</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>fdisk / du</h2>
+						<div class="entry">
+							<span class="cmd">sudo fdisk -l</span><span class="desc">Manipulateur de partitions</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">du</span
+							><span class="desc">Espace disque utilisé par le fichier ou répertoire cité</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>ssh</h2>
+						<div class="entry">
+							<span class="cmd">ssh user@host</span
+							><span class="desc">Connexion à la machine distante avec le login user</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ssh-keygen -t dsa</span
+							><span class="desc">Génération d'une clé DSA (machine locale)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ssh-copy-id -i ~/.ssh/id_dsa.pub user@host</span
+							><span class="desc">Copie de la clé publique sur la machine distante</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>ip</h2>
+						<div class="entry">
+							<span class="cmd">ip a</span
+							><span class="desc">Affichage de toute la configuration interface réseau</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Wildcards</h2>
+						<div class="entry"><span class="cmd">*</span><span class="desc">Tous les caractères</span></div>
+						<div class="entry">
+							<span class="cmd">[abc]</span><span class="desc">Tout caractère membre de la liste</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[!abc]</span><span class="desc">Caractère qui n'est pas membre de la liste</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">g*</span><span class="desc">Chaque fichier commençant par g</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">b*.txt</span
+							><span class="desc">Commençant par b et se terminant par l'extension .txt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Data???</span><span class="desc">Commençant par Data suivi de trois caractères</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[abc]*</span><span class="desc">Tout fichier commençant soit par a, b, ou c</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">BACKUP.[0-9][0-9][0-9]</span
+							><span class="desc">Commençant par BACKUP suivi de trois chiffres</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[[:upper:]]*</span><span class="desc">Tout fichier commençant par une majuscule</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[![:digit:]]*</span
+							><span class="desc">Tout fichier ne commençant pas par un chiffre</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">*[[:lower:]123]</span
+							><span class="desc">Tout fichier finissant par une minuscule ou 1, 2, 3</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>grep</h2>
+						<div class="entry">
+							<span class="cmd">grep texte fichier.txt</span
+							><span class="desc">Rechercher un élément dans un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">grep -n texte fichier.txt</span
+							><span class="desc">Retourne les lignes et leurs numéros</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">grep "expr?" index.html</span
+							><span class="desc">Rechercher à l'aide d'expressions régulières</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">grep -nri '(foo|bar|baz)' /project</span
+							><span class="desc">Rechercher toutes les occurrences dans le répertoire</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>find</h2>
+						<div class="entry">
+							<span class="cmd">find myfile* -print</span
+							><span class="desc">Rechercher un fichier commençant par « myfile »</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">find -name *myfile*.txt -print</span
+							><span class="desc">Rechercher un fichier contenant myfile, extension .txt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">find /usr -type d -print</span
+							><span class="desc">Afficher les répertoires de /usr</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">find $HOME -name *.txt -atime +7 -exec rm {} \;</span
+							><span class="desc">Supprimer les .txt non consultés depuis 7 jours</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Gestion des utilisateurs</h2>
+						<div class="entry">
+							<span class="cmd">adduser newuser</span><span class="desc">Créer un nouvel utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">deluser newuser</span><span class="desc">Supprimer un utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">passwd</span><span class="desc">Modifier le mot de passe d'un user</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">groups</span><span class="desc">Afficher les groupes d'un utilisateur</span>
+						</div>
+						<div class="entry"><span class="cmd">groupadd group</span><span class="desc">Ajouter un groupe</span></div>
+						<div class="entry">
+							<span class="cmd">groupdel group</span><span class="desc">Supprimer un groupe</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>packages</h2>
+						<div class="entry">
+							<span class="cmd">apt-get update</span
+							><span class="desc">Mettre à jour la liste des paquets référentiels</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">apt-get upgrade</span
+							><span class="desc">Récupérer les dernières versions des packages</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">apt install mysql</span><span class="desc">Installer le paquet mysql</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>processus</h2>
+						<div class="entry">
+							<span class="cmd">top</span><span class="desc">Monitoring des activités système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">free</span><span class="desc">Affiche la disponibilité de la mémoire vive</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ps -aux</span
+							><span class="desc">Afficher les processus actifs et utilisateurs associés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">kill pid</span><span class="desc">Arrêt immédiat d'un processus</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>chown / chmod</h2>
+						<div class="entry">
+							<span class="cmd">chown bob:admin foo.txt</span
+							><span class="desc">Attribuer « foo.txt » à l'utilisateur bob, groupe admin</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chmod u+w fichier</span
+							><span class="desc">Ajouter les droits d'écriture au propriétaire</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chmod g+r fichier</span
+							><span class="desc">Ajouter les droits de lecture au groupe</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chmod 764 dossier</span
+							><span class="desc">Tous droits (7) proprio, lecture+écriture (6) groupe, lecture (4) autres</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chmod o-x fichier</span
+							><span class="desc">Supprimer les droits d'exécution aux autres utilisateurs</span>
+						</div>
+					</div>
+					<div class="group rights-block">
+						<h2>Représentation des droits (chmod)</h2>
+						<table class="rights-table">
+							<thead>
+								<tr>
+									<th>Symbole</th>
+									<th>Val.</th>
+									<th>Signification</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="sym">---</td>
+									<td class="val">0</td>
+									<td class="lbl">Aucun droit</td>
+								</tr>
+								<tr>
+									<td class="sym">--x</td>
+									<td class="val">1</td>
+									<td class="lbl">Exécution seulement</td>
+								</tr>
+								<tr>
+									<td class="sym">-w-</td>
+									<td class="val">2</td>
+									<td class="lbl">Écriture seulement</td>
+								</tr>
+								<tr>
+									<td class="sym">-wx</td>
+									<td class="val">3</td>
+									<td class="lbl">Écriture et exécution</td>
+								</tr>
+								<tr>
+									<td class="sym">r--</td>
+									<td class="val">4</td>
+									<td class="lbl">Lecture seulement</td>
+								</tr>
+								<tr>
+									<td class="sym">r-x</td>
+									<td class="val">5</td>
+									<td class="lbl">Lecture et exécution</td>
+								</tr>
+								<tr>
+									<td class="sym">rw-</td>
+									<td class="val">6</td>
+									<td class="lbl">Lecture et écriture</td>
+								</tr>
+								<tr>
+									<td class="sym">rwx</td>
+									<td class="val">7</td>
+									<td class="lbl">Tous les droits</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="group">
+						<h2>visudo</h2>
+						<div class="entry">
+							<span class="cmd">visudo</span
+							><span class="desc">Éditer /etc/sudoers, privilèges selon l'utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">vi /etc/sudoers.d/user</span
+							><span class="desc">Modifie également les privilèges de l'utilisateur</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento GNU/Linux</span>
+			</div>
+		</div>
+		
+		<div class="sheet" id="sheet2" data-face="Verso — page 2" data-cols="5">
+			<div class="doc-title"><span class="doc-name">Mémento GNU/Linux</span><span class="doc-sub">Verso</span></div>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Services &amp; outils</span
+					><span class="sub-desc">vi · nano · systemd · tmux · matériel · cron · réseau</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>vi / vim — éditeur de texte</h2>
+						<div class="entry">
+							<span class="cmd">vi texte.txt</span><span class="desc">Ouvrir un fichier dans vi</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">i · a · o</span><span class="desc">Insérer avant / après / nouvelle ligne</span>
+						</div>
+						<div class="entry"><span class="cmd">Échap</span><span class="desc">Revenir en mode commande</span></div>
+						<div class="entry">
+							<span class="cmd">:w · :w jolitexte</span><span class="desc">Enregistrer / Enregistrer sous un nom</span>
+						</div>
+						<div class="entry"><span class="cmd">:x · :wq</span><span class="desc">Quitter en sauvegardant</span></div>
+						<div class="entry"><span class="cmd">:q!</span><span class="desc">Quitter sans sauvegarder</span></div>
+						<div class="entry">
+							<span class="cmd">dd · yy · p</span><span class="desc">Couper la ligne / copier / coller</span>
+						</div>
+						<div class="entry"><span class="cmd">u · Ctrl+r</span><span class="desc">Annuler / rétablir</span></div>
+						<div class="entry">
+							<span class="cmd">gg · G</span><span class="desc">Aller au début / à la fin du fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/texte · n</span><span class="desc">Rechercher / occurrence suivante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">:set number</span><span class="desc">Afficher les numéros de ligne</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">:%s/old/new/g</span><span class="desc">Remplacer dans tout le fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">vimtutor</span><span class="desc">Lancer le tuteur d'apprentissage</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>nano — éditeur simple</h2>
+						<div class="entry">
+							<span class="cmd">nano fichier.txt</span><span class="desc">Ouvrir un fichier dans nano</span>
+						</div>
+						<div class="entry"><span class="cmd">Ctrl+O</span><span class="desc">Sauvegarder</span></div>
+						<div class="entry"><span class="cmd">Ctrl+X</span><span class="desc">Quitter</span></div>
+						<div class="entry"><span class="cmd">Ctrl+W</span><span class="desc">Rechercher</span></div>
+						<div class="entry">
+							<span class="cmd">Ctrl+K · Ctrl+U</span><span class="desc">Couper la ligne / Coller</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+G</span><span class="desc">Afficher l'aide (raccourcis)</span>
+						</div>
+						<div class="entry"><span class="cmd">Ctrl+R</span><span class="desc">Lire / insérer un fichier</span></div>
+						<div class="entry">
+							<span class="cmd">Ctrl+_ </span><span class="desc">Aller à une ligne : colonne</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>systemctl — gestion des services</h2>
+						<div class="entry">
+							<span class="cmd">systemctl status svc</span><span class="desc">Afficher l'état d'un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl start svc</span><span class="desc">Démarrer un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl stop svc</span><span class="desc">Arrêter un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl restart svc</span><span class="desc">Redémarrer un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl reload svc</span><span class="desc">Recharger la configuration</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl enable svc</span><span class="desc">Activer le service au démarrage</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl disable svc</span
+							><span class="desc">Désactiver le démarrage automatique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl list-units --type=service</span
+							><span class="desc">Lister tous les services</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl is-active svc</span><span class="desc">Vérifier si le service est actif</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">journalctl -u svc</span><span class="desc">Voir les logs du service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">journalctl -f</span><span class="desc">Suivre les logs en temps réel</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Monitoring & performance</h2>
+						<div class="entry"><span class="cmd">htop</span><span class="desc">Version améliorée de top</span></div>
+						<div class="entry">
+							<span class="cmd">iotop</span><span class="desc">Monitoring des entrées/sorties disque</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nethogs</span><span class="desc">Monitoring réseau par processus</span>
+						</div>
+						<div class="entry"><span class="cmd">vmstat</span><span class="desc">Statistiques mémoire / CPU</span></div>
+						<div class="entry"><span class="cmd">free -h</span><span class="desc">Mémoire, format lisible</span></div>
+						<div class="entry">
+							<span class="cmd">watch commande</span><span class="desc">Exécuter une commande de façon répétitive</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Archives & compression</h2>
+						<div class="entry">
+							<span class="cmd">tar -cvf arch.tar rep/</span><span class="desc">Créer une archive</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tar -xvf arch.tar</span><span class="desc">Extraire une archive</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tar -czvf arch.tar.gz rep/</span><span class="desc">Créer et compresser (gzip)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tar -xzvf arch.tar.gz</span><span class="desc">Extraire une archive gzip</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">zip -r arch.zip rep/ · unzip arch.zip</span
+							><span class="desc">Compresser / décompresser en zip</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>cron — tâches planifiées</h2>
+						<div class="entry">
+							<span class="cmd">crontab -e</span><span class="desc">Éditer les tâches planifiées de l'utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">crontab -l</span><span class="desc">Lister les tâches planifiées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">crontab -r</span><span class="desc">Supprimer toutes les tâches</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">* * * * * commande</span
+							><span class="desc">min · heure · jour · mois · jour-semaine</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">0 2 * * * backup.sh</span
+							><span class="desc">Exécuter tous les jours à 2h du matin</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Traitement de texte</h2>
+						<div class="entry">
+							<span class="cmd">sed 's/old/new/g' fichier</span
+							><span class="desc">Remplacer une chaîne dans tout le fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">awk '{print $1}' fichier</span><span class="desc">Extraire une colonne</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cut -d: -f1 fichier</span><span class="desc">Découper selon un séparateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sort fichier · sort -n</span><span class="desc">Trier les lignes (numériquement)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">uniq · sort | uniq -c</span><span class="desc">Supprimer / compter les doublons</span>
+						</div>
+						<div class="entry"><span class="cmd">wc -l fichier</span><span class="desc">Compter les lignes</span></div>
+						<div class="entry">
+							<span class="cmd">xargs commande</span
+							><span class="desc">Passer une entrée en argument à une commande</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Réseau — diagnostic</h2>
+						<div class="entry">
+							<span class="cmd">ping host</span><span class="desc">Tester la connectivité vers un hôte</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">traceroute host</span><span class="desc">Afficher le chemin réseau vers un hôte</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dig domaine · nslookup domaine</span><span class="desc">Résolution DNS</span>
+						</div>
+						<div class="entry"><span class="cmd">wget url</span><span class="desc">Télécharger un fichier</span></div>
+						<div class="entry"><span class="cmd">curl -O url</span><span class="desc">Télécharger avec curl</span></div>
+					</div>
+					<div class="group">
+						<h2>Variables & montage</h2>
+						<div class="entry">
+							<span class="cmd">export VAR=valeur</span><span class="desc">Définir une variable d'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">echo $PATH</span><span class="desc">Afficher une variable d'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">env</span><span class="desc">Lister toutes les variables d'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mount /dev/sdX /mnt</span><span class="desc">Monter un périphérique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">umount /mnt</span><span class="desc">Démonter un périphérique</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>tmux — sessions persistantes</h2>
+						<div class="entry">
+							<span class="cmd">tmux</span><span class="desc">Démarrer une nouvelle session</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tmux new -s nom</span><span class="desc">Créer une session nommée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tmux ls</span><span class="desc">Lister les sessions existantes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tmux attach -t nom · -a</span><span class="desc">Se rattacher à une session</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tmux kill-session -t nom</span><span class="desc">Fermer une session</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis d</span><span class="desc">Détacher — la session continue en fond</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis c</span><span class="desc">Créer une nouvelle fenêtre</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis n · p</span><span class="desc">Fenêtre suivante / précédente</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis 0-9</span><span class="desc">Aller à la fenêtre numérotée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis % · "</span><span class="desc">Diviser le volet vertical / horizontal</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis flèches</span><span class="desc">Naviguer entre les volets</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis x</span><span class="desc">Fermer le volet courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+b puis [</span><span class="desc">Mode défilement (q pour sortir)</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Tâches en arrière-plan</h2>
+						<div class="entry">
+							<span class="cmd">commande &amp;</span
+							><span class="desc">Lancer en arrière-plan, le terminal reste libre</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Ctrl+Z</span><span class="desc">Suspendre la tâche en cours</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">bg</span><span class="desc">Reprendre la tâche suspendue en arrière-plan</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">fg · fg %1</span><span class="desc">Ramener une tâche au premier plan</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jobs</span><span class="desc">Lister les tâches du terminal courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nohup commande &amp;</span
+							><span class="desc">Continue même après fermeture du terminal</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nohup cmd &gt; log.txt 2&gt;&amp;1 &amp;</span
+							><span class="desc">En fond, sortie redirigée vers un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">disown %1</span><span class="desc">Détacher la tâche du terminal</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">kill %1</span><span class="desc">Arrêter une tâche par son numéro</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">screen -S nom · -r nom</span
+							><span class="desc">Alternative à tmux : créer / reprendre</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Matériel &amp; GPU — inventaire</h2>
+						<div class="entry">
+							<span class="cmd">lspci</span
+							><span class="desc">Lister les périphériques PCI (carte graphique, réseau...)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lspci -k</span><span class="desc">Idem avec les pilotes noyau utilisés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lspci | grep -i vga</span><span class="desc">Identifier la carte graphique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lspci -k | grep -A 3 -i vga</span
+							><span class="desc">Carte graphique + pilote utilisé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lsusb</span><span class="desc">Lister les périphériques USB</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lshw · lshw -short</span
+							><span class="desc">Matériel détaillé / inventaire condensé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lsblk</span><span class="desc">Lister les disques et partitions</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lscpu</span><span class="desc">Détails du processeur (cœurs, architecture)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">lsmod</span><span class="desc">Lister les modules noyau chargés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dmidecode -t memory</span><span class="desc">Infos sur les barrettes de RAM</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sensors</span><span class="desc">Températures et ventilateurs (lm-sensors)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nvidia-smi</span><span class="desc">État GPU NVIDIA : usage, mémoire, température</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nvidia-smi -l 1</span><span class="desc">Rafraîchir toutes les secondes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nvtop</span><span class="desc">Monitoring GPU interactif (NVIDIA / AMD)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">radeontop · intel_gpu_top</span><span class="desc">Monitoring GPU AMD / Intel</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">glxinfo | grep -i renderer</span
+							><span class="desc">Renderer OpenGL actif (mesa-utils)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nvcc --version</span><span class="desc">Version du compilateur CUDA</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Bash scripting</span
+					><span class="sub-desc">variables · conditions · boucles · fonctions · tableaux</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>Bash — structure d'un script</h2>
+						<div class="entry">
+							<span class="cmd">#!/bin/bash</span
+							><span class="desc">Shebang : première ligne, interpréteur utilisé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chmod +x script.sh</span><span class="desc">Rendre le script exécutable</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">./script.sh · bash script.sh</span><span class="desc">Exécuter le script</span>
+						</div>
+						<div class="entry">
+							<span class="cmd"># commentaire</span><span class="desc">Ligne de commentaire</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">set -e</span><span class="desc">Arrêter le script à la première erreur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">set -u</span><span class="desc">Erreur si une variable non définie est utilisée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">set -euo pipefail</span><span class="desc">Trio recommandé en début de script</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">exit 0 · exit 1</span><span class="desc">Sortir avec succès / avec erreur</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Bash — variables</h2>
+						<div class="entry">
+							<span class="cmd">nom="valeur"</span><span class="desc">Affectation (pas d'espace autour du =)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">echo "$nom"</span
+							><span class="desc">Utiliser une variable (guillemets recommandés)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">${nom}</span><span class="desc">Délimiter explicitement le nom</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">${nom:-defaut}</span><span class="desc">Valeur par défaut si vide ou non définie</span>
+						</div>
+						<div class="entry"><span class="cmd">${#nom}</span><span class="desc">Longueur de la chaîne</span></div>
+						<div class="entry">
+							<span class="cmd">readonly nom=val</span><span class="desc">Constante non modifiable</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">local nom=val</span><span class="desc">Variable locale à une fonction</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">resultat=$(commande)</span><span class="desc">Capturer la sortie d'une commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">total=$((a + b))</span><span class="desc">Calcul arithmétique</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Bash — arguments &amp; entrée</h2>
+						<div class="entry"><span class="cmd">$0</span><span class="desc">Nom du script</span></div>
+						<div class="entry">
+							<span class="cmd">$1 $2 $3 ...</span><span class="desc">Arguments positionnels</span>
+						</div>
+						<div class="entry"><span class="cmd">$#</span><span class="desc">Nombre d'arguments reçus</span></div>
+						<div class="entry">
+							<span class="cmd">$@ · "$@"</span><span class="desc">Tous les arguments (guillemets = un par mot)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">$?</span><span class="desc">Code de retour de la dernière commande</span>
+						</div>
+						<div class="entry"><span class="cmd">$$</span><span class="desc">PID du script courant</span></div>
+						<div class="entry">
+							<span class="cmd">read -p "Nom ? " var</span><span class="desc">Demander une saisie à l'utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">read -s -p "Mdp : " mdp</span><span class="desc">Saisie masquée (mot de passe)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">shift</span><span class="desc">Décaler les arguments vers la gauche</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Bash — tests &amp; conditions</h2>
+						<div class="entry">
+							<span class="cmd">if [ cond ]; then ... fi</span><span class="desc">Condition simple</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">if ... elif ... else ... fi</span><span class="desc">Conditions enchaînées</span>
+						</div>
+						<div class="entry"><span class="cmd">[ -f fichier ]</span><span class="desc">Le fichier existe</span></div>
+						<div class="entry">
+							<span class="cmd">[ -d dossier ]</span><span class="desc">Le répertoire existe</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[ -z "$v" ] · [ -n "$v" ]</span><span class="desc">Chaîne vide / non vide</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[ "$a" = "$b" ]</span><span class="desc">Égalité de chaînes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[ "$a" -eq "$b" ]</span
+							><span class="desc">Égalité numérique (-ne -lt -le -gt -ge)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[[ "$v" == pre* ]]</span><span class="desc">Comparaison avec motif (bash)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">[ cond1 ] &amp;&amp; [ cond2 ]</span
+							><span class="desc">ET logique · || pour le OU</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">case $v in a) ... ;; *) ... ;; esac</span
+							><span class="desc">Aiguillage multi-valeurs</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Bash — boucles &amp; fonctions</h2>
+						<div class="entry">
+							<span class="cmd">for i in 1 2 3; do ... done</span><span class="desc">Boucle sur une liste</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">for f in *.txt; do ... done</span><span class="desc">Boucle sur des fichiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">for i in {1..10}; do ... done</span><span class="desc">Boucle sur une plage</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">while [ cond ]; do ... done</span
+							><span class="desc">Boucle tant que la condition est vraie</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">until [ cond ]; do ... done</span
+							><span class="desc">Boucle jusqu'à ce que la condition soit vraie</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">while read ligne; do ... done &lt; f.txt</span
+							><span class="desc">Lire un fichier ligne par ligne</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">break · continue</span
+							><span class="desc">Sortir de la boucle / passer à l'itération suivante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ma_fonction() { ... }</span><span class="desc">Définir une fonction</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ma_fonction arg1 arg2</span><span class="desc">Appeler la fonction</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">return 0</span><span class="desc">Code de retour d'une fonction</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Bash — tableaux &amp; utilitaires</h2>
+						<div class="entry"><span class="cmd">tab=(a b c)</span><span class="desc">Déclarer un tableau</span></div>
+						<div class="entry">
+							<span class="cmd">${tab[0]} · ${tab[@]}</span><span class="desc">Un élément / tous les éléments</span>
+						</div>
+						<div class="entry"><span class="cmd">${#tab[@]}</span><span class="desc">Nombre d'éléments</span></div>
+						<div class="entry"><span class="cmd">tab+=(d)</span><span class="desc">Ajouter un élément</span></div>
+						<div class="entry">
+							<span class="cmd">printf "%s\n" "$v"</span><span class="desc">Affichage formaté (plus sûr qu'echo)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">date +%Y-%m-%d</span
+							><span class="desc">Date formatée, utile pour nommer des fichiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mktemp · mktemp -d</span><span class="desc">Créer un fichier / dossier temporaire</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">trap 'rm -f $tmp' EXIT</span><span class="desc">Nettoyer à la sortie du script</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">command -v git &gt;/dev/null</span
+							><span class="desc">Vérifier qu'une commande existe</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">bash -n script.sh</span><span class="desc">Vérifier la syntaxe sans exécuter</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">bash -x script.sh</span><span class="desc">Exécuter en mode debug (trace)</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento GNU/Linux</span>
+			</div>
+		</div>
+</body>
+</html>

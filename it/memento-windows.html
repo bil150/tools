@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Mémento Windows</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/memento.css">
+<script src="../assets/js/memento.js" defer></script>
+</head>
+<body class="dense">
+<nav class="topbar wide" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Windows</li></ol></nav>
+<header class="toolbar"><h1>Mémento Windows</h1></header>
+		<div class="sheet" id="sheet1" data-face="Recto — page 1" data-cols="5">
+			<div class="doc-title"><span class="doc-name">Mémento Windows</span><span class="doc-sub">Recto</span></div>
+			<section class="cat">
+				<div class="subbanner cmd">
+					<span class="sub-title">Invite de commandes (cmd)</span
+					><span class="sub-desc">l'ancienne console : dir · copy · findstr · tasklist · ipconfig</span>
+				</div>
+				<div class="mc">
+					<div class="group cmd">
+						<h2>cmd — navigation &amp; dossiers</h2>
+						<div class="entry"><span class="cmd">dir</span><span class="desc">Lister le contenu du dossier</span></div>
+						<div class="entry">
+							<span class="cmd">dir /a</span><span class="desc">Inclure les fichiers cachés et système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dir /s</span><span class="desc">Parcourir récursivement les sous-dossiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dir /o:d · /o:-s</span
+							><span class="desc">Trier par date · par taille décroissante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd chemin · chdir</span><span class="desc">Changer de dossier</span>
+						</div>
+						<div class="entry"><span class="cmd">cd ..</span><span class="desc">Remonter au dossier parent</span></div>
+						<div class="entry"><span class="cmd">cd \</span><span class="desc">Aller à la racine du lecteur</span></div>
+						<div class="entry"><span class="cmd">D:</span><span class="desc">Changer de lecteur</span></div>
+						<div class="entry">
+							<span class="cmd">md dossier · mkdir</span><span class="desc">Créer un dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rd dossier · rmdir</span><span class="desc">Supprimer un dossier vide</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rd /s /q dossier</span
+							><span class="desc">Supprimer un dossier et son contenu, sans confirmation</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tree · tree /f</span><span class="desc">Arborescence (avec les fichiers)</span>
+						</div>
+						<div class="entry"><span class="cmd">cls</span><span class="desc">Effacer l'écran</span></div>
+					</div>
+					<div class="group cmd">
+						<h2>cmd — fichiers</h2>
+						<div class="entry">
+							<span class="cmd">copy source dest</span><span class="desc">Copier un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">xcopy src dst /s /e /i</span><span class="desc">Copier une arborescence complète</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">robocopy src dst /MIR</span
+							><span class="desc">Miroir exact d'un dossier (outil recommandé)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">robocopy src dst /E /Z /R:3</span
+							><span class="desc">Copie avec reprise et 3 tentatives</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">move source dest</span><span class="desc">Déplacer ou renommer</span>
+						</div>
+						<div class="entry"><span class="cmd">ren ancien nouveau</span><span class="desc">Renommer</span></div>
+						<div class="entry">
+							<span class="cmd">del fichier · erase</span><span class="desc">Supprimer un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">del /s /q *.tmp</span
+							><span class="desc">Supprimer récursivement sans confirmation</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">type fichier.txt</span><span class="desc">Afficher le contenu (équivalent de cat)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">more fichier.txt</span><span class="desc">Afficher page par page</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">fc f1.txt f2.txt</span><span class="desc">Comparer deux fichiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">attrib +h fichier</span
+							><span class="desc">Modifier les attributs (+h caché, +r lecture seule)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">where programme</span><span class="desc">Trouver l'emplacement d'un exécutable</span>
+						</div>
+					</div>
+					<div class="group cmd">
+						<h2>cmd — recherche &amp; redirections</h2>
+						<div class="entry">
+							<span class="cmd">findstr "texte" fichier</span
+							><span class="desc">Chercher une chaîne dans un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">findstr /i /s "texte" *.txt</span
+							><span class="desc">Insensible à la casse, récursif</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">findstr /r "^motif" f.txt</span
+							><span class="desc">Recherche par expression régulière</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dir | findstr ".log"</span><span class="desc">Filtrer la sortie d'une commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">commande &gt; fichier.txt</span
+							><span class="desc">Rediriger la sortie vers un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">commande &gt;&gt; fichier.txt</span
+							><span class="desc">Ajouter à la fin du fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">commande 2&gt; erreurs.txt</span><span class="desc">Rediriger les erreurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">commande &gt; nul 2&gt;&amp;1</span><span class="desc">Masquer toute la sortie</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 &amp;&amp; cmd2</span
+							><span class="desc">Exécuter cmd2 seulement si cmd1 réussit</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cmd1 &amp; cmd2</span><span class="desc">Enchaîner quoi qu'il arrive</span>
+						</div>
+					</div>
+					<div class="group cmd">
+						<h2>cmd — processus &amp; système</h2>
+						<div class="entry">
+							<span class="cmd">tasklist</span><span class="desc">Lister les processus en cours</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tasklist | findstr chrome</span><span class="desc">Filtrer les processus</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">taskkill /IM nom.exe /F</span
+							><span class="desc">Terminer un processus par son nom</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">taskkill /PID 1234 /F</span><span class="desc">Terminer par identifiant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systeminfo</span><span class="desc">Informations complètes sur la machine</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">hostname · whoami</span
+							><span class="desc">Nom de la machine · utilisateur courant</span>
+						</div>
+						<div class="entry"><span class="cmd">ver</span><span class="desc">Version de Windows</span></div>
+						<div class="entry">
+							<span class="cmd">set · set VAR=valeur</span
+							><span class="desc">Lister / définir une variable d'environnement</span>
+						</div>
+						<div class="entry"><span class="cmd">echo %PATH%</span><span class="desc">Afficher une variable</span></div>
+						<div class="entry">
+							<span class="cmd">shutdown /r /t 0</span><span class="desc">Redémarrer immédiatement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">shutdown /s /t 60</span><span class="desc">Arrêter dans 60 secondes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sfc /scannow</span><span class="desc">Vérifier et réparer les fichiers système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">chkdsk C: /f</span><span class="desc">Vérifier et réparer un disque</span>
+						</div>
+					</div>
+					<div class="group cmd">
+						<h2>cmd — réseau</h2>
+						<div class="entry"><span class="cmd">ipconfig</span><span class="desc">Configuration réseau</span></div>
+						<div class="entry">
+							<span class="cmd">ipconfig /all</span><span class="desc">Configuration détaillée (MAC, DNS, DHCP)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ipconfig /release · /renew</span
+							><span class="desc">Libérer · renouveler l'adresse DHCP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ipconfig /flushdns</span><span class="desc">Vider le cache DNS</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ping host · ping -t host</span
+							><span class="desc">Tester la connectivité · en continu</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">tracert host</span><span class="desc">Suivre le chemin réseau</span>
+						</div>
+						<div class="entry"><span class="cmd">nslookup domaine</span><span class="desc">Résolution DNS</span></div>
+						<div class="entry">
+							<span class="cmd">netstat -ano</span><span class="desc">Connexions et ports avec les PID</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">netstat -ano | findstr :443</span><span class="desc">Trouver qui utilise un port</span>
+						</div>
+						<div class="entry"><span class="cmd">arp -a</span><span class="desc">Table ARP du réseau local</span></div>
+						<div class="entry">
+							<span class="cmd">net user</span><span class="desc">Lister les comptes utilisateurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">net share</span><span class="desc">Lister les partages réseau</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">net use Z: \\serveur\partage</span><span class="desc">Monter un lecteur réseau</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">WSL, winget &amp; correspondances</span
+					><span class="sub-desc">équivalences Linux · paquets · outils système</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>Correspondance Linux · cmd · PowerShell</h2>
+						<div class="entry">
+							<span class="cmd">ls → dir → Get-ChildItem</span><span class="desc">Lister le contenu</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cd → cd → Set-Location</span><span class="desc">Changer de dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pwd → cd → Get-Location</span><span class="desc">Dossier courant</span>
+						</div>
+						<div class="entry"><span class="cmd">cp → copy → Copy-Item</span><span class="desc">Copier</span></div>
+						<div class="entry">
+							<span class="cmd">mv → move → Move-Item</span><span class="desc">Déplacer / renommer</span>
+						</div>
+						<div class="entry"><span class="cmd">rm → del → Remove-Item</span><span class="desc">Supprimer</span></div>
+						<div class="entry">
+							<span class="cmd">mkdir → md → New-Item -ItemType Directory</span
+							><span class="desc">Créer un dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">cat → type → Get-Content</span><span class="desc">Afficher un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">grep → findstr → Select-String</span><span class="desc">Rechercher du texte</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ps → tasklist → Get-Process</span><span class="desc">Lister les processus</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">kill → taskkill → Stop-Process</span><span class="desc">Terminer un processus</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ifconfig → ipconfig → Get-NetIPAddress</span
+							><span class="desc">Configuration réseau</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl → — → Invoke-RestMethod</span><span class="desc">Requête HTTP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">clear → cls → Clear-Host</span><span class="desc">Effacer l'écran</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">man → help → Get-Help</span><span class="desc">Aide sur une commande</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>winget &amp; gestion des paquets</h2>
+						<div class="entry">
+							<span class="cmd">winget search nom</span><span class="desc">Chercher une application</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">winget install nom</span><span class="desc">Installer une application</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">winget list</span><span class="desc">Lister les applications installées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">winget upgrade</span><span class="desc">Voir les mises à jour disponibles</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">winget upgrade --all</span><span class="desc">Tout mettre à jour</span>
+						</div>
+						<div class="entry"><span class="cmd">winget uninstall nom</span><span class="desc">Désinstaller</span></div>
+						<div class="entry">
+							<span class="cmd">choco install nom</span><span class="desc">Chocolatey : installer</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">choco upgrade all -y</span><span class="desc">Chocolatey : tout mettre à jour</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">scoop install nom</span><span class="desc">Scoop : installer sans droits admin</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>WSL — Linux sous Windows</h2>
+						<div class="entry">
+							<span class="cmd">wsl --install</span
+							><span class="desc">Installer WSL et la distribution par défaut</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --list --online</span
+							><span class="desc">Distributions disponibles au téléchargement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl -l -v</span><span class="desc">Distributions installées et leur version</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --install -d Ubuntu</span
+							><span class="desc">Installer une distribution précise</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl</span><span class="desc">Ouvrir un shell dans la distribution par défaut</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl -d Ubuntu</span><span class="desc">Ouvrir une distribution précise</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --set-default Ubuntu</span
+							><span class="desc">Choisir la distribution par défaut</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --shutdown</span><span class="desc">Arrêter toutes les distributions</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --unregister nom</span
+							><span class="desc">Supprimer complètement une distribution</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wsl --export nom f.tar · --import</span
+							><span class="desc">Sauvegarder / restaurer une distribution</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">\\wsl$\Ubuntu\home</span
+							><span class="desc">Accéder aux fichiers WSL depuis l'explorateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/mnt/c/Users</span><span class="desc">Accéder au disque Windows depuis WSL</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">explorer.exe .</span
+							><span class="desc">Ouvrir le dossier courant dans l'explorateur</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Outils &amp; raccourcis Windows</h2>
+						<div class="entry"><span class="cmd">Win + R</span><span class="desc">Ouvrir la boîte Exécuter</span></div>
+						<div class="entry">
+							<span class="cmd">services.msc</span><span class="desc">Gestionnaire de services</span>
+						</div>
+						<div class="entry"><span class="cmd">taskmgr</span><span class="desc">Gestionnaire des tâches</span></div>
+						<div class="entry">
+							<span class="cmd">devmgmt.msc</span><span class="desc">Gestionnaire de périphériques</span>
+						</div>
+						<div class="entry"><span class="cmd">diskmgmt.msc</span><span class="desc">Gestion des disques</span></div>
+						<div class="entry"><span class="cmd">regedit</span><span class="desc">Éditeur de registre</span></div>
+						<div class="entry"><span class="cmd">eventvwr</span><span class="desc">Observateur d'événements</span></div>
+						<div class="entry">
+							<span class="cmd">msconfig</span><span class="desc">Configuration du démarrage</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">appwiz.cpl</span><span class="desc">Programmes et fonctionnalités</span>
+						</div>
+						<div class="entry"><span class="cmd">ncpa.cpl</span><span class="desc">Connexions réseau</span></div>
+						<div class="entry">
+							<span class="cmd">sysdm.cpl</span><span class="desc">Propriétés système (variables d'environnement)</span>
+						</div>
+						<div class="entry"><span class="cmd">control</span><span class="desc">Panneau de configuration</span></div>
+						<div class="entry">
+							<span class="cmd">DISM /Online /Cleanup-Image /RestoreHealth</span
+							><span class="desc">Réparer l'image système</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento Windows</span>
+			</div>
+		</div>
+		
+		<div class="sheet" id="sheet2" data-face="Verso — page 2" data-cols="5">
+			<div class="doc-title"><span class="doc-name">Mémento Windows</span><span class="doc-sub">Verso</span></div>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">PowerShell</span
+					><span class="sub-desc">objets · pipeline · services · réseau · scripting</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>PowerShell — bases</h2>
+						<div class="entry">
+							<span class="cmd">Get-Help commande -Full</span><span class="desc">Aide complète sur une commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Command *service*</span><span class="desc">Chercher une commande disponible</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Member</span><span class="desc">Voir les propriétés et méthodes d'un objet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-ChildItem · gci · ls</span
+							><span class="desc">Lister le contenu (alias dir, ls)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-ChildItem -Recurse -Filter *.log</span
+							><span class="desc">Recherche récursive filtrée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Set-Location chemin · cd</span><span class="desc">Changer de dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Location · pwd</span><span class="desc">Dossier courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">New-Item -ItemType Directory nom</span><span class="desc">Créer un dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">New-Item -ItemType File nom.txt</span><span class="desc">Créer un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Copy-Item src dst -Recurse</span><span class="desc">Copier fichiers et dossiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Move-Item src dst</span><span class="desc">Déplacer ou renommer</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Remove-Item chemin -Recurse -Force</span
+							><span class="desc">Supprimer sans confirmation</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Content f.txt · cat</span><span class="desc">Afficher un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Content f.txt -Tail 20 -Wait</span
+							><span class="desc">Suivre un fichier en direct (tail -f)</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>PowerShell — pipeline &amp; objets</h2>
+						<div class="entry">
+							<span class="cmd">cmd1 | cmd2</span
+							><span class="desc">Le pipeline transmet des objets, pas du texte</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Where-Object { $_.Name -like "*.log" }</span
+							><span class="desc">Filtrer les objets</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">? { $_.Size -gt 1MB }</span><span class="desc">Alias court de Where-Object</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ForEach-Object { $_.Name }</span><span class="desc">Traiter chaque élément</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Select-Object Nom, Taille -First 10</span
+							><span class="desc">Choisir des colonnes et limiter</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Sort-Object Taille -Descending</span><span class="desc">Trier les résultats</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Measure-Object -Sum -Average</span
+							><span class="desc">Calculer somme, moyenne, total</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Group-Object Extension</span><span class="desc">Regrouper par valeur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Select-String "motif" *.txt</span><span class="desc">Équivalent de grep</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Out-File f.txt · &gt; f.txt</span
+							><span class="desc">Écrire la sortie dans un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Export-Csv f.csv -NoTypeInformation</span><span class="desc">Exporter en CSV</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ConvertTo-Json · ConvertFrom-Json</span
+							><span class="desc">Convertir depuis/vers JSON</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Format-Table -AutoSize · Format-List</span
+							><span class="desc">Mise en forme de l'affichage</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>PowerShell — système &amp; services</h2>
+						<div class="entry">
+							<span class="cmd">Get-Process · ps</span><span class="desc">Lister les processus</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Process | Sort CPU -Desc | Select -First 5</span
+							><span class="desc">Les 5 plus gourmands en CPU</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Stop-Process -Name nom -Force</span><span class="desc">Terminer un processus</span>
+						</div>
+						<div class="entry"><span class="cmd">Get-Service</span><span class="desc">Lister les services</span></div>
+						<div class="entry">
+							<span class="cmd">Get-Service | Where Status -eq 'Running'</span
+							><span class="desc">Services en cours d'exécution</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Start-Service nom · Stop-Service nom</span
+							><span class="desc">Démarrer / arrêter un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Restart-Service nom</span><span class="desc">Redémarrer un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Set-Service nom -StartupType Automatic</span
+							><span class="desc">Démarrage automatique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-ComputerInfo</span><span class="desc">Informations système complètes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-EventLog -LogName System -Newest 20</span
+							><span class="desc">Derniers événements système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-WinEvent -LogName Application -MaxEvents 20</span
+							><span class="desc">Journal applicatif (moderne)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Volume · Get-Disk</span><span class="desc">Volumes et disques</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-ScheduledTask</span><span class="desc">Tâches planifiées</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>PowerShell — réseau</h2>
+						<div class="entry">
+							<span class="cmd">Get-NetIPAddress</span><span class="desc">Adresses IP des interfaces</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-NetIPConfiguration</span><span class="desc">Configuration réseau complète</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Test-NetConnection host</span
+							><span class="desc">Tester la connectivité (ping moderne)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Test-NetConnection host -Port 443</span
+							><span class="desc">Tester l'ouverture d'un port</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Resolve-DnsName domaine</span><span class="desc">Résolution DNS</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-NetTCPConnection -State Listen</span><span class="desc">Ports en écoute</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Invoke-WebRequest url</span><span class="desc">Requête HTTP (équivalent curl)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Invoke-RestMethod url</span
+							><span class="desc">Requête d'API, réponse déjà décodée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Invoke-RestMethod url -Method Post -Body $j</span
+							><span class="desc">Appel d'API avec corps</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Start-BitsTransfer -Source url -Destination f</span
+							><span class="desc">Téléchargement avec reprise</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Clear-DnsClientCache</span><span class="desc">Vider le cache DNS</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>PowerShell — scripting</h2>
+						<div class="entry">
+							<span class="cmd">$var = "valeur"</span><span class="desc">Déclarer une variable</span>
+						</div>
+						<div class="entry"><span class="cmd">$tableau = @(1, 2, 3)</span><span class="desc">Tableau</span></div>
+						<div class="entry">
+							<span class="cmd">$hash = @{ cle = "valeur" }</span><span class="desc">Table de hachage</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">if ($a -eq $b) { } else { }</span
+							><span class="desc">Condition (-ne -lt -gt -le -ge)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">-match · -like · -contains</span
+							><span class="desc">Comparaisons motif / appartenance</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">foreach ($x in $liste) { }</span><span class="desc">Boucle sur une collection</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">for ($i=0; $i -lt 10; $i++) { }</span><span class="desc">Boucle comptée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">while ($cond) { }</span><span class="desc">Boucle conditionnelle</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">function Nom { param($a) ... }</span
+							><span class="desc">Définir une fonction avec paramètres</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">try { } catch { $_.Exception.Message }</span
+							><span class="desc">Gestion des erreurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">param($Chemin, [switch]$Force)</span><span class="desc">Paramètres d'un script</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Write-Host · Write-Output</span
+							><span class="desc">Afficher à l'écran / envoyer au pipeline</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">$PSVersionTable</span><span class="desc">Version de PowerShell installée</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>PowerShell — exécution &amp; modules</h2>
+						<div class="entry">
+							<span class="cmd">Get-ExecutionPolicy</span
+							><span class="desc">Voir la politique d'exécution des scripts</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</span
+							><span class="desc">Autoriser les scripts locaux</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.\script.ps1</span><span class="desc">Exécuter un script du dossier courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">powershell -File script.ps1</span><span class="desc">Lancer un script depuis cmd</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-Module -ListAvailable</span><span class="desc">Modules installés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Install-Module nom -Scope CurrentUser</span
+							><span class="desc">Installer un module</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Import-Module nom</span><span class="desc">Charger un module</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Get-PSDrive</span><span class="desc">Lecteurs et espaces de noms disponibles</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">$PROFILE</span
+							><span class="desc">Chemin du profil PowerShell (équivalent .bashrc)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Start-Transcript · Stop-Transcript</span
+							><span class="desc">Enregistrer la session dans un fichier</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento Windows</span>
+			</div>
+		</div>
+</body>
+</html>

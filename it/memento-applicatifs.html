@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Mémento Dev & Applicatifs</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/memento.css">
+<script src="../assets/js/memento.js" defer></script>
+</head>
+<body class="dense">
+<nav class="topbar wide" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Dev &amp; Applicatifs</li></ol></nav>
+<header class="toolbar"><h1>Mémento Dev & Applicatifs</h1></header>
+		<div class="sheet" id="sheet1" data-face="Recto — page 1" data-cols="5">
+			<div class="doc-title">
+				<span class="doc-name">Mémento Dev & Applicatifs</span><span class="doc-sub">Recto</span>
+			</div>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Git &amp; GitHub</span
+					><span class="sub-desc">dépôts · commits · branches · historique</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>git — initialiser & configurer</h2>
+						<div class="entry"><span class="cmd">git init</span><span class="desc">Initialiser un dépôt Git</span></div>
+						<div class="entry"><span class="cmd">git clone url</span><span class="desc">Cloner un dépôt</span></div>
+						<div class="entry">
+							<span class="cmd">git clone url -b branch</span><span class="desc">Cloner une branche spécifique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git config --global user.name "Nom"</span
+							><span class="desc">Configurer le nom d'utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git config --global user.email "mail"</span
+							><span class="desc">Configurer l'adresse email</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>git — suivre les changements</h2>
+						<div class="entry">
+							<span class="cmd">git status</span><span class="desc">Afficher le statut du dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git add fichier</span><span class="desc">Ajouter un fichier au staging</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git add .</span><span class="desc">Ajouter tous les changements</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git commit -m "message"</span><span class="desc">Valider avec un message</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git commit -am "message"</span
+							><span class="desc">Valider les fichiers suivis, sans add</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>git — synchroniser</h2>
+						<div class="entry">
+							<span class="cmd">git push</span><span class="desc">Envoyer les commits vers le distant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git push -u origin branch</span><span class="desc">Envoyer et suivre une branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git push origin --delete branch</span
+							><span class="desc">Supprimer une branche distante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git pull</span><span class="desc">Récupérer et fusionner les changements distants</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git fetch</span><span class="desc">Récupérer sans fusionner</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>git — branches</h2>
+						<div class="entry">
+							<span class="cmd">git branch</span><span class="desc">Lister les branches locales</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git branch -a</span><span class="desc">Lister toutes les branches</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git branch nom</span><span class="desc">Créer une nouvelle branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git checkout branch</span><span class="desc">Changer de branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git checkout -b branch</span><span class="desc">Créer et changer de branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git merge branch</span><span class="desc">Fusionner une branche dans la courante</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>git — historique & divers</h2>
+						<div class="entry">
+							<span class="cmd">git log · git log --oneline</span
+							><span class="desc">Historique des commits, complet / condensé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git log --graph --all</span
+							><span class="desc">Historique visuel avec les branches</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git diff · git diff --cached</span
+							><span class="desc">Différences non indexées / indexées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git reset fichier</span><span class="desc">Retirer un fichier du staging</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git reset --hard</span><span class="desc">Annuler tous les changements</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git revert commit</span><span class="desc">Créer un commit qui annule un autre</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git tag v1.0</span><span class="desc">Créer un tag / une release</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git stash · git stash pop</span
+							><span class="desc">Mettre de côté / récupérer les changements</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>git — avancé</h2>
+						<div class="entry">
+							<span class="cmd">git remote add origin url</span
+							><span class="desc">Lier le dépôt à une origine distante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git remote -v</span><span class="desc">Afficher les dépôts distants</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git rebase branch</span><span class="desc">Rejouer les commits sur une autre base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git cherry-pick commit</span
+							><span class="desc">Appliquer un commit précis sur la branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git clone --depth 1 url</span><span class="desc">Cloner sans historique (rapide)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">echo "node_modules/" &gt;&gt; .gitignore</span
+							><span class="desc">Ignorer des fichiers/dossiers</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">git blame fichier</span><span class="desc">Voir qui a modifié chaque ligne</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Docker</span><span class="sub-desc">conteneurs · images · compose · nettoyage</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>docker — lancer un conteneur</h2>
+						<div class="entry">
+							<span class="cmd">docker run -d image</span><span class="desc">Lancer un conteneur en arrière-plan</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker run -it image bash</span
+							><span class="desc">Lancer en interactif, avec un shell</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker run -p 80:8080 image</span
+							><span class="desc">Mapper les ports (host : conteneur)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker run -v /host:/cont image</span><span class="desc">Monter un volume</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker run -e VAR=val image</span
+							><span class="desc">Définir une variable d'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker run --name nom image</span><span class="desc">Nommer le conteneur</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>docker — inspecter</h2>
+						<div class="entry">
+							<span class="cmd">docker ps · docker ps -a</span
+							><span class="desc">Conteneurs actifs / tous les conteneurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker images</span><span class="desc">Lister les images locales</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker logs -f id</span><span class="desc">Suivre les logs en temps réel</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker inspect id</span><span class="desc">Afficher les détails d'un conteneur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker stats</span><span class="desc">Monitoring des ressources en temps réel</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>docker — construire & gérer</h2>
+						<div class="entry">
+							<span class="cmd">docker build -t nom:tag .</span
+							><span class="desc">Construire une image depuis un Dockerfile</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker pull image · docker push image</span
+							><span class="desc">Télécharger / envoyer une image</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker exec -it id bash</span
+							><span class="desc">Exécuter un bash dans un conteneur actif</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker stop id · docker start id</span
+							><span class="desc">Arrêter / redémarrer un conteneur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker rm id · docker rm -f id</span
+							><span class="desc">Supprimer un conteneur (forcé)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker rmi image</span><span class="desc">Supprimer une image</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker tag ancien:tag nouveau:tag</span><span class="desc">Créer un alias d'image</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>docker-compose</h2>
+						<div class="entry">
+							<span class="cmd">docker-compose up · up -d</span
+							><span class="desc">Démarrer les services (détaché)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose down</span><span class="desc">Arrêter et supprimer les conteneurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose ps</span><span class="desc">Lister les services du compose</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose logs -f svc</span><span class="desc">Suivre les logs d'un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose exec svc bash</span
+							><span class="desc">Exécuter une commande dans un service</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose build · pull</span
+							><span class="desc">Construire / télécharger les images</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose restart · stop · start</span
+							><span class="desc">Contrôler les services</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose config</span
+							><span class="desc">Valider le fichier docker-compose.yml</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>docker — nettoyage & orphelins</h2>
+						<div class="entry">
+							<span class="cmd">docker container prune</span><span class="desc">Supprimer les conteneurs arrêtés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker image prune · prune -a</span
+							><span class="desc">Supprimer les images non utilisées / toutes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker volume prune · network prune</span
+							><span class="desc">Supprimer volumes / réseaux inutilisés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker system prune -a</span><span class="desc">Nettoyage général agressif</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose down -v</span><span class="desc">Down + suppression des volumes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose rm --remove-orphans</span
+							><span class="desc">Supprimer les conteneurs orphelins</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker rm $(docker ps -aq)</span><span class="desc">Supprimer TOUS les conteneurs</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker rmi $(docker images -q)</span
+							><span class="desc">Supprimer TOUTES les images</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>docker — volumes & réseaux</h2>
+						<div class="entry">
+							<span class="cmd">docker volume ls · create nom</span><span class="desc">Lister / créer un volume</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker volume rm nom</span><span class="desc">Supprimer un volume</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker network ls · create nom</span><span class="desc">Lister / créer un réseau</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker network connect net id</span
+							><span class="desc">Connecter un conteneur à un réseau</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker cp id:/chemin ./local</span
+							><span class="desc">Copier un fichier depuis un conteneur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker save image &gt; f.tar</span
+							><span class="desc">Exporter une image en fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker load &lt; f.tar</span
+							><span class="desc">Importer une image depuis un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">docker-compose up -d --build</span><span class="desc">Reconstruire puis démarrer</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">GitHub Actions &amp; gh CLI</span
+					><span class="sub-desc">workflows · jobs · étapes · pull requests</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>GitHub Actions — structure</h2>
+						<div class="entry">
+							<span class="cmd">.github/workflows/ci.yml</span
+							><span class="desc">Emplacement des workflows dans le dépôt</span>
+						</div>
+						<div class="entry"><span class="cmd">name: CI</span><span class="desc">Nom affiché du workflow</span></div>
+						<div class="entry">
+							<span class="cmd">on: [push, pull_request]</span><span class="desc">Déclencheurs du workflow</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">on: push: branches: [main]</span><span class="desc">Limiter à une branche</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">on: schedule: - cron: '0 2 * * *'</span><span class="desc">Exécution planifiée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">on: workflow_dispatch</span
+							><span class="desc">Déclenchement manuel depuis l'interface</span>
+						</div>
+						<div class="entry"><span class="cmd">jobs:</span><span class="desc">Bloc contenant les tâches</span></div>
+						<div class="entry">
+							<span class="cmd">runs-on: ubuntu-latest</span
+							><span class="desc">Machine d'exécution (windows/macos-latest)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">steps:</span><span class="desc">Liste ordonnée des étapes du job</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">needs: build</span><span class="desc">Attendre qu'un autre job réussisse</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">strategy: matrix: node: [18, 20]</span
+							><span class="desc">Tester plusieurs versions en parallèle</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>GitHub Actions — étapes courantes</h2>
+						<div class="entry">
+							<span class="cmd">uses: actions/checkout@v4</span><span class="desc">Récupérer le code du dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">uses: actions/setup-node@v4</span><span class="desc">Installer Node.js</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">uses: actions/setup-python@v5</span><span class="desc">Installer Python</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">run: npm ci &amp;&amp; npm test</span
+							><span class="desc">Exécuter des commandes shell</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">run: |</span><span class="desc">Bloc multi-lignes de commandes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">with: node-version: 20</span><span class="desc">Paramètres passés à une action</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">env: NODE_ENV: production</span><span class="desc">Variables d'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">if: github.ref == 'refs/heads/main'</span><span class="desc">Étape conditionnelle</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">uses: actions/upload-artifact@v4</span
+							><span class="desc">Publier un artefact de build</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">uses: actions/cache@v4</span><span class="desc">Mettre en cache les dépendances</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">${{ secrets.MON_TOKEN }}</span><span class="desc">Utiliser un secret du dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">${{ github.sha }} · github.actor</span><span class="desc">Variables de contexte</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>GitHub — CLI &amp; dépôt</h2>
+						<div class="entry">
+							<span class="cmd">gh auth login</span><span class="desc">S'authentifier auprès de GitHub</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh repo clone user/repo</span><span class="desc">Cloner un dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh repo create nom --public</span><span class="desc">Créer un dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh pr create --fill</span><span class="desc">Ouvrir une pull request</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh pr list · gh pr checkout 42</span><span class="desc">Lister / récupérer une PR</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh pr merge --squash</span><span class="desc">Fusionner une PR</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh issue create · gh issue list</span><span class="desc">Gérer les tickets</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh run list · gh run watch</span
+							><span class="desc">Suivre les exécutions de workflows</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh run view --log-failed</span><span class="desc">Voir les logs d'un job en échec</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh secret set NOM</span><span class="desc">Définir un secret du dépôt</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gh release create v1.0</span><span class="desc">Publier une release</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento Dev & Applicatifs</span>
+			</div>
+		</div>
+		
+		<div class="sheet" id="sheet2" data-face="Verso — page 2" data-cols="5">
+			<div class="doc-title">
+				<span class="doc-name">Mémento Dev & Applicatifs</span><span class="doc-sub">Verso</span>
+			</div>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Bases de données</span><span class="sub-desc">MySQL · MariaDB · SQLite · SQL</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>MySQL / MariaDB — connexion</h2>
+						<div class="entry">
+							<span class="cmd">mysql -u user -p</span><span class="desc">Se connecter (mot de passe demandé)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysql -u user -p base</span
+							><span class="desc">Se connecter directement à une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysql -h serveur -P 3306 -u user -p</span
+							><span class="desc">Connexion à un serveur distant</span>
+						</div>
+						<div class="entry"><span class="cmd">SHOW DATABASES;</span><span class="desc">Lister les bases</span></div>
+						<div class="entry"><span class="cmd">USE base;</span><span class="desc">Sélectionner une base</span></div>
+						<div class="entry"><span class="cmd">SHOW TABLES;</span><span class="desc">Lister les tables</span></div>
+						<div class="entry">
+							<span class="cmd">DESCRIBE table; · SHOW COLUMNS FROM t;</span
+							><span class="desc">Structure d'une table</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SHOW CREATE TABLE t;</span><span class="desc">Script de création de la table</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SHOW PROCESSLIST;</span><span class="desc">Requêtes en cours d'exécution</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">STATUS;</span><span class="desc">Infos sur la connexion et le serveur</span>
+						</div>
+						<div class="entry"><span class="cmd">exit · \q</span><span class="desc">Quitter le client</span></div>
+					</div>
+					<div class="group">
+						<h2>MySQL / MariaDB — administration</h2>
+						<div class="entry">
+							<span class="cmd">CREATE DATABASE base CHARACTER SET utf8mb4;</span
+							><span class="desc">Créer une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">DROP DATABASE base;</span><span class="desc">Supprimer une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">CREATE USER 'u'@'localhost' IDENTIFIED BY 'mdp';</span
+							><span class="desc">Créer un utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">GRANT ALL ON base.* TO 'u'@'localhost';</span
+							><span class="desc">Donner les droits sur une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">GRANT SELECT, INSERT ON base.* TO 'u'@'%';</span
+							><span class="desc">Droits limités, depuis tout hôte</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">REVOKE ALL ON base.* FROM 'u'@'localhost';</span
+							><span class="desc">Retirer les droits</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">FLUSH PRIVILEGES;</span><span class="desc">Recharger la table des droits</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SHOW GRANTS FOR 'u'@'localhost';</span
+							><span class="desc">Voir les droits d'un utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ALTER USER 'u'@'localhost' IDENTIFIED BY 'nv';</span
+							><span class="desc">Changer un mot de passe</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">DROP USER 'u'@'localhost';</span><span class="desc">Supprimer un utilisateur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">systemctl status mariadb · mysql</span><span class="desc">État du service</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>MySQL / MariaDB — sauvegarde</h2>
+						<div class="entry">
+							<span class="cmd">mysqldump -u user -p base &gt; sauv.sql</span
+							><span class="desc">Sauvegarder une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysqldump -u user -p --all-databases &gt; all.sql</span
+							><span class="desc">Sauvegarder tout le serveur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysqldump -u user -p base table &gt; t.sql</span
+							><span class="desc">Sauvegarder une seule table</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysqldump --no-data base &gt; schema.sql</span
+							><span class="desc">Structure seule, sans les données</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysql -u user -p base &lt; sauv.sql</span
+							><span class="desc">Restaurer une sauvegarde</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysqldump ... | gzip &gt; sauv.sql.gz</span
+							><span class="desc">Sauvegarde compressée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">gunzip &lt; sauv.sql.gz | mysql -u user -p base</span
+							><span class="desc">Restaurer depuis une archive</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SOURCE /chemin/fichier.sql;</span
+							><span class="desc">Exécuter un script depuis le client</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">mysqlcheck -u user -p --auto-repair base</span
+							><span class="desc">Vérifier et réparer les tables</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>SQLite</h2>
+						<div class="entry">
+							<span class="cmd">sqlite3 base.db</span><span class="desc">Ouvrir (ou créer) une base</span>
+						</div>
+						<div class="entry"><span class="cmd">.tables</span><span class="desc">Lister les tables</span></div>
+						<div class="entry">
+							<span class="cmd">.schema table</span><span class="desc">Structure d'une table</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.headers on · .mode column</span
+							><span class="desc">Affichage lisible des résultats</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.mode csv · .output f.csv</span><span class="desc">Exporter les résultats en CSV</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.import f.csv table</span><span class="desc">Importer un CSV dans une table</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.dump &gt; sauvegarde.sql</span><span class="desc">Exporter toute la base en SQL</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">sqlite3 base.db &lt; sauvegarde.sql</span><span class="desc">Restaurer une base</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.backup sauv.db</span><span class="desc">Sauvegarde binaire à chaud</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.read script.sql</span><span class="desc">Exécuter un script SQL</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">.databases · .indexes</span><span class="desc">Bases attachées · index</span>
+						</div>
+						<div class="entry"><span class="cmd">.quit</span><span class="desc">Quitter</span></div>
+						<div class="entry">
+							<span class="cmd">sqlite3 base.db "SELECT * FROM t;"</span
+							><span class="desc">Requête directe depuis le shell</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>SQL — requêtes de base</h2>
+						<div class="entry">
+							<span class="cmd">SELECT * FROM table LIMIT 10;</span><span class="desc">Voir les premières lignes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SELECT col1, col2 FROM t WHERE cond;</span><span class="desc">Sélection filtrée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">WHERE col LIKE '%motif%'</span><span class="desc">Filtrer par motif</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ORDER BY col DESC</span><span class="desc">Trier les résultats</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">INSERT INTO t (a,b) VALUES (1,'x');</span><span class="desc">Insérer une ligne</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">UPDATE t SET a=1 WHERE id=2;</span><span class="desc">Modifier des lignes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">DELETE FROM t WHERE id=2;</span><span class="desc">Supprimer des lignes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SELECT count(*) FROM t;</span><span class="desc">Compter les lignes</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SELECT a, count(*) FROM t GROUP BY a;</span><span class="desc">Agréger par valeur</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">SELECT * FROM a JOIN b ON a.id=b.a_id;</span
+							><span class="desc">Jointure entre deux tables</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">LEFT JOIN · INNER JOIN</span><span class="desc">Types de jointures</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">CREATE INDEX idx ON t(col);</span><span class="desc">Créer un index</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">EXPLAIN SELECT ...;</span><span class="desc">Analyser le plan d'exécution</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">BEGIN; · COMMIT; · ROLLBACK;</span><span class="desc">Transactions</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Node &amp; Python</span><span class="sub-desc">npm · venv · pip · dépendances</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>Node.js &amp; npm</h2>
+						<div class="entry">
+							<span class="cmd">node -v · npm -v</span><span class="desc">Versions installées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm init -y</span><span class="desc">Créer un package.json par défaut</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm install</span><span class="desc">Installer les dépendances du projet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm install paquet</span><span class="desc">Ajouter une dépendance</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm install -D paquet</span><span class="desc">Dépendance de développement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm install -g paquet</span><span class="desc">Installation globale</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm uninstall paquet</span><span class="desc">Retirer une dépendance</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm run script</span><span class="desc">Lancer un script du package.json</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm outdated · npm update</span
+							><span class="desc">Lister / mettre à jour les paquets</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npx paquet</span><span class="desc">Exécuter sans installer</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">npm audit fix</span><span class="desc">Corriger les vulnérabilités connues</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">rm -rf node_modules &amp;&amp; npm ci</span
+							><span class="desc">Réinstallation propre depuis le lock</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Python &amp; environnements</h2>
+						<div class="entry">
+							<span class="cmd">python3 -m venv .venv</span><span class="desc">Créer un environnement virtuel</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">source .venv/bin/activate</span><span class="desc">Activer l'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">deactivate</span><span class="desc">Sortir de l'environnement</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pip install paquet</span><span class="desc">Installer un paquet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pip install -r requirements.txt</span
+							><span class="desc">Installer depuis un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pip freeze &gt; requirements.txt</span
+							><span class="desc">Figer les versions installées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pip list · pip show paquet</span
+							><span class="desc">Lister / détailler les paquets</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">pip install --upgrade paquet</span><span class="desc">Mettre à jour un paquet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">python3 -m http.server 8000</span
+							><span class="desc">Serveur web instantané dans le dossier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">python3 -m json.tool f.json</span><span class="desc">Formater/valider du JSON</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">API &amp; JSON</span><span class="sub-desc">curl · jq · requêtes HTTP</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>curl — requêtes HTTP</h2>
+						<div class="entry"><span class="cmd">curl url</span><span class="desc">Requête GET simple</span></div>
+						<div class="entry">
+							<span class="cmd">curl -i url</span><span class="desc">Afficher aussi les en-têtes de réponse</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -I url</span><span class="desc">En-têtes seulement (HEAD)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -L url</span><span class="desc">Suivre les redirections</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -o fichier url</span><span class="desc">Enregistrer dans un fichier</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -X POST url</span><span class="desc">Choisir la méthode HTTP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -H "Content-Type: application/json"</span
+							><span class="desc">Ajouter un en-tête</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -d '{"a":1}' url</span><span class="desc">Envoyer un corps de requête</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -u user:mdp url</span><span class="desc">Authentification basique</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -s url | jq .</span><span class="desc">Sortie silencieuse, formatée par jq</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -w "%{http_code}" -o /dev/null -s url</span
+							><span class="desc">Récupérer juste le code HTTP</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Codes HTTP à connaître</h2>
+						<div class="entry">
+							<span class="cmd">200 OK · 201 Created</span><span class="desc">Succès · ressource créée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">204 No Content</span><span class="desc">Succès, aucun corps renvoyé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">301 · 302</span><span class="desc">Redirection permanente · temporaire</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">400 Bad Request</span><span class="desc">Requête mal formée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">401 · 403</span><span class="desc">Non authentifié · authentifié mais interdit</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">404 Not Found</span><span class="desc">Ressource inexistante</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">409 Conflict</span><span class="desc">Conflit avec l'état actuel</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">422</span><span class="desc">Données valides en forme mais refusées</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">429 Too Many Requests</span><span class="desc">Quota / limitation dépassée</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">500 · 502 · 503</span
+							><span class="desc">Erreur serveur · passerelle · indisponible</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Autres outils réseau</h2>
+						<div class="entry">
+							<span class="cmd">http GET url</span><span class="desc">HTTPie : syntaxe plus lisible que curl</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wget -c url</span><span class="desc">Téléchargement avec reprise</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">wget -r -np url</span
+							><span class="desc">Aspirer un site (récursif, sans remonter)</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">nc -zv host 443</span><span class="desc">Tester l'ouverture d'un port</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">openssl s_client -connect host:443</span
+							><span class="desc">Inspecter un certificat TLS</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">dig +short domaine</span><span class="desc">Résolution DNS concise</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ssh -L 8080:localhost:80 user@host</span><span class="desc">Tunnel SSH local</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>jq — manipuler du JSON</h2>
+						<div class="entry">
+							<span class="cmd">jq . fichier.json</span><span class="desc">Afficher formaté et coloré</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jq '.cle' fichier.json</span><span class="desc">Extraire une clé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jq '.tableau[]' f.json</span><span class="desc">Parcourir un tableau</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jq '.[] | .nom' f.json</span
+							><span class="desc">Extraire un champ de chaque élément</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jq -r '.cle'</span><span class="desc">Sortie brute, sans guillemets</span>
+						</div>
+						<div class="entry"><span class="cmd">jq 'length'</span><span class="desc">Nombre d'éléments</span></div>
+						<div class="entry">
+							<span class="cmd">jq 'select(.age &gt; 30)'</span><span class="desc">Filtrer selon une condition</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">jq -s '.' f1.json f2.json</span><span class="desc">Fusionner plusieurs fichiers</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="cat">
+				<div class="subbanner">
+					<span class="sub-title">Claude &amp; MCP</span
+					><span class="sub-desc">CLI · API · serveurs MCP · configuration</span>
+				</div>
+				<div class="mc">
+					<div class="group">
+						<h2>MCP — Model Context Protocol</h2>
+						<div class="entry">
+							<span class="cmd">npx mcp create-server</span><span class="desc">Créer son propre serveur MCP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">~/.config/Claude/claude_desktop_config.json</span
+							><span class="desc">Fichier de configuration MCP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">Claude Desktop → Settings → Features</span
+							><span class="desc">Ajouter un serveur MCP</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude mcp add nom</span
+							><span class="desc">Ajouter un serveur MCP via Claude Code</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude mcp list</span><span class="desc">Lister les serveurs MCP configurés</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude mcp remove nom</span><span class="desc">Retirer un serveur MCP</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Claude Code (CLI)</h2>
+						<div class="entry">
+							<span class="cmd">npm install -g @anthropic-ai/claude-code</span
+							><span class="desc">Installer Claude Code</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code</span><span class="desc">Lancer l'interface en ligne de commande</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code --help</span><span class="desc">Voir les options disponibles</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code --model opus</span><span class="desc">Spécifier le modèle utilisé</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code /chemin</span><span class="desc">Analyser un fichier ou un projet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code --continue · -c</span
+							><span class="desc">Reprendre la dernière session</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude-code --resume</span><span class="desc">Choisir une session à reprendre</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/clear</span><span class="desc">Effacer le contexte de la conversation</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/compact</span><span class="desc">Résumer et compresser le contexte</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Claude API</h2>
+						<div class="entry">
+							<span class="cmd">export ANTHROPIC_API_KEY=sk-...</span><span class="desc">Définir la clé API</span>
+						</div>
+						<div class="entry"><span class="cmd">pip install anthropic</span><span class="desc">SDK Python</span></div>
+						<div class="entry">
+							<span class="cmd">npm install @anthropic-ai/sdk</span><span class="desc">SDK Node.js</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">curl -X POST api.anthropic.com/v1/messages</span
+							><span class="desc">Appel direct à l'API</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">max_tokens: 4096</span><span class="desc">Limiter la taille de la réponse</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">model: claude-opus-4-1</span
+							><span class="desc">Spécifier le modèle dans la requête</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">system: "..."</span><span class="desc">Définir l'instruction système</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">stream: true</span><span class="desc">Activer le streaming de la réponse</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">temperature: 0.7</span><span class="desc">Ajuster la créativité de la réponse</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Claude Code — commandes slash</h2>
+						<div class="entry">
+							<span class="cmd">/help</span><span class="desc">Afficher l'aide et les commandes disponibles</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/init</span><span class="desc">Générer un fichier CLAUDE.md pour le projet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/model</span><span class="desc">Changer de modèle en cours de session</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/permissions</span><span class="desc">Gérer les autorisations d'outils</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/review</span><span class="desc">Demander une revue du code courant</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/bug</span><span class="desc">Signaler un problème à Anthropic</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">/cost</span><span class="desc">Afficher le coût de la session en cours</span>
+						</div>
+					</div>
+					<div class="group">
+						<h2>Claude Code — configuration</h2>
+						<div class="entry">
+							<span class="cmd">CLAUDE.md</span><span class="desc">Fichier de contexte/instructions du projet</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">~/.claude/settings.json</span
+							><span class="desc">Préférences globales de Claude Code</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude config set nom valeur</span
+							><span class="desc">Définir un paramètre de configuration</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">claude config get nom</span><span class="desc">Lire un paramètre de configuration</span>
+						</div>
+						<div class="entry">
+							<span class="cmd">ANTHROPIC_MODEL</span
+							><span class="desc">Variable d'env. pour le modèle par défaut</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="credits">
+				<span><b>bil150</b> — CC BY-NC-SA 4.0 — 2026</span><span>Mémento Dev & Applicatifs</span>
+			</div>
+		</div>
+</body>
+</html>
