@@ -1,0 +1,122 @@
+/* Base commune à toutes les pages : variables, reset, mise en page, composants.
+   Minimaliste et neutre. Les feuilles imprimables sont dans memento.css,
+   les styles propres à une page dans assets/css/pages/. */
+
+:root {
+  --paper: #FAFAF8;
+  --paper-2: #FFFFFF;
+  --ink: #14213D;
+  --muted: #5F6980;
+  --line: #DADDE3;
+  --accent: #C8372D;
+  --hi: #FFF1B0;
+  --good: #17794A;
+  --good-bg: #E6F4EC;
+  --bad: #B3261E;
+  --bad-bg: #FBE9E7;
+  --body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0F141D;
+    --paper-2: #171E2B;
+    --ink: #E8ECF4;
+    --muted: #9AA5BC;
+    --line: #2A3445;
+    --accent: #FF7366;
+    --hi: #3A3517;
+    --good: #6FD6A0;
+    --good-bg: #12352A;
+    --bad: #FF8F86;
+    --bad-bg: #3D1B1A;
+    color-scheme: dark;
+  }
+}
+
+/* Reset */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.5 var(--body);
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px));
+}
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* Mise en page */
+.wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+.topbar { padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 2px 8px; }
+.crumbs li { color: var(--ink); font-weight: 600; }
+.crumbs li + li::before { content: "/"; margin-right: 8px; color: var(--muted); font-weight: 400; }
+.crumbs a { color: var(--muted); font-weight: 500; text-decoration: none; }
+.crumbs a:hover { color: var(--ink); text-decoration: underline; }
+
+.eyebrow { font-size: 14px; color: var(--muted); }
+.title { font: 600 clamp(28px, 7vw, 36px)/1.15 var(--body); text-wrap: balance; }
+.sub { color: var(--muted); max-width: 54ch; }
+.muted { color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); }
+
+/* Liste de liens (pages d'accueil) */
+.tiles { display: flex; flex-direction: column; gap: 12px; }
+.tile {
+  display: grid; gap: 4px; padding: 18px 20px; text-decoration: none; color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: 8px;
+}
+a.tile:hover { border-color: var(--ink); }
+.tile.soon { color: var(--muted); border-style: dashed; }
+.tile-name { font-size: 20px; font-weight: 600; }
+.tile-desc { color: var(--muted); }
+
+/* Boutons */
+.btn {
+  font: 500 14px/1 var(--body);
+  border: 1px solid var(--ink); border-radius: 6px;
+  min-height: 44px; padding: 0 16px; background: var(--ink); color: var(--paper);
+}
+.btn:hover:not(:disabled) { opacity: .88; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.ghost { background: var(--paper-2); color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover:not(:disabled) { opacity: 1; border-color: var(--ink); }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--paper-2); max-width: 100%; }
+.seg button {
+  border: 0; border-right: 1px solid var(--line); background: transparent;
+  padding: 0 14px; min-height: 44px; font: 500 14px/1 var(--body);
+}
+.seg button:last-child { border-right: 0; }
+.seg button:hover { background: var(--hi); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 180px; }
+.field label { font-size: 13px; color: var(--muted); }
+select, input[type="text"] {
+  min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--paper-2); width: 100%; text-overflow: ellipsis;
+}
+
+/* Panneau et messages */
+.card {
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 20px; display: flex; flex-direction: column; gap: 20px; min-width: 0;
+}
+.card h2 { font: 600 18px/1.3 var(--body); text-wrap: balance; }
+
+.notice { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); font-size: 14px; }
+.err { padding: 10px 12px; border: 1px solid var(--bad); border-radius: 6px; background: var(--bad-bg); color: var(--bad); font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

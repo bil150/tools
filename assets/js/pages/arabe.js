@@ -1,396 +1,3 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Syllabes arabes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,700..900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;700&display=swap">
-<style>
-/* Tools — feuille de style commune
-   Idée : un cahier d'écolier français. Papier réglé, marge rouge, encre bleu nuit, surligneur jaune.
-   Chaque page ajoute son propre <style> pour ce qui lui est propre. */
-
-:root {
-  --paper: #FAFAF6;
-  --paper-2: #FFFFFF;
-  --ink: #14213D;
-  --muted: #566178;
-  --rule: #D3E3F1;
-  --grid: #86B5DC;
-  --margin: #E59A9A;
-  --red: #D6362D;
-  --hi: #FFE45E;
-  --hi-ink: #14213D;
-  --lv-hi: #C42B22;
-  --shadow: #14213D;
-  --good: #17794A;
-  --good-bg: #DDF3E7;
-  --bad: #B3261E;
-  --bad-bg: #FBE1DE;
-  --step: 32px;
-  --display: 'Archivo', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
-  --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
-  --ar: 'Noto Naskh Arabic', 'Geeza Pro', 'Traditional Arabic', Tahoma, serif;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0F141D;
-    --paper-2: #171E2B;
-    --ink: #E8ECF4;
-    --muted: #9AA5BC;
-    --rule: #192332;
-    --grid: #3C5F88;
-    --margin: #6A3036;
-    --red: #FF7366;
-    --hi: #F0D44A;
-    --hi-ink: #14213D;
-    --lv-hi: #B3261E;
-    --shadow: #000000;
-    --good: #6FD6A0;
-    --good-bg: #12352A;
-    --bad: #FF8F86;
-    --bad-bg: #3D1B1A;
-    color-scheme: dark;
-  }
-}
-
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-
-/* Papier réglé : une ligne bleue tous les 32 px, une marge rouge à gauche du contenu */
-body {
-  margin: 0;
-  min-height: 100vh;
-  background-color: var(--paper);
-  background-image: linear-gradient(to bottom, transparent calc(var(--step) - 1px), var(--rule) calc(var(--step) - 1px));
-  background-size: 100% var(--step);
-  color: var(--ink);
-  font: 400 16px/1.5 var(--body);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px 56px;
-}
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: calc(50% - min(340px, 50% - 16px) - 10px);
-  width: 1.5px;
-  background: var(--margin);
-  pointer-events: none;
-}
-
-.wrap { position: relative; max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
-
-button, input, select { font: inherit; color: inherit; }
-button { cursor: pointer; }
-:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
-[hidden] { display: none !important; }
-
-/* Barre du haut */
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); }
-.mark {
-  font: 700 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
-  background: var(--ink); color: var(--paper); padding: 8px 10px; text-decoration: none;
-}
-a.mark:hover { background: var(--red); }
-.crumb { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-
-/* Titres */
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.title {
-  margin: 0; font: 900 clamp(34px, 10vw, 56px)/1.02 var(--display); font-stretch: 125%;
-  letter-spacing: -.01em; text-wrap: balance;
-}
-.hl { background: linear-gradient(transparent 58%, var(--hi) 58%, var(--hi) 92%, transparent 92%); padding: 0 .06em; }
-.sub { margin: 0; color: var(--muted); max-width: 54ch; line-height: var(--step); }
-
-/* Boutons */
-.ghost, .primary {
-  font: 600 13px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
-  border: 1.5px solid var(--ink); border-radius: 0;
-  min-height: 44px; padding: 0 16px; background: var(--paper-2); color: var(--ink);
-}
-.ghost:hover:not(:disabled) { background: var(--hi); color: var(--hi-ink); }
-.ghost:disabled { opacity: .4; cursor: default; }
-.primary { background: var(--ink); color: var(--paper); min-height: 48px; }
-.primary:hover:not(:disabled) { background: var(--red); border-color: var(--red); color: var(--paper); }
-
-.seg { display: inline-flex; border: 1.5px solid var(--ink); background: var(--paper-2); max-width: 100%; }
-.seg button {
-  border: 0; border-right: 1.5px solid var(--ink); background: transparent; color: var(--ink);
-  padding: 0 12px; min-height: 44px; font: 600 13px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
-}
-.seg button:last-child { border-right: 0; }
-.seg button:hover { background: var(--hi); color: var(--hi-ink); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-
-.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 180px; }
-.field label { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.field select { min-height: 44px; padding: 0 10px; border: 1.5px solid var(--ink); border-radius: 0; background: var(--paper-2); width: 100%; text-overflow: ellipsis; }
-
-/* Panneau */
-.card {
-  background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 0; box-shadow: 5px 5px 0 var(--shadow);
-  padding: 20px; display: flex; flex-direction: column; gap: 20px; min-width: 0;
-}
-.card h2 { margin: 0; font: 800 20px/1.2 var(--display); font-stretch: 112%; text-wrap: balance; }
-
-/* Messages */
-.notice { margin: 0; padding: 10px 12px; border: 1.5px dashed var(--muted); background: var(--paper-2); font-size: 14px; }
-.err { margin: 0; padding: 10px 12px; border: 1.5px solid var(--bad); background: var(--bad-bg); color: var(--bad); font-size: 14px; font-weight: 500; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
-</style>
-<style>
-/* Syllabes arabes : styles propres à la page (le reste vient de style.css) */
-.ar { font-family: var(--ar); font-weight: 500; line-height: 1.7; direction: rtl; unicode-bidi: isolate; }
-.lv { color: var(--red); }
-.head { display: flex; flex-direction: column; gap: 8px; }
-.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
-.hintline { margin: 0; color: var(--muted); font-size: 15px; }
-.muted { color: var(--muted); }
-.tr { font: 500 22px/1.2 var(--mono); }
-.dsc { color: var(--muted); font-size: 14px; }
-
-/* Fiche de la syllabe choisie : un post-it surligneur */
-.detail { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border: 1.5px solid var(--ink); background: var(--hi); color: var(--hi-ink); min-width: 0; }
-.detail .ar { font-size: 56px; line-height: 1.3; flex: none; min-width: 92px; text-align: center; }
-.detail .lv, .on .lv { color: var(--lv-hi); }
-.detail .dsc, .ahead .dsc { color: var(--hi-ink); opacity: .75; }
-.detail-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-
-/* Tableau, lu comme dans le livre : ب à droite, lignes bleues */
-.gridwrap { overflow-x: auto; }
-.grid {
-  display: grid; direction: rtl;
-  grid-template-columns: repeat(3, minmax(78px, 1fr)) 84px;
-  gap: 1.5px; background: var(--grid); border: 1.5px solid var(--grid);
-}
-.grid > * { background: var(--paper-2); min-width: 0; }
-.gh { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; }
-.gh .ar { font-size: 30px; line-height: 1.4; font-weight: 700; }
-.gh small { font: 500 12px/1 var(--mono); color: var(--muted); }
-.corner { display: grid; place-items: center; font: 500 11px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); direction: ltr; }
-.cell { border: 0; padding: 4px; min-height: 56px; display: grid; place-items: center; color: var(--ink); }
-.cell .ar { font-size: 32px; line-height: 1.5; }
-.cell.word .ar { font-size: 26px; }
-.cell:hover { background: color-mix(in srgb, var(--hi) 40%, var(--paper-2)); }
-.cell.on { background: var(--hi); color: var(--hi-ink); }
-.rowlab { direction: ltr; text-align: left; padding: 6px 8px; display: flex; flex-direction: column; justify-content: center; font-size: 12px; line-height: 1.25; }
-.rowlab b { font-weight: 600; }
-.rowlab span { color: var(--muted); }
-.row-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-
-/* Progression */
-.progress { display: flex; flex-direction: column; gap: 8px; }
-.progress-row { display: flex; justify-content: space-between; gap: 12px; font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-.bar { height: 10px; border: 1.5px solid var(--ink); background: var(--paper-2); }
-.bar > i { display: block; height: 100%; width: 0; background: var(--red); transition: width .3s ease; }
-
-/* Lecteur */
-.player { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
-.play {
-  width: 76px; height: 76px; border: 1.5px solid var(--ink); border-radius: 0; flex: none;
-  background: var(--ink); color: var(--paper); display: grid; place-items: center;
-}
-.play:hover { background: var(--red); border-color: var(--red); }
-.play:active { transform: translate(2px, 2px); }
-.play svg { width: 34px; height: 34px; fill: currentColor; }
-.wave { display: flex; align-items: center; gap: 4px; height: 40px; flex: 1 1 80px; min-width: 60px; }
-.wave i { display: block; width: 5px; height: 8px; background: var(--grid); transition: background .2s; }
-.player.speaking .wave i { background: var(--red); animation: bounce .9s ease-in-out infinite; }
-.player.speaking .wave i:nth-child(2) { animation-delay: .1s; }
-.player.speaking .wave i:nth-child(3) { animation-delay: .2s; }
-.player.speaking .wave i:nth-child(4) { animation-delay: .3s; }
-.player.speaking .wave i:nth-child(5) { animation-delay: .15s; }
-.player.speaking .wave i:nth-child(6) { animation-delay: .25s; }
-.player.speaking .wave i:nth-child(7) { animation-delay: .05s; }
-@keyframes bounce { 0%, 100% { height: 8px; } 50% { height: 36px; } }
-.side { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
-.fallback { margin: 0; font: 500 28px/1 var(--mono); }
-
-/* Questions */
-.prompt { margin: 0; font: 800 20px/1.25 var(--display); font-stretch: 112%; text-wrap: balance; }
-.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-.opt {
-  position: relative; display: grid; place-items: center;
-  border: 1.5px solid var(--ink); background: var(--paper-2); border-radius: 0;
-  padding: 10px; min-height: 84px; min-width: 0; color: var(--ink);
-}
-.opt .ar { font-size: 42px; line-height: 1.5; }
-.opt .k { position: absolute; top: 6px; left: 8px; font: 500 12px/1 var(--mono); color: var(--muted); border: 1px solid var(--grid); padding: 3px 6px; }
-.opt:hover:not(:disabled) { background: color-mix(in srgb, var(--hi) 40%, var(--paper-2)); }
-.opt.good { background: var(--good-bg); border-color: var(--good); }
-.opt.bad { background: var(--bad-bg); border-color: var(--bad); }
-.opt:disabled { cursor: default; }
-
-.feedback { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border: 1.5px solid var(--ink); }
-.feedback.good { background: var(--good-bg); border-color: var(--good); }
-.feedback.bad { background: var(--bad-bg); border-color: var(--bad); }
-.feedback p { margin: 0; }
-.verdict { font: 700 14px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-.feedback.good .verdict { color: var(--good); }
-.feedback.bad .verdict { color: var(--bad); }
-.fb-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.fb-line .ar { font-size: 38px; line-height: 1.5; }
-.next-row { display: flex; justify-content: flex-end; }
-
-/* Résultat */
-.result { gap: 16px; }
-.score-big { font: 900 56px/1 var(--display); font-stretch: 125%; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.score-big small { font-size: 24px; color: var(--muted); font-weight: 700; }
-.miss { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.miss li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border: 1.5px solid var(--grid); }
-.miss .txt { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.miss .ar { font-size: 32px; line-height: 1.5; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-
-/* Alphabet */
-.agrid { display: grid; direction: rtl; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
-.lbtn { display: flex; flex-direction: column; align-items: center; padding: 2px 2px 6px; min-height: 68px; border: 1.5px solid var(--grid); background: var(--paper-2); border-radius: 0; min-width: 0; color: var(--ink); }
-.lbtn .ar { font-size: 30px; line-height: 1.5; }
-.lbtn small { font: 500 11px/1 var(--mono); color: var(--muted); direction: ltr; }
-.lbtn:hover { border-color: var(--ink); }
-.lbtn.on { background: var(--hi); border-color: var(--ink); color: var(--hi-ink); }
-.lbtn.on small { color: var(--hi-ink); }
-.apanel { display: flex; flex-direction: column; gap: 16px; }
-.ahead { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 12px 16px; border: 1.5px solid var(--ink); background: var(--hi); color: var(--hi-ink); }
-.ahead .ar { font-size: 72px; line-height: 1.3; min-width: 92px; text-align: center; font-weight: 700; }
-.ahead .detail-txt { flex: 1 1 140px; }
-.sec { margin: 0; font: 800 14px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.forms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; direction: rtl; }
-.form { display: flex; flex-direction: column; align-items: center; padding: 4px 2px 6px; border: 1.5px solid var(--grid); direction: ltr; min-width: 0; }
-.form .ar { font-size: 34px; line-height: 1.5; }
-.form small { font: 500 11px/1 var(--mono); color: var(--muted); }
-.vgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
-.vcard { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border: 1.5px solid var(--grid); background: var(--paper-2); border-radius: 0; text-align: center; min-width: 0; color: var(--ink); }
-.vcard .ar { font-size: 38px; line-height: 1.5; }
-.vcard .tr { font-size: 16px; }
-.vcard small { color: var(--muted); font-size: 12px; line-height: 1.25; }
-.vcard:hover { border-color: var(--ink); }
-.vcard.on { border-color: var(--ink); background: var(--hi); color: var(--hi-ink); }
-.vcard.on small { color: var(--hi-ink); }
-</style>
-</head>
-<body>
-<main class="wrap">
-  <nav class="topbar" aria-label="Navigation">
-    <a class="mark" href="index-autonome.html">← Tools</a>
-    <span class="crumb">Arabe</span>
-  </nav>
-
-  <header class="head">
-    <span class="eyebrow">Lecture et écoute</span>
-    <h1 class="title">Syllabes <span class="hl">arabes</span></h1>
-    <p class="sub">Le tableau de votre livre, avec le son. Lisez en colonne puis en ligne, puis testez votre oreille.</p>
-  </header>
-
-  <p class="notice" id="noSpeech" hidden>Ce navigateur ne propose pas la synthèse vocale. La prononciation s'affiche en lettres latines à la place du son.</p>
-  <p class="notice" id="noArabic" hidden>Aucune voix arabe n'a été trouvée sur cet appareil. Ajoutez une voix arabe dans les réglages de langue ou de synthèse vocale du système, puis rechargez la page.</p>
-
-  <div class="controls">
-    <div class="seg" role="group" aria-label="Activité">
-      <button type="button" id="mStudy" aria-pressed="true">Tableau</button>
-      <button type="button" id="mAlpha" aria-pressed="false">Alphabet</button>
-      <button type="button" id="mSyl" aria-pressed="false">Écoute</button>
-      <button type="button" id="mWord" aria-pressed="false">Mots</button>
-    </div>
-    <div class="field" id="voiceField" hidden>
-      <label for="voiceSel">Voix arabe</label>
-      <select id="voiceSel"></select>
-    </div>
-  </div>
-
-  <!-- Mode tableau -->
-  <section class="card" id="study" aria-label="Tableau des syllabes">
-    <h2>Touchez une syllabe pour l'entendre</h2>
-    <p class="hintline">Comme dans le livre : lisez d'abord en colonne, de haut en bas, puis en ligne, de droite à gauche. En rouge : la lettre qui allonge la voyelle.</p>
-    <div class="detail" id="detail" aria-live="polite">
-      <span class="ar" id="dAr" lang="ar" dir="rtl"></span>
-      <div class="detail-txt"><span class="tr" id="dTr"></span><span class="dsc" id="dDsc"></span></div>
-    </div>
-    <p class="err" id="errStudy" role="alert" hidden></p>
-    <div class="gridwrap"><div class="grid" id="grid"></div></div>
-    <div class="row-actions">
-      <button type="button" class="ghost" id="readCols">Lire les colonnes</button>
-      <button type="button" class="ghost" id="readRows">Lire les lignes</button>
-      <button type="button" class="ghost" id="stopRead" disabled>Arrêter</button>
-    </div>
-  </section>
-
-  <!-- Mode alphabet -->
-  <section class="card" id="alpha" aria-label="Alphabet" hidden>
-    <h2>Touchez une lettre</h2>
-    <p class="hintline">Ses formes dans le mot et toutes ses variations (voyelles, tanwîn, soukoun, chadda) s'affichent, avec le son.</p>
-    <div class="agrid" id="agrid"></div>
-    <p class="err" id="errAlpha" role="alert" hidden></p>
-    <div class="apanel">
-      <div class="ahead">
-        <span class="ar" id="aBig" lang="ar" dir="rtl"></span>
-        <div class="detail-txt"><span class="tr" id="aName"></span><span class="dsc" id="aDsc"></span></div>
-        <button type="button" class="ghost" id="aHear">Écouter la lettre</button>
-      </div>
-      <h3 class="sec">Formes dans le mot</h3>
-      <div class="forms" id="forms"></div>
-      <h3 class="sec">Variations</h3>
-      <div class="vgrid" id="vgrid"></div>
-      <div class="row-actions">
-        <button type="button" class="ghost" id="aRead">Tout lire</button>
-        <button type="button" class="ghost" id="aStop" disabled>Arrêter</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Modes quiz -->
-  <div id="quizWrap" hidden>
-    <div class="progress" style="margin-bottom:20px">
-      <div class="progress-row"><span id="qCount">Question 1 / 10</span><span id="scoreTxt">Score 0</span></div>
-      <div class="bar"><i id="barFill"></i></div>
-    </div>
-
-    <section class="card" id="stage" aria-label="Question">
-      <div class="player" id="player">
-        <button type="button" class="play" id="play" aria-label="Écouter">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
-        </button>
-        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="side">
-          <button type="button" class="ghost" id="slow">Plus lent</button>
-        </div>
-      </div>
-      <p class="err" id="errQuiz" role="alert" hidden></p>
-      <p class="fallback" id="fallback" hidden></p>
-      <p class="prompt" id="prompt"></p>
-      <div class="opts" id="opts"></div>
-      <div class="feedback" id="feedback" aria-live="polite" hidden></div>
-      <div class="next-row"><button type="button" class="primary" id="next" hidden>Question suivante</button></div>
-    </section>
-
-    <section class="card result" id="result" hidden aria-label="Résultat">
-      <div class="score-big"><span id="finalScore">0</span><small> / <span id="finalTotal">10</span></small></div>
-      <p id="finalMsg" style="margin:0"></p>
-      <div id="missBlock" hidden>
-        <h2>À revoir</h2>
-        <ul class="miss" id="missList" style="margin-top:12px"></ul>
-      </div>
-      <div class="actions">
-        <button type="button" class="primary" id="again">Recommencer</button>
-        <button type="button" class="ghost" id="retry" hidden>Refaire mes erreurs</button>
-      </div>
-    </section>
-  </div>
-</main>
-
-<script>
 (function () {
   'use strict';
 
@@ -416,9 +23,9 @@ a.mark:hover { background: var(--red); }
     { id: 'shadda', name: 'Chadda', hint: 'lettre doublée', mk: function (l) { return { parts: [[l.ch + SH + F]], tr: l.tr + l.tr + 'a' }; } }
   ];
   var WORDS = [
-    { parts: [['ب' + F], [ALIF, 1], ['ب' + DT]], tr: 'bâb', fr: 'la porte' },
-    { parts: [['ت' + D], [WAW, 1], ['ت' + DT]], tr: 'toût', fr: 'la mûre' },
-    { parts: [['أ' + F + 'ث' + F], [ALIF, 1], ['ث' + DT]], tr: 'athâth', fr: 'les meubles' }
+    { parts: [['ب' + F], [ALIF, 1], ['ت' + F]], tr: 'bâta', fr: 'il a passé la nuit' },
+    { parts: [['ت' + F], [ALIF, 1], ['ب' + F]], tr: 'tâba', fr: 'il s’est repenti' },
+    { parts: [['ث' + D + 'ب' + D], [WAW, 1], ['ت' + DT]], tr: 'thouboût', fr: 'la preuve, la fermeté' }
   ];
 
   function textOf(parts) { return parts.map(function (p) { return p[0]; }).join(''); }
@@ -438,6 +45,22 @@ a.mark:hover { background: var(--red); }
     return { kind: 'word', parts: w.parts, tr: w.tr, text: textOf(w.parts), r: ROWS.length, c: c, rowId: 'word', fr: w.fr, desc: w.fr };
   });
   var WORD_ITEMS = GRID[ROWS.length];
+
+  /* Mots d'entraînement en plus du tableau : uniquement les lettres du livre (ب ت ث)
+     avec les voyelles, tanwîn, chadda et lettres de prolongation déjà étudiés. */
+  var MORE_WORDS = [
+    { parts: [['ب' + F], [ALIF, 1], ['ب' + DT]], tr: 'bâb', fr: 'la porte' },
+    { parts: [['ت' + D], [WAW, 1], ['ت' + DT]], tr: 'toût', fr: 'la mûre' },
+    { parts: [['أ' + F + 'ث' + F], [ALIF, 1], ['ث' + DT]], tr: 'athâth', fr: 'les meubles' },
+    { parts: [['أ' + F + 'ب' + DT]], tr: 'ab', fr: 'le père' },
+    { parts: [['ث' + F + 'ب' + F], [ALIF, 1], ['ت' + DT]], tr: 'thabât', fr: 'la stabilité' },
+    { parts: [['ب' + F + 'ث' + SH + F]], tr: 'baththa', fr: 'il a diffusé' },
+    { parts: [['ث' + F + 'ب' + F + 'ت' + F]], tr: 'thabata', fr: 'il est resté ferme' },
+    { parts: [['ث' + F], [ALIF, 1], ['ب' + K + 'ت' + DT]], tr: 'thâbit', fr: 'stable, ferme' }
+  ];
+  var QUIZ_WORDS = WORD_ITEMS.concat(MORE_WORDS.map(function (w) {
+    return { kind: 'word', parts: w.parts, tr: w.tr, text: textOf(w.parts), rowId: 'word', fr: w.fr, desc: w.fr };
+  }));
   var NROWS = ROWS.length + 1;
 
   /* Alphabet complet (ordre arabe). ch = base des variations, nj = ne se lie pas à la lettre suivante */
@@ -751,11 +374,14 @@ a.mark:hover { background: var(--red); }
   function pickOne(arr) { return arr.length ? arr[Math.floor(Math.random() * arr.length)] : null; }
 
   function buildQuiz() {
-    return state.mode === 'word' ? shuffle(WORD_ITEMS) : shuffle(SYLS).slice(0, 10);
+    return shuffle(state.mode === 'word' ? QUIZ_WORDS : SYLS).slice(0, 10);
   }
 
   function optionsFor(t) {
-    if (t.kind === 'word') return shuffle(WORD_ITEMS);
+    if (t.kind === 'word') {
+      var others = shuffle(QUIZ_WORDS.filter(function (x) { return x.text !== t.text; })).slice(0, 3);
+      return shuffle([t].concat(others));
+    }
     var sameLetter = SYLS.filter(function (x) { return x.c === t.c && x.rowId !== t.rowId; });
     var sameRow = SYLS.filter(function (x) { return x.rowId === t.rowId && x.c !== t.c; });
     var chosen = [t];
@@ -884,7 +510,7 @@ a.mark:hover { background: var(--red); }
       info.appendChild(document.createElement('br'));
       info.appendChild(h('span', 'muted', t.desc));
       left.appendChild(info);
-      var b = h('button', 'ghost', 'Écouter');
+      var b = h('button', 'btn ghost', 'Écouter');
       b.type = 'button';
       b.setAttribute('aria-label', 'Écouter ' + t.tr);
       b.addEventListener('click', function () { state.interacted = true; speakItem(t, 0.7); });
@@ -967,6 +593,3 @@ a.mark:hover { background: var(--red); }
     else synth.onvoiceschanged = loadVoices;
   }
 })();
-</script>
-</body>
-</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Exercices : Syllabes pour arabe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/pages/arabe.css">
+<script src="../../assets/js/pages/arabe.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../../index.html">Tools</a></li><li><a href="../langues.html">Langues</a></li><li><a href="arabe.html">Arabe</a></li><li aria-current="page">Exercices : Syllabes pour arabe</li></ol></nav>
+
+  <header class="head">
+    <span class="eyebrow">Lecture et écoute</span>
+    <h1 class="title">Syllabes arabes</h1>
+    <p class="sub">Le tableau de votre livre, avec le son. Lisez en colonne puis en ligne, puis testez votre oreille.</p>
+  </header>
+
+  <p class="notice" id="noSpeech" hidden>Ce navigateur ne propose pas la synthèse vocale. La prononciation s'affiche en lettres latines à la place du son.</p>
+  <p class="notice" id="noArabic" hidden>Aucune voix arabe n'a été trouvée sur cet appareil. Ajoutez une voix arabe dans les réglages de langue ou de synthèse vocale du système, puis rechargez la page.</p>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Activité">
+      <button type="button" id="mStudy" aria-pressed="true">Tableau</button>
+      <button type="button" id="mAlpha" aria-pressed="false">Alphabet</button>
+      <button type="button" id="mSyl" aria-pressed="false">Écoute</button>
+      <button type="button" id="mWord" aria-pressed="false">Mots</button>
+    </div>
+    <div class="field" id="voiceField" hidden>
+      <label for="voiceSel">Voix arabe</label>
+      <select id="voiceSel"></select>
+    </div>
+  </div>
+
+  <!-- Mode tableau -->
+  <section class="card" id="study" aria-label="Tableau des syllabes">
+    <h2>Touchez une syllabe pour l'entendre</h2>
+    <p class="hintline">Comme dans le livre : lisez d'abord en colonne, de haut en bas, puis en ligne, de droite à gauche. En rouge : la lettre qui allonge la voyelle.</p>
+    <div class="detail" id="detail" aria-live="polite">
+      <span class="ar" id="dAr" lang="ar" dir="rtl"></span>
+      <div class="detail-txt"><span class="tr" id="dTr"></span><span class="dsc" id="dDsc"></span></div>
+    </div>
+    <p class="err" id="errStudy" role="alert" hidden></p>
+    <div class="gridwrap"><div class="grid" id="grid"></div></div>
+    <div class="row-actions">
+      <button type="button" class="btn ghost" id="readCols">Lire les colonnes</button>
+      <button type="button" class="btn ghost" id="readRows">Lire les lignes</button>
+      <button type="button" class="btn ghost" id="stopRead" disabled>Arrêter</button>
+    </div>
+  </section>
+
+  <!-- Mode alphabet -->
+  <section class="card" id="alpha" aria-label="Alphabet" hidden>
+    <h2>Touchez une lettre</h2>
+    <p class="hintline">Ses formes dans le mot et toutes ses variations (voyelles, tanwîn, soukoun, chadda) s'affichent, avec le son.</p>
+    <div class="agrid" id="agrid"></div>
+    <p class="err" id="errAlpha" role="alert" hidden></p>
+    <div class="apanel">
+      <div class="ahead">
+        <span class="ar" id="aBig" lang="ar" dir="rtl"></span>
+        <div class="detail-txt"><span class="tr" id="aName"></span><span class="dsc" id="aDsc"></span></div>
+        <button type="button" class="btn ghost" id="aHear">Écouter la lettre</button>
+      </div>
+      <h3 class="sec">Formes dans le mot</h3>
+      <div class="forms" id="forms"></div>
+      <h3 class="sec">Variations</h3>
+      <div class="vgrid" id="vgrid"></div>
+      <div class="row-actions">
+        <button type="button" class="btn ghost" id="aRead">Tout lire</button>
+        <button type="button" class="btn ghost" id="aStop" disabled>Arrêter</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modes quiz -->
+  <div id="quizWrap" hidden>
+    <div class="progress" style="margin-bottom:20px">
+      <div class="progress-row"><span id="qCount">Question 1 / 10</span><span id="scoreTxt">Score 0</span></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+
+    <section class="card" id="stage" aria-label="Question">
+      <div class="player" id="player">
+        <button type="button" class="play" id="play" aria-label="Écouter">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+        </button>
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="side">
+          <button type="button" class="btn ghost" id="slow">Plus lent</button>
+        </div>
+      </div>
+      <p class="err" id="errQuiz" role="alert" hidden></p>
+      <p class="fallback" id="fallback" hidden></p>
+      <p class="prompt" id="prompt"></p>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+      <div class="next-row"><button type="button" class="btn" id="next" hidden>Question suivante</button></div>
+    </section>
+
+    <section class="card result" id="result" hidden aria-label="Résultat">
+      <div class="score-big"><span id="finalScore">0</span><small> / <span id="finalTotal">10</span></small></div>
+      <p id="finalMsg" style="margin:0"></p>
+      <div id="missBlock" hidden>
+        <h2>À revoir</h2>
+        <ul class="miss" id="missList" style="margin-top:12px"></ul>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn" id="again">Recommencer</button>
+        <button type="button" class="btn ghost" id="retry" hidden>Refaire mes erreurs</button>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

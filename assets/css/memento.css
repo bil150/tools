@@ -1,0 +1,122 @@
+/* Feuilles de mémento imprimables (A4 paysage).
+   Partagé par toutes les pages de mémento. Nécessite base.css.
+   Le JS (memento.js) construit les barres de réglage et pilote --s (échelle) et --c (colonnes). */
+
+/* ---------- Écran : en-tête et barres de réglage ---------- */
+.toolbar,
+.sheet-bar {
+  max-width: 297mm;
+  margin-inline: auto;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  font-size: 14px;
+}
+.topbar.wide { max-width: 297mm; margin: 0 auto 12px; }
+.toolbar { padding: 12px 16px; margin-bottom: 16px; }
+.toolbar h1 { font: 600 18px/1.3 var(--body); margin-right: auto; }
+.toolbar select { width: auto; min-height: 36px; }
+.toolbar .btn { min-height: 36px; }
+.toolbar label { display: flex; align-items: center; gap: 8px; color: var(--muted); white-space: nowrap; }
+.toolbar .hint { width: 100%; font-size: 13px; color: var(--muted); }
+
+.sheet-bar { padding: 8px 14px; margin-bottom: 8px; width: 297mm; max-width: 100%; }
+.sheet-bar .face { font-weight: 600; margin-right: auto; }
+.sheet-bar label { display: flex; align-items: center; gap: 8px; white-space: nowrap; color: var(--muted); }
+.sheet-bar input[type="range"] { width: 140px; accent-color: var(--ink); }
+.sheet-bar select { width: auto; min-height: 36px; }
+.sheet-bar .btn { min-height: 36px; }
+.scv { min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+.fit { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+.fit.ok { background: var(--good-bg); color: var(--good); }
+.fit.over { background: var(--bad-bg); color: var(--bad); }
+
+/* ---------- Feuille : reste blanche, elle est imprimée ---------- */
+.sheet {
+  --s: 1;          /* échelle, pilotée par le curseur */
+  --c: 4;          /* nombre de colonnes */
+  --base: 10px;    /* taille de texte de référence ; body.dense la réduit */
+  position: relative;
+  width: 297mm;
+  height: 210mm;
+  margin: 0 auto 24px;
+  padding: 6mm 7mm 11mm;
+  overflow: hidden;
+  background: #fff;
+  color: #14213D;
+  border: 1px solid var(--line);
+  font-size: calc(var(--s) * var(--base));
+  line-height: 1.25;
+}
+body.dense .sheet { --base: 8.4px; }
+
+/* Feuille de mesure, hors écran, utilisée par memento.js pour répartir le contenu */
+.sheet.probe { position: absolute; left: -99999px; top: 0; height: auto; overflow: visible; padding: 0; margin: 0; border: 0; visibility: hidden; }
+.sheet.probe .mc { column-count: 1; }
+
+/* ---------- Structure ---------- */
+.doc-title {
+  display: flex; align-items: baseline; gap: .9em;
+  padding-bottom: .4em; margin-bottom: .8em;
+  border-bottom: 1px solid #14213D;
+}
+.doc-name { font-size: 2em; font-weight: 600; }
+.doc-sub { font-size: 1.1em; color: #5F6980; margin-left: auto; }
+
+.cat { break-inside: avoid; margin-bottom: .75em; }
+.subbanner {
+  display: flex; align-items: baseline; gap: .8em;
+  padding-bottom: .25em; margin-bottom: .55em;
+  border-bottom: 1px solid #DADDE3;
+}
+.sub-title { font-size: 1.35em; font-weight: 600; }
+.sub-desc { font-size: 1em; color: #5F6980; }
+
+.mc { column-count: var(--c); column-gap: 1.2em; }
+.group { break-inside: avoid; margin-bottom: .7em; }
+.group h2 {
+  font-size: 1.1em; font-weight: 600;
+  margin-bottom: .3em; padding-bottom: .15em; border-bottom: 1px solid #14213D;
+}
+
+/* ---------- Entrées : commande + description (mementos informatiques) ---------- */
+.entry { padding: .13em .55em; margin-bottom: .11em; border-radius: 2px; break-inside: avoid; }
+.group .entry:nth-child(odd) { background: #F4F5F7; }
+.cmd { display: block; font: 700 1.03em/1.14 var(--mono); }
+.desc { display: block; font-size: .945em; line-height: 1.14; color: #5F6980; }
+
+/* ---------- Tableau des droits ---------- */
+.rights-table { width: 100%; border-collapse: collapse; font-size: .95em; margin: .15em 0; }
+.rights-table th, .rights-table td { padding: .16em .4em; border-bottom: 1px solid #DADDE3; text-align: left; }
+.rights-table th { font-weight: 700; border-bottom: 1px solid #14213D; }
+.rights-table tr:nth-child(even) td { background: #F4F5F7; }
+.rights-table td.sym, .rights-table td.val { font-family: var(--mono); font-weight: 700; }
+.rights-table td.val { text-align: center; }
+.rights-table td.lbl { color: #5F6980; }
+.rights-block { border: 1px solid #DADDE3; border-radius: 3px; padding: .35em .45em .45em; }
+.rights-block h2 { border-bottom: 0; margin-bottom: .25em; }
+
+/* ---------- Pied de feuille ---------- */
+.credits {
+  position: absolute; left: 7mm; right: 7mm; bottom: 3.5mm;
+  display: flex; justify-content: space-between; gap: 1em;
+  padding-top: .2em; border-top: 1px solid #DADDE3;
+  font-size: .8em; color: #7C8391;
+}
+.credits b { font-weight: 600; }
+
+/* ---------- Impression ---------- */
+@page { size: A4 landscape; margin: 0; }
+@media print {
+  body { background: #fff; padding: 0; min-height: 0; }
+  .topbar, .toolbar, .sheet-bar { display: none !important; }
+  .sheet { margin: 0; border: 0; break-after: page; page-break-after: always; }
+  .sheet:last-of-type { break-after: auto; page-break-after: auto; }
+  body[data-only] .sheet:not(.print-only) { display: none; }
+  .entry, .group, .cat { break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
