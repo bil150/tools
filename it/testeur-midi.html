@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Testeur de clavier MIDI</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/midi.css">
+<script src="../assets/js/pages/midi.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Testeur de clavier MIDI</li></ol></nav>
+
+  <header>
+    <h1 class="title">Testeur de clavier MIDI</h1>
+    <p class="sub">Branchez un clavier ou un contrôleur MIDI, puis jouez : les touches, la vélocité, les molettes, les potentiomètres et les pédales s’affichent en direct.</p>
+  </header>
+
+  <p class="notice" id="unsupported" hidden>Ce navigateur ne prend pas en charge le MIDI. Utilisez Chrome, Edge ou Opera sur ordinateur ou sur Android (Safari sur iPhone et iPad ne le propose pas).</p>
+  <button type="button" class="btn start" id="start">Activer le MIDI</button>
+  <p class="err" id="err" role="alert" hidden></p>
+
+  <div id="panel" class="stage" hidden>
+    <p class="muted" id="devices" aria-live="polite"></p>
+
+    <section class="card" aria-label="Clavier">
+      <div class="scroll"><div class="piano" id="piano" aria-hidden="true"></div></div>
+      <dl class="last">
+        <div><dt>Dernière note</dt><dd id="lastNote">—</dd></div>
+        <div><dt>Numéro</dt><dd id="lastNum">—</dd></div>
+        <div><dt>Vélocité</dt><dd id="lastVel">—</dd></div>
+        <div><dt>Canal</dt><dd id="lastCh">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="card" aria-label="Molettes et pédales">
+      <h2>Molettes, pédale et pression</h2>
+      <div class="ctl wide"><span class="name">Hauteur (molette)</span><span class="val" id="bendVal">0</span>
+        <div class="meter center"><i id="bendFill"></i></div></div>
+      <div class="ctl wide"><span class="name">Pression</span><span class="val" id="pressVal">0</span>
+        <div class="meter"><i id="pressFill"></i></div></div>
+      <div class="row2">
+        <span class="chip" id="pedal">Pédale de sustain</span>
+        <span class="muted">Programme : <b id="progVal">—</b></span>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Contrôleurs">
+      <h2>Contrôleurs</h2>
+      <p class="muted" id="ctlsEmpty">Bougez un potentiomètre, un curseur ou la molette de modulation pour les voir apparaître ici.</p>
+      <div class="ctls" id="ctls"></div>
+    </section>
+
+    <section class="card" aria-label="Statistiques et journal">
+      <h2>Mesures</h2>
+      <dl class="facts">
+        <dt>Notes jouées</dt><dd id="statNotes">0</dd>
+        <dt>Messages reçus</dt><dd id="statMsgs">0</dd>
+        <dt>Vélocités</dt><dd id="statVel">—</dd>
+        <dt>Notes enfoncées</dt><dd id="statHeld">0</dd>
+      </dl>
+      <div class="opts">
+        <label class="check"><input type="checkbox" id="optSound"> Entendre les notes (son de contrôle)</label>
+        <label class="check"><input type="checkbox" id="optSystem"> Afficher l’horloge et le signal de présence</label>
+      </div>
+      <button type="button" class="btn ghost" id="reset">Tout remettre à zéro</button>
+      <h2>Journal</h2>
+      <ul class="log" id="log" aria-live="off"></ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

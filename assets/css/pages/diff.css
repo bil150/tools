@@ -1,0 +1,34 @@
+/* Comparateur de textes : styles propres à la page. S'appuie sur base.css. */
+
+.wrap { max-width: 1100px; }
+.inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.inputs .field { flex: none; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.summary { color: var(--muted); font-size: 14px; min-height: 1.5em; }
+
+/* Tableau de différences */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-2); }
+table.diff { width: 100%; border-collapse: collapse; font: 13px/1.5 var(--mono); }
+table.diff td { padding: 0 8px; vertical-align: top; }
+.no { width: 1%; min-width: 44px; padding: 0 8px; text-align: right; color: var(--muted); user-select: none; border-right: 1px solid var(--line); }
+.sign { width: 1%; text-align: center; user-select: none; }
+.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+table.side .code { width: 50%; }
+table.side .code:nth-child(2) { border-right: 1px solid var(--line); }
+
+/* Couleurs : ajouts, suppressions, mots modifiés */
+td.add, tr td.sign.add { background: var(--good-bg); }
+td.del, tr td.sign.del { background: var(--bad-bg); }
+td.no.add { background: var(--good-bg); color: var(--good); }
+td.no.del { background: var(--bad-bg); color: var(--bad); }
+td.void { background: var(--paper); }
+mark { color: inherit; border-radius: 2px; }
+mark.add { background: color-mix(in srgb, var(--good) 38%, transparent); }
+mark.del { background: color-mix(in srgb, var(--bad) 38%, transparent); }
+tr.fold td { padding: 4px 12px; color: var(--muted); background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-family: var(--body); font-size: 13px; }
+
+@media (max-width: 720px) {
+  .inputs { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Testeur de manette</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/manette.css">
+<script src="../assets/js/pages/manette.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Testeur de manette</li></ol></nav>
+
+  <header>
+    <h1 class="title">Testeur de manette</h1>
+    <p class="sub">Branchez une manette, puis appuyez sur un bouton : elle est détectée et son état s’affiche en direct.</p>
+  </header>
+
+  <p class="notice" id="waiting">Aucune manette détectée. Branchez-la ou allumez-la, puis appuyez sur un bouton.</p>
+  <p class="notice" id="unsupported" hidden>Ce navigateur ne prend pas en charge les manettes de jeu.</p>
+
+  <section class="card" id="panel" hidden aria-label="Manette">
+    <div class="field">
+      <label for="padSel">Manette</label>
+      <select id="padSel"></select>
+    </div>
+    <p class="muted" id="info"></p>
+
+    <h2>Boutons</h2>
+    <div class="pbtns" id="buttons"></div>
+
+    <h2>Sticks et axes</h2>
+    <div class="sticks" id="sticks"></div>
+    <div class="axes" id="axes"></div>
+
+    <div class="tools">
+      <div class="field">
+        <label for="dead">Zone morte : <span id="deadVal">0,10</span></label>
+        <input type="range" id="dead" min="0" max="0.5" step="0.01" value="0.1">
+      </div>
+      <button type="button" class="btn ghost" id="rumble">Tester la vibration</button>
+      <button type="button" class="btn ghost" id="reset">Remettre les compteurs à zéro</button>
+    </div>
+    <p class="muted" id="rate"></p>
+    <p class="err" id="rumbleErr" role="alert" hidden></p>
+  </section>
+</main>
+</body>
+</html>

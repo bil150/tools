@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../../assets/js/app.js"></script>
+<title>Écriture à la main</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/arabe.css">
+<link rel="stylesheet" href="../../assets/css/pages/ecriture.css">
+<script src="../../assets/js/arabe-core.js"></script>
+<script src="../../assets/js/pages/ecriture.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../../index.html">Tools</a></li><li><a href="../langues.html">Langues</a></li><li><a href="arabe.html">Arabe</a></li><li aria-current="page">Écriture à la main</li></ol></nav>
+
+  <header class="noprint">
+    <h1 class="title">Écriture à la main</h1>
+    <p class="sub">Choisissez une lettre et ses signes de voyelle (harakat) : écrivez avec le doigt, un stylet ou la souris sur les lignes de guidage, ou imprimez la feuille pour écrire sur papier.</p>
+  </header>
+
+  <section class="card noprint" aria-label="Choix de la lettre">
+    <h2>Lettre</h2>
+    <div class="letters" id="letters" role="group" aria-label="Lettres"></div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="free">Ou un mot, saisi avec votre clavier arabe</label>
+        <input type="text" id="free" dir="rtl" lang="ar" autocomplete="off" spellcheck="false" placeholder="بَاب">
+      </div>
+      <div class="field">
+        <label for="mark">Signe de voyelle</label>
+        <select id="mark"></select>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Forme dans le mot</span>
+      <div class="seg" role="group" aria-label="Forme">
+        <button type="button" data-form="iso" aria-pressed="true">Isolée</button>
+        <button type="button" data-form="ini" aria-pressed="false">Initiale</button>
+        <button type="button" data-form="med" aria-pressed="false">Médiane</button>
+        <button type="button" data-form="fin" aria-pressed="false">Finale</button>
+      </div>
+    </div>
+
+    <div class="info" id="info" aria-live="polite"></div>
+  </section>
+
+  <section class="card noprint" aria-label="Feuille">
+    <h2>Feuille</h2>
+    <div class="grid2">
+      <div class="field"><label for="size">Taille du modèle : <span id="sizeVal">80</span></label><input type="range" id="size" min="48" max="140" step="2" value="80"></div>
+      <div class="field"><label for="rows">Nombre de lignes : <span id="rowsVal">4</span></label><input type="range" id="rows" min="1" max="8" step="1" value="4"></div>
+      <div class="field"><label for="model">Modèle</label>
+        <select id="model">
+          <option value="gray">Lettre en gris à repasser</option>
+          <option value="dots">Lettre en pointillés</option>
+          <option value="none">Aucun modèle</option>
+        </select>
+      </div>
+      <div class="field"><label for="every">Modèle sur</label>
+        <select id="every">
+          <option value="first">La première ligne seulement</option>
+          <option value="all">Toutes les lignes</option>
+        </select>
+      </div>
+      <div class="field"><label for="pen">Épaisseur du trait : <span id="penVal">5</span></label><input type="range" id="pen" min="2" max="14" step="1" value="5"></div>
+      <div class="field"><label for="color">Couleur du stylo</label>
+        <select id="color"><option value="ink">Encre</option><option value="blue">Bleu</option><option value="red">Rouge</option></select>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="undo">Annuler le dernier trait</button>
+      <button type="button" class="btn ghost" id="clear">Tout effacer</button>
+      <button type="button" class="btn ghost" id="save">Enregistrer l’image</button>
+      <button type="button" class="btn" id="print">Imprimer la feuille</button>
+    </div>
+  </section>
+
+  <section class="sheet" aria-label="Zone d’écriture">
+    <div class="stack" id="stack">
+      <canvas id="guide" aria-hidden="true"></canvas>
+      <canvas id="ink" aria-label="Zone de dessin : écrivez avec le doigt, un stylet ou la souris"></canvas>
+    </div>
+  </section>
+
+  <section class="card legend noprint" aria-label="Lignes de guidage">
+    <h2>Les lignes</h2>
+    <ul>
+      <li><i class="sw marks"></i><b>Signes du dessus</b> — fatha, damma, soukoun, chadda s’écrivent dans cette bande, au-dessus de la lettre.</li>
+      <li><i class="sw tall"></i><b>Haut des lettres hautes</b> — alif, lâm, ṭâ, kâf montent jusqu’ici.</li>
+      <li><i class="sw body"></i><b>Hauteur du corps</b> — le corps des lettres reste sous cette ligne.</li>
+      <li><i class="sw base"></i><b>Ligne d’écriture</b> — la lettre « s’assoit » sur cette ligne. La kasra se place juste en dessous.</li>
+      <li><i class="sw desc"></i><b>Bas des lettres qui descendent</b> — jîm, ḥâ, ʿayn, qâf, noûn… descendent jusqu’ici.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

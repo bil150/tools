@@ -1,0 +1,28 @@
+/* Cartes à retourner : styles propres à la page. S'appuie sur base.css et arabe.css. */
+
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.muted { color: var(--muted); font-size: 14px; }
+
+.deck { display: flex; flex-direction: column; gap: 12px; }
+.count { color: var(--muted); font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.row .btn { flex: 1 1 120px; }
+.keys { display: none; }
+@media (hover: hover) and (pointer: fine) { .keys { display: block; } }
+
+/* La carte */
+.flip {
+  display: grid; place-items: center; width: 100%; min-height: 280px; padding: 24px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2); color: var(--ink);
+  transition: border-color .15s, background .15s;
+}
+.flip:hover { border-color: var(--ink); }
+.flip.is-known { border-color: var(--good); }
+.flip.is-review { border-color: var(--accent); }
+.face { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; max-width: 100%; }
+.face.reading { animation: appear .18s ease; }
+.face.arabic { animation: appear .18s ease; }
+.face.done { color: var(--muted); font-size: 16px; }
+.ar.big { font-size: clamp(80px, 24vw, 140px); line-height: 1.4; }
+.tr.big { font-size: clamp(36px, 10vw, 56px); }
+@keyframes appear { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }

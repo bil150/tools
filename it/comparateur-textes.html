@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Comparateur de textes</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/diff.css">
+<script src="../assets/js/pages/diff.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Comparateur de textes</li></ol></nav>
+
+  <header>
+    <h1 class="title">Comparateur de textes</h1>
+    <p class="sub">Collez deux versions d’un texte, d’un fichier de configuration ou d’un code : les lignes ajoutées, supprimées et les mots modifiés sont surlignés.</p>
+  </header>
+
+  <section class="inputs" aria-label="Textes à comparer">
+    <div class="field"><label for="textA">Texte A (original)</label><textarea id="textA" rows="10" spellcheck="false"></textarea></div>
+    <div class="field"><label for="textB">Texte B (modifié)</label><textarea id="textB" rows="10" spellcheck="false"></textarea></div>
+  </section>
+
+  <section class="card" aria-label="Options">
+    <div class="opts">
+      <label class="check"><input type="checkbox" id="optTrim"> Ignorer les espaces en début et fin de ligne</label>
+      <label class="check"><input type="checkbox" id="optSpaces"> Ignorer les espaces répétés</label>
+      <label class="check"><input type="checkbox" id="optCase"> Ignorer les majuscules</label>
+      <label class="check"><input type="checkbox" id="optOnly" checked> Replier les lignes identiques</label>
+    </div>
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Affichage">
+        <button type="button" id="viewSide" aria-pressed="true">Côte à côte</button>
+        <button type="button" id="viewUni" aria-pressed="false">Unifié</button>
+      </div>
+      <button type="button" class="btn ghost" id="swap">Échanger A et B</button>
+      <button type="button" class="btn ghost" id="clear">Effacer</button>
+      <button type="button" class="btn ghost" id="copy" disabled>Copier le diff</button>
+    </div>
+  </section>
+
+  <p class="summary" id="summary" aria-live="polite"></p>
+  <p class="err" id="err" role="alert" hidden></p>
+  <div id="out"></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../../assets/js/app.js"></script>
+<title>Dictée</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/arabe.css">
+<link rel="stylesheet" href="../../assets/css/pages/dictee.css">
+<script src="../../assets/js/arabe-core.js"></script>
+<script src="../../assets/js/pages/dictee.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../../index.html">Tools</a></li><li><a href="../langues.html">Langues</a></li><li><a href="arabe.html">Arabe</a></li><li aria-current="page">Dictée</li></ol></nav>
+
+  <header>
+    <h1 class="title">Dictée</h1>
+    <p class="sub">Écoutez, puis écrivez ce que vous entendez en assemblant les morceaux dans le bon ordre, de droite à gauche.</p>
+  </header>
+
+  <p class="notice" id="noSpeech" hidden>Cet appareil ne propose pas la synthèse vocale : la dictée a besoin du son. Essayez avec Chrome, Edge ou Safari.</p>
+  <p class="notice" id="noArabic" hidden>Aucune voix arabe n’a été trouvée sur cet appareil. Ajoutez une voix arabe dans les réglages de langue ou de synthèse vocale du système.</p>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Série">
+      <button type="button" id="mSyl" aria-pressed="true">Syllabes</button>
+      <button type="button" id="mWord" aria-pressed="false">Mots</button>
+    </div>
+    <div class="field" id="voiceField" hidden>
+      <label for="voiceSel">Voix arabe</label>
+      <select id="voiceSel"></select>
+    </div>
+  </div>
+
+  <div id="quiz">
+    <div class="progress">
+      <div class="progress-row"><span id="qCount">Question 1 / 10</span><span id="scoreTxt">Score 0</span></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+
+    <section class="card" id="stage" aria-label="Question">
+      <div class="player" id="player">
+        <button type="button" class="play" id="play" aria-label="Écouter">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+        </button>
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="side"><button type="button" class="btn ghost" id="slow">Plus lent</button></div>
+      </div>
+      <p class="err" id="err" role="alert" hidden></p>
+
+      <p class="prompt" id="prompt"></p>
+      <div class="line" id="line" aria-label="Votre écriture" dir="rtl" lang="ar"></div>
+      <div class="bank" id="bank" aria-label="Morceaux disponibles" dir="rtl" lang="ar"></div>
+
+      <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+      <div class="next-row">
+        <button type="button" class="btn ghost" id="undo">Retirer le dernier</button>
+        <button type="button" class="btn ghost" id="skip">Passer</button>
+        <button type="button" class="btn" id="check" disabled>Vérifier</button>
+        <button type="button" class="btn" id="next" hidden>Question suivante</button>
+      </div>
+    </section>
+
+    <section class="card result" id="result" hidden aria-label="Résultat">
+      <div class="score-big"><span id="finalScore">0</span><small> / <span id="finalTotal">10</span></small></div>
+      <p id="finalMsg"></p>
+      <div id="missBlock" hidden>
+        <h2>À revoir</h2>
+        <ul class="miss" id="missList"></ul>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn" id="again">Recommencer</button>
+        <button type="button" class="btn ghost" id="retry" hidden>Refaire mes erreurs</button>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

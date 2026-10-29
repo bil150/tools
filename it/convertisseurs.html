@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Formateur et convertisseurs</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/convertisseurs.css">
+<script src="../assets/js/pages/convertisseurs.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="it.html">IT</a></li><li aria-current="page">Formateur et convertisseurs</li></ol></nav>
+
+  <header>
+    <h1 class="title">Formateur et convertisseurs</h1>
+    <p class="sub">JSON, Base64, URL, bases numériques et couleurs. Tout est calculé dans votre navigateur.</p>
+  </header>
+
+  <div class="seg" role="group" aria-label="Outil">
+    <button type="button" data-tab="json" aria-pressed="true">JSON</button>
+    <button type="button" data-tab="b64" aria-pressed="false">Base64</button>
+    <button type="button" data-tab="url" aria-pressed="false">URL</button>
+    <button type="button" data-tab="base" aria-pressed="false">Bases</button>
+    <button type="button" data-tab="col" aria-pressed="false">Couleurs</button>
+  </div>
+
+  <section class="card panel" id="p-json" aria-label="JSON">
+    <h2>JSON</h2>
+    <div class="field"><label for="jsonIn">Texte JSON</label><textarea id="jsonIn" rows="7" spellcheck="false" placeholder='{"nom":"exemple","valeurs":[1,2,3]}'></textarea></div>
+    <div class="actions"><button type="button" class="btn" id="jsonFormat">Mettre en forme</button><button type="button" class="btn ghost" id="jsonMin">Compacter</button></div>
+    <p class="err" id="jsonErr" role="alert" hidden></p>
+    <div class="field"><label for="jsonOut">Résultat</label><textarea id="jsonOut" rows="7" readonly spellcheck="false"></textarea></div>
+    <div class="actions"><button type="button" class="btn ghost" data-copy="jsonOut">Copier</button></div>
+  </section>
+
+  <section class="card panel" id="p-b64" aria-label="Base64" hidden>
+    <h2>Base64</h2>
+    <div class="field"><label for="b64In">Texte ou Base64</label><textarea id="b64In" rows="6" spellcheck="false"></textarea></div>
+    <label class="check"><input type="checkbox" id="b64Safe"> Variante pour URL (sans « = », avec « - » et « _ »)</label>
+    <div class="actions"><button type="button" class="btn" id="b64Enc">Encoder</button><button type="button" class="btn ghost" id="b64Dec">Décoder</button></div>
+    <p class="err" id="b64Err" role="alert" hidden></p>
+    <div class="field"><label for="b64Out">Résultat</label><textarea id="b64Out" rows="6" readonly spellcheck="false"></textarea></div>
+    <div class="actions"><button type="button" class="btn ghost" data-copy="b64Out">Copier</button></div>
+  </section>
+
+  <section class="card panel" id="p-url" aria-label="URL" hidden>
+    <h2>Encodage d’URL</h2>
+    <div class="field"><label for="urlIn">Texte ou valeur encodée</label><textarea id="urlIn" rows="5" spellcheck="false" placeholder="café & thé"></textarea></div>
+    <div class="actions"><button type="button" class="btn" id="urlEnc">Encoder</button><button type="button" class="btn ghost" id="urlDec">Décoder</button></div>
+    <p class="err" id="urlErr" role="alert" hidden></p>
+    <div class="field"><label for="urlOut">Résultat</label><textarea id="urlOut" rows="5" readonly spellcheck="false"></textarea></div>
+    <div class="actions"><button type="button" class="btn ghost" data-copy="urlOut">Copier</button></div>
+  </section>
+
+  <section class="card panel" id="p-base" aria-label="Bases numériques" hidden>
+    <h2>Bases numériques</h2>
+    <div class="inputs">
+      <div class="field"><label for="baseIn">Nombre</label><input type="text" id="baseIn" value="255" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label for="baseFrom">Base de départ</label>
+        <select id="baseFrom"><option value="2">Binaire (2)</option><option value="8">Octal (8)</option><option value="10" selected>Décimal (10)</option><option value="16">Hexadécimal (16)</option></select>
+      </div>
+    </div>
+    <p class="err" id="baseErr" role="alert" hidden></p>
+    <div class="results" id="baseOut"></div>
+  </section>
+
+  <section class="card panel" id="p-col" aria-label="Couleurs" hidden>
+    <h2>Couleurs</h2>
+    <div class="inputs">
+      <div class="field"><label for="colIn">Couleur</label><input type="text" id="colIn" value="#3366cc" autocomplete="off" spellcheck="false" placeholder="#3366cc, rgb(…), hsl(…)"></div>
+      <div class="field small"><label for="colPick">Sélecteur</label><input type="color" id="colPick" value="#3366cc"></div>
+    </div>
+    <div class="swatch" id="swatch" aria-hidden="true"></div>
+    <p class="err" id="colErr" role="alert" hidden></p>
+    <div class="results" id="colOut"></div>
+  </section>
+</main>
+</body>
+</html>
