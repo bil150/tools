@@ -1,0 +1,36 @@
+/* Quiz de néerlandais : styles propres à la page. S'appuie sur base.css. */
+
+#app { display: flex; flex-direction: column; gap: 12px; }
+.muted { font-size: 14px; }
+.count { color: var(--muted); font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+
+.btn.theme { display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; }
+.btn.theme span { font-weight: 400; opacity: .75; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+/* La carte : image (SVG) et mot à deviner */
+.face {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  padding: 20px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2);
+  font-size: 24px; font-weight: 600;
+}
+.face.long { font-size: 20px; }
+.face svg { width: 120px; height: 120px; }
+.face.score { padding: 32px 16px; }
+
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.btn.opt { text-align: left; }
+.btn.opt.ok { background: var(--good-bg); border-color: var(--good); color: var(--good); }
+.btn.opt.ko { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.btn.next { width: 100%; }
+
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; min-width: 0; }
+.msg { min-height: 28px; font-size: 17px; }
+.msg.ok { color: var(--good); }
+.msg.ko { color: var(--bad); }
+
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+td { padding: 8px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td:last-child { font-weight: 600; }

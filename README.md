@@ -21,6 +21,9 @@ langues/
     cartes.html                  cartes à retourner (alphabet, syllabes, mots)
     dictee.html                  dictée : assembler les morceaux d'une écriture entendue
     ecriture.html                écriture à la main avec harakat et lignes de guidage
+  nl/
+    neerlandais.html             menu néerlandais
+    quiz-vocabulaire.html        quiz illustré : vêtements, couleurs, visage, émotions, fréquences, saisons (choix multiple ou saisie)
 
 it/
   it.html                        menu informatique
@@ -40,7 +43,7 @@ assets/
     arabe.css                    styles communs aux pages d'arabe
     memento.css                  feuilles A4 paysage imprimables (mémentos IT)
     pages/                       un fichier par page : arabe, cartes, dictee, ecriture,
-                                 manette, midi, reseau, convertisseurs, cron, diff
+                                 manette, midi, reseau, convertisseurs, cron, diff, quiz-nl
   js/
     app.js                       thème clair/sombre (icône), bouton « Installer »
     arabe-core.js                données de l'arabe et voix, partagées par les 4 pages d'arabe
@@ -51,7 +54,7 @@ assets/
 
 Chaque page de `it/` et `langues/` charge `base.css`, puis sa feuille de style dédiée dans `assets/css/pages/`,
 puis son script dans `assets/js/pages/` (même nom). Les mémentos utilisent `memento.css` et `memento.js`.
-Correspondance des noms : syllabes → `arabe`, calculateur-reseau → `reseau`, comparateur-textes → `diff`, aide-cron → `cron`, testeur-manette → `manette`, testeur-midi → `midi` ; les autres pages portent leur propre nom.
+Correspondance des noms : syllabes → `arabe`, quiz-vocabulaire → `quiz-nl`, calculateur-reseau → `reseau`, comparateur-textes → `diff`, aide-cron → `cron`, testeur-manette → `manette`, testeur-midi → `midi` ; les autres pages portent leur propre nom.
 
 ## Publication sur GitHub Pages
 
