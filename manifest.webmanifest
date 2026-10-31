@@ -1,6 +1,6 @@
 {
-  "name": "Tools",
-  "short_name": "Tools",
+  "name": "bil150.github.io/tools",
+  "short_name": "bil150/tools",
   "description": "Compilation de petits outils pour la maison et les proches : arabe, mémentos et outils informatiques.",
   "lang": "fr",
   "start_url": "./",
