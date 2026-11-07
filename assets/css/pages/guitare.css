@@ -1,0 +1,8 @@
+/* Guitare : styles propres à la page (feuille d'accords ouverts). Le reste est dans assets/css/musique.css. */
+
+.sgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; max-width: 420px; text-align: center; }
+.sc { display: flex; flex-direction: column; gap: 2px; padding: 6px 2px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
+.sc small { color: var(--muted); }
+.sc b { font: 600 16px var(--mono); }
+.sc.off { opacity: .45; }
+.sc .nt { border-radius: 4px; padding: 1px 0; font-weight: 600; }

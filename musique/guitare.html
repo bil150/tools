@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Guitare</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/musique.css">
+<link rel="stylesheet" href="../assets/css/pages/guitare.css">
+<script src="../assets/js/musique/core.js" defer></script>
+<script src="../assets/js/musique/batterie.js" defer></script>
+<script src="../assets/js/musique/instrument-guitare.js" defer></script>
+<script src="../assets/js/musique/instrument-piano.js" defer></script>
+<script src="../assets/js/musique/instrument-basse.js" defer></script>
+<script src="../assets/js/musique/clavier.js" defer></script>
+<script src="../assets/js/musique/gammes.js" defer></script>
+<script src="../assets/js/musique/accordeur.js" defer></script>
+<script src="../assets/js/musique/cordes.js" defer></script>
+<script src="../assets/js/musique/composer.js" defer></script>
+<script src="../assets/js/musique/harmonie.js" defer></script>
+<script src="../assets/js/pages/guitare.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="musique.html">Musique</a></li><li aria-current="page">Guitare</li></ol></nav>
+
+  <header>
+    <h1 class="title">Guitare</h1>
+    <p class="sub">Accords ouverts, guitare virtuelle, notes du manche et gammes, accordeur, Composer (suite d’accords, rythmes, batterie) et suites harmoniques. Touchez un accord, une corde ou une note pour l’entendre.</p>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" role="tablist" aria-label="Sections de la page">
+      <button type="button" role="tab" id="tab-accords" aria-controls="panel-accords" aria-selected="true">Accords</button>
+      <button type="button" role="tab" id="tab-virtuelle" aria-controls="panel-virtuelle" aria-selected="false" tabindex="-1">Guitare virtuelle</button>
+      <button type="button" role="tab" id="tab-manche" aria-controls="panel-manche" aria-selected="false" tabindex="-1">Manche et gammes</button>
+      <button type="button" role="tab" id="tab-accordeur" aria-controls="panel-accordeur" aria-selected="false" tabindex="-1">Accordeur</button>
+      <button type="button" role="tab" id="tab-composer" aria-controls="panel-composer" aria-selected="false" tabindex="-1">Composer</button>
+      <button type="button" role="tab" id="tab-harmonie" aria-controls="panel-harmonie" aria-selected="false" tabindex="-1">Suites harmoniques</button>
+    </div>
+    <div class="notation">
+      <span class="muted">Notation</span>
+      <div class="seg" role="group" aria-label="Notation des notes">
+        <button type="button" data-notation="abc" aria-pressed="true">A B C</button>
+        <button type="button" data-notation="do" aria-pressed="false">Do Ré Mi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accords : la feuille des accords ouverts -->
+  <section class="panel" id="panel-accords" role="tabpanel" aria-labelledby="tab-accords">
+    <div class="card" aria-live="polite">
+      <div class="detail">
+        <div class="big" id="chordBig"></div>
+        <div class="info">
+          <h2 id="chordName"></h2>
+          <p class="muted" id="chordNotes"></p>
+          <div class="sgrid" id="chordStrings"></div>
+          <div class="actions">
+            <button type="button" class="btn" id="chordStrum">Gratter</button>
+            <button type="button" class="btn ghost" id="chordArp">Arpège</button>
+          </div>
+          <p class="muted">Touchez une corde du schéma pour l’entendre seule. Les cordes sont de la plus grave (à gauche) à la plus aiguë ; ○ = corde à vide, × = corde non jouée.</p>
+        </div>
+      </div>
+    </div>
+    <section class="card" aria-label="Accords majeurs"><h2>Accords majeurs</h2><div class="chords" id="chordsMaj"></div></section>
+    <section class="card" aria-label="Accords mineurs"><h2>Accords mineurs</h2><div class="chords" id="chordsMin"></div></section>
+    <section class="card" aria-label="Accords de septième"><h2>Accords de septième</h2><div class="chords" id="chordsDom7"></div></section>
+  </section>
+
+  <!-- Guitare virtuelle : cordes à balayer, puis la main gauche -->
+  <section class="panel" id="panel-virtuelle" role="tabpanel" aria-labelledby="tab-virtuelle" hidden>
+    <div id="padHost"></div>
+    <div id="leftHost"></div>
+  </section>
+
+  <!-- Manche et gammes -->
+  <section class="panel" id="panel-manche" role="tabpanel" aria-labelledby="tab-manche" hidden>
+    <div id="scalesHost" class="panel"></div>
+  </section>
+
+  <!-- Accordeur -->
+  <section class="panel" id="panel-accordeur" role="tabpanel" aria-labelledby="tab-accordeur" hidden>
+    <div id="tunerHost"></div>
+  </section>
+
+  <!-- Composer : noter une suite d'accords ou obtenir un accompagnement -->
+  <section class="panel" id="panel-composer" role="tabpanel" aria-labelledby="tab-composer" hidden>
+    <div id="composerHost" class="panel"></div>
+  </section>
+
+  <!-- Suites harmoniques : roue des accords -->
+  <section class="panel" id="panel-harmonie" role="tabpanel" aria-labelledby="tab-harmonie" hidden>
+    <div id="harmonieHost" class="panel"></div>
+  </section>
+</main>
+</body>
+</html>

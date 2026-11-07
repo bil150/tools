@@ -8,7 +8,7 @@ En HTML, CSS et JS, sans compte. Site statique : aucune donnée n'est collectée
 ## Structure
 
 ```
-index.html                       accueil : Langues et IT (le seul index)
+index.html                       accueil : Langues, IT et Musique (le seul index)
 manifest.webmanifest             nom, couleurs et icônes du raccourci mobile
 .nojekyll                        désactive Jekyll sur GitHub Pages
 README.md
@@ -31,30 +31,71 @@ it/
   memento-windows.html           mémento Windows
   memento-applicatifs.html       mémento Dev & Applicatifs
   testeur-manette.html           testeur de manette (API Gamepad)
-  testeur-midi.html              testeur de clavier MIDI (API Web MIDI)
   calculateur-reseau.html        adresse, masque, CIDR, plage, sous-réseaux
   convertisseurs.html            JSON, Base64, URL, bases numériques, couleurs
   aide-cron.html                 explication d'une expression cron, prochaines exécutions
   comparateur-textes.html        différences entre deux textes (diff)
 
+musique/
+  musique.html                   menu musique
+  guitare.html                   guitare : accords ouverts, guitare virtuelle (six lignes à balayer), manche et gammes,
+                                 accordeur (micro), Composer, suites harmoniques
+  basse.html                     basse : mêmes onglets que la guitare (quatre cordes)
+  piano.html                     piano : mêmes onglets, sans accordeur ; clavier virtuel
+  testeur-midi.html              testeur de clavier MIDI (API Web MIDI)
+
 assets/
   css/
     base.css                     variables, thème clair/sombre, reset, composants communs
+    musique.css                  styles communs des pages d'instruments (onglets, schémas, Composer, batterie, roue, gammes…)
     arabe.css                    styles communs aux pages d'arabe
     memento.css                  feuilles A4 paysage imprimables (mémentos IT)
     pages/                       un fichier par page : arabe, cartes, dictee, ecriture,
-                                 manette, midi, reseau, convertisseurs, cron, diff, quiz-nl
+                                 manette, midi, guitare, basse, piano, reseau, convertisseurs, cron, diff, quiz-nl
   js/
     app.js                       thème clair/sombre (icône), bouton « Installer »
     arabe-core.js                données de l'arabe et voix, partagées par les 4 pages d'arabe
     memento.js                   nombre de pages, échelle et impression des feuilles
+    musique/                     modules communs des pages d'instruments (voir « Pages d'instruments »)
     pages/                       un fichier par page, même noms que dans css/pages/
   icons/                         favicon.svg, icon-192/512.png, maskable-512.png, apple-touch-icon.png
 ```
 
-Chaque page de `it/` et `langues/` charge `base.css`, puis sa feuille de style dédiée dans `assets/css/pages/`,
+Chaque page de `it/`, `langues/` et `musique/` (hors pages d'instruments, décrites plus haut) charge `base.css`, puis sa feuille de style dédiée dans `assets/css/pages/`,
 puis son script dans `assets/js/pages/` (même nom). Les mémentos utilisent `memento.css` et `memento.js`.
 Correspondance des noms : syllabes → `arabe`, quiz-vocabulaire → `quiz-nl`, calculateur-reseau → `reseau`, comparateur-textes → `diff`, aide-cron → `cron`, testeur-manette → `manette`, testeur-midi → `midi` ; les autres pages portent leur propre nom.
+
+## Pages d'instruments (guitare, basse, piano)
+
+Les trois pages ont les mêmes onglets et partagent leur code, rangé dans `assets/js/musique/`. Une page d'instrument ne contient
+que ce qui est propre à l'instrument ; tout le reste est un module qui construit sa propre interface dans un conteneur.
+Tous les modules s'attachent à `window.Musique` et se chargent avec `defer`, dans cet ordre.
+
+```
+core.js                  noyau : aides DOM, stockage, théorie (notes, gammes, accords), audio (un « bus » par instrument),
+                         notation A B C / Do Ré Mi, onglets
+batterie.js              batterie : sons synthétisés, 15 styles, grille éditable (Musique.Drums)
+instrument-guitare.js    un fichier par instrument : doigtés, schéma d'accord, son, rythmes (guitare, piano, basse)
+instrument-piano.js
+instrument-basse.js
+clavier.js               clavier de piano cliquable, touches de l'ordinateur
+gammes.js                onglet « gammes » : notes naturelles, gammes, décalages ; afficheurs manche à cordes et clavier
+accordeur.js             onglet « accordeur » : micro, détection de hauteur, notes de référence
+cordes.js                instrument virtuel fait de lignes à balayer (N cordes)
+fiche.js                 fiche des accords d'un instrument (12 fondamentales × familles) avec leurs schémas
+composer.js              Composer : suite d'accords jouée par un ou plusieurs instruments et la batterie
+harmonie.js              roue des accords, accords de chaque tonalité et suites classiques
+```
+
+Un instrument est un objet enregistré avec `Musique.registerInstrument` :
+`{ id, name, qualities, chordFor(root, q), diagram(accord), rhythms: [{ id, name, events(accord, temps) }], defaultRhythm,
+play(événement, accord, instant, secondesParTemps), chord(accord, instant, volume) }`.
+Composer, la fiche d'accords et les suites harmoniques n'en demandent pas davantage : pour ajouter un instrument, on écrit
+son fichier `instrument-*.js`, puis on le donne à `Musique.Composer.mount` dans la page.
+
+Une page assemble ces modules (voir `assets/js/pages/guitare.js`) : `M.initNotation()`, un `mount` par onglet, puis `M.tabs` qui
+arrête ce qui sonne quand on change d'onglet. Dans le HTML, chaque onglet est un bouton `#tab-<nom>` et un panneau
+`#panel-<nom>` contenant un conteneur vide.
 
 ## Publication sur GitHub Pages
 
