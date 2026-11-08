@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Liste de courses</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/courses.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Liste de courses</li></ol></nav>
+
+  <header>
+    <h1 class="title">Liste de courses</h1>
+    <p class="sub">Ajoutez les ingrédients de vos idées de repas ou d’autres aliments : les quantités s’additionnent, à cocher au magasin.</p>
+  </header>
+
+  <section class="card" aria-label="Ajouter">
+    <h2>➕ Ajouter</h2>
+    <div class="inputs">
+      <div class="field narrow"><label for="pers">Personnes</label><input type="number" id="pers" min="1" max="12" step="1" value="1" inputmode="numeric"></div>
+    </div>
+    <div id="idees"></div>
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-vue">Un aliment</span>
+        <div class="seg" id="vue" role="group" aria-labelledby="lab-vue">
+          <button type="button" data-v="grille" aria-pressed="true">Grille</button>
+          <button type="button" data-v="pastilles" aria-pressed="false">Pastilles</button>
+          <button type="button" data-v="liste" aria-pressed="false">Liste</button>
+        </div>
+      </div>
+      <div class="field"><label for="cherche">Chercher</label><input type="text" id="cherche" placeholder="Poulet, riz, brocoli…" autocomplete="off"></div>
+    </div>
+    <div id="choix"></div>
+    <p class="hint">Touchez un aliment pour l’ajouter (une portion par personne).</p>
+  </section>
+
+  <section class="card" aria-label="Ma liste" aria-live="polite">
+    <h2 id="titre">🛒 Ma liste</h2>
+    <div id="liste"></div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="copier">Copier</button>
+      <button type="button" class="btn ghost" id="decocher">Tout décocher</button>
+      <button type="button" class="btn ghost" id="vider">Vider</button>
+    </div>
+  </section>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

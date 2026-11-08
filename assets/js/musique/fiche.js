@@ -2,7 +2,8 @@
    l'accord choisi. Expose Musique.ChordSheet. Dépend de musique/core.js.
 
    Musique.ChordSheet.mount(container, opts) -> { render }
-   opts : instrument (voir Musique.instruments), hint (texte d'aide sous le détail, facultatif).
+   opts : instrument (voir Musique.instruments), hint (texte d'aide sous le détail, facultatif),
+          notes (facultatif) : la fiche ne montre que les 12 notes, nommées « Notes », sans famille d'accord (cas de la basse).
    Si l'instrument fournit describe(accord), ses lignes s'ajoutent au détail (notes à jouer, position…). */
 (function () {
   'use strict';
@@ -30,12 +31,12 @@
 
     function renderDetail() {
       var c = selected;
-      title.textContent = M.chordTitle(c);
-      notes.textContent = 'Notes de l’accord : ' + c.tones.map(M.fmt).join(' · ');
+      title.textContent = opts.notes ? M.fmt(c.root) : M.chordTitle(c);
+      notes.textContent = opts.notes ? '' : 'Notes de l’accord : ' + c.tones.map(M.fmt).join(' · ');
       big.replaceChildren(inst.diagram(c, true));
       lines.replaceChildren();
       if (inst.describe) inst.describe(c).forEach(function (t) { lines.appendChild(el('p', '', t)); });
-      tiles.forEach(function (x) { x.btn.setAttribute('aria-pressed', String(x.c.id === c.id)); });
+      tiles.forEach(function (x) { x.btn.setAttribute('aria-pressed', String(opts.notes ? x.c.root.l === c.root.l && x.c.root.a === c.root.a : x.c.id === c.id)); });
     }
 
     function select(c, play) {
@@ -48,17 +49,17 @@
     function render() {
       tiles = [];
       groups.replaceChildren();
-      inst.qualities.forEach(function (q) {
-        var card = el('section', 'card'), grid = el('div', 'chords');
-        card.setAttribute('aria-label', 'Accords ' + M.QUALITY[q].plural.toLowerCase());
-        card.appendChild(el('h2', '', 'Accords ' + M.QUALITY[q].plural.toLowerCase()));
+      (opts.notes ? inst.qualities.slice(0, 1) : inst.qualities).forEach(function (q) {
+        var card = el('section', 'card'), grid = el('div', 'chords'), head = opts.notes ? 'Notes' : 'Accords ' + M.QUALITY[q].plural.toLowerCase();
+        card.setAttribute('aria-label', head);
+        card.appendChild(el('h2', '', head));
         M.ROOTS.forEach(function (root) {
           var c = inst.chordFor(root, q);
           if (!c) return;
           var b = el('button', 'chord-btn');
           b.type = 'button';
-          b.setAttribute('aria-label', 'Accord ' + M.chordTitle(c));
-          b.appendChild(el('b', '', M.chordTitle(c)));
+          b.setAttribute('aria-label', (opts.notes ? 'Note ' : 'Accord ') + (opts.notes ? M.fmt(c.root) : M.chordTitle(c)));
+          b.appendChild(el('b', '', opts.notes ? M.fmt(c.root) : M.chordTitle(c)));
           b.appendChild(inst.diagram(c));
           b.addEventListener('click', function () { select(c, true); });
           grid.appendChild(b);

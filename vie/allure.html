@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Calculateur d’allure</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/allure.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Calculateur d’allure</li></ol></nav>
+
+  <header>
+    <h1 class="title">Calculateur d’allure</h1>
+    <p class="sub">Distance, temps ou allure : renseignez deux des trois, le troisième se calcule.</p>
+  </header>
+
+  <section class="card" aria-label="Calcul">
+    <div class="field small">
+      <span class="lab" id="lab-mode">Je cherche</span>
+      <div class="seg" id="mode" role="group" aria-labelledby="lab-mode">
+        <button type="button" data-v="allure" aria-pressed="true">L’allure</button>
+        <button type="button" data-v="temps" aria-pressed="false">Le temps</button>
+        <button type="button" data-v="distance" aria-pressed="false">La distance</button>
+      </div>
+    </div>
+
+    <div class="inputs" id="f-distance">
+      <div class="field narrow"><label for="dist">Distance (km)</label><input type="number" id="dist" min="0.1" max="500" step="0.01" value="10" inputmode="decimal"></div>
+      <div class="chips" id="presets" role="group" aria-label="Distances courantes"></div>
+    </div>
+    <div class="inputs" id="f-temps">
+      <div class="field narrow"><label for="t-h">Heures</label><input type="number" id="t-h" min="0" max="48" step="1" value="0" inputmode="numeric"></div>
+      <div class="field narrow"><label for="t-m">Minutes</label><input type="number" id="t-m" min="0" max="59" step="1" value="50" inputmode="numeric"></div>
+      <div class="field narrow"><label for="t-s">Secondes</label><input type="number" id="t-s" min="0" max="59" step="1" value="0" inputmode="numeric"></div>
+    </div>
+    <div class="inputs" id="f-allure">
+      <div class="field narrow"><label for="a-m">Allure : min / km</label><input type="number" id="a-m" min="1" max="30" step="1" value="5" inputmode="numeric"></div>
+      <div class="field narrow"><label for="a-s">Secondes</label><input type="number" id="a-s" min="0" max="59" step="1" value="0" inputmode="numeric"></div>
+    </div>
+    <p class="err" id="err" role="alert" hidden></p>
+  </section>
+
+  <section class="card" id="result" aria-label="Résultat" aria-live="polite">
+    <h2>⚡ Résultat</h2>
+    <div class="bento" id="stats"></div>
+  </section>
+
+  <section class="card" id="pred" aria-label="Estimations" aria-live="polite">
+    <h2>🔮 Estimation sur d’autres distances</h2>
+    <div class="bento" id="preds"></div>
+    <p class="hint">Estimation simple, valable pour des distances proches : elle suppose le même niveau d’effort.</p>
+  </section>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

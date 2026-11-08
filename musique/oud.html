@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Oud</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/musique.css">
+<script src="../assets/js/musique/core.js" defer></script>
+<script src="../assets/js/musique/instrument-oud.js" defer></script>
+<script src="../assets/js/musique/clavier.js" defer></script>
+<script src="../assets/js/musique/fiche.js" defer></script>
+<script src="../assets/js/musique/gammes.js" defer></script>
+<script src="../assets/js/musique/accordeur.js" defer></script>
+<script src="../assets/js/musique/cordes.js" defer></script>
+<script src="../assets/js/pages/oud.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="musique.html">Musique</a></li><li aria-current="page">Oud</li></ol></nav>
+
+  <header>
+    <h1 class="title">Oud</h1>
+    <p class="sub">Notes, oud virtuel avec son manche, gammes et accordeur. L’oud n’a pas de frettes : les cases de la grille sont les demi-tons. Touchez une note ou une corde pour l’entendre.</p>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" role="tablist" aria-label="Sections de la page">
+      <button type="button" role="tab" id="tab-accords" aria-controls="panel-accords" aria-selected="true">Notes</button>
+      <button type="button" role="tab" id="tab-virtuelle" aria-controls="panel-virtuelle" aria-selected="false" tabindex="-1">Oud virtuel</button>
+      <button type="button" role="tab" id="tab-manche" aria-controls="panel-manche" aria-selected="false" tabindex="-1">Manche et gammes</button>
+      <button type="button" role="tab" id="tab-accordeur" aria-controls="panel-accordeur" aria-selected="false" tabindex="-1">Accordeur</button>
+    </div>
+    <div class="notation">
+      <span class="muted">Notation</span>
+      <div class="seg" role="group" aria-label="Notation des notes">
+        <button type="button" data-notation="abc" aria-pressed="true">A B C</button>
+        <button type="button" data-notation="do" aria-pressed="false">Do Ré Mi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes : les 12 notes, avec leur place sur le manche -->
+  <section class="panel" id="panel-accords" role="tabpanel" aria-labelledby="tab-accords">
+    <div id="sheetHost" class="panel"></div>
+  </section>
+
+  <!-- Oud virtuel : cordes à balayer, avec le manche jouable et le sélecteur de case -->
+  <section class="panel" id="panel-virtuelle" role="tabpanel" aria-labelledby="tab-virtuelle" hidden>
+    <div id="padHost"></div>
+  </section>
+
+  <!-- Gammes -->
+  <section class="panel" id="panel-manche" role="tabpanel" aria-labelledby="tab-manche" hidden>
+    <div id="scalesHost" class="panel"></div>
+  </section>
+
+  <!-- Accordeur -->
+  <section class="panel" id="panel-accordeur" role="tabpanel" aria-labelledby="tab-accordeur" hidden>
+    <div id="tunerHost"></div>
+  </section>
+
+
+  <footer>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

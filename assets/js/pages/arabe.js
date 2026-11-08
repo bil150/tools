@@ -3,8 +3,18 @@
 
   /* Données et voix : voir arabe-core.js */
   var A = window.Arabe;
-  var LETTERS = A.LETTERS, ROWS = A.ROWS, GRID = A.GRID, SYLS = A.SYLS, WORD_ITEMS = A.WORD_ITEMS, QUIZ_WORDS = A.QUIZ_WORDS;
-  var NROWS = A.NROWS, ALPHA = A.ALPHA, ZWJ = A.ZWJ;
+  var ROWS = A.ROWS, WORD_ITEMS = A.WORD_ITEMS, QUIZ_WORDS = A.QUIZ_WORDS;
+  var ALPHA = A.ALPHA, ZWJ = A.ZWJ;
+  /* Les lettres du tableau : par défaut ب ت ث (celles du livre) ; le choix est gardé dans le navigateur */
+  var BOOK = [1, 2, 3], MAX_LETTERS = 8, KEY = 'tools:arabe:lettres';
+  function loadLetters() {
+    try {
+      var v = JSON.parse(localStorage.getItem(KEY));
+      if (Array.isArray(v) && v.length && v.length <= MAX_LETTERS && v.every(function (i) { return ALPHA[i]; })) return v;
+    } catch (e) { /* lecture impossible */ }
+    return BOOK.slice();
+  }
+  var letters = loadLetters(), T = A.build(letters);
   var variationsFor = A.variationsFor, h = A.h, arEl = A.arEl, shuffle = A.shuffle;
   var $ = function (id) { return document.getElementById(id); };
   var state = { mode: 'study', queue: [], i: 0, score: 0, answered: false, mistakes: [], interacted: false, reading: false, sel: null };
@@ -27,17 +37,18 @@
   function buildGrid() {
     var g = $('grid');
     g.innerHTML = '';
-    LETTERS.forEach(function (l) {
+    g.style.gridTemplateColumns = 'repeat(' + T.letters.length + ', minmax(78px, 1fr)) 84px';
+    T.letters.forEach(function (l) {
       var hd = h('div', 'gh');
-      hd.appendChild(arEl({ parts: [[l.ch]] }));
+      hd.appendChild(arEl({ parts: [[l.disp]] }));
       hd.appendChild(h('small', null, l.n));
       g.appendChild(hd);
     });
     g.appendChild(h('div', 'corner', 'Ligne'));
-    for (var r = 0; r < NROWS; r++) {
-      for (var c = 0; c < 3; c++) {
+    for (var r = 0; r < T.nrows; r++) {
+      for (var c = 0; c < T.letters.length; c++) {
         (function (r, c) {
-          var item = GRID[r][c];
+          var item = T.grid[r][c];
           var b = h('button', 'cell' + (item.kind === 'word' ? ' word' : ''));
           b.type = 'button';
           b.id = 'cell-' + r + '-' + c;
@@ -62,7 +73,7 @@
     state.sel = { r: r, c: c };
     var cell = $('cell-' + r + '-' + c);
     if (cell) cell.classList.add('on');
-    var item = GRID[r][c];
+    var item = T.grid[r][c];
     var dAr = $('dAr');
     dAr.innerHTML = '';
     item.parts.forEach(function (p) { dAr.appendChild(h('span', p[1] ? 'lv' : null, p[0])); });
@@ -94,7 +105,7 @@
       selectCell(pos[0], pos[1], false);
       var cell = $('cell-' + pos[0] + '-' + pos[1]);
       if (cell && cell.scrollIntoView) cell.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      speak(GRID[pos[0]][pos[1]].text, 0.7, function (ok) {
+      speak(T.grid[pos[0]][pos[1]].text, 0.7, function (ok) {
         if (!state.reading) return;
         if (!ok) { setReading(false); return; }
         setTimeout(step, 350);
@@ -103,12 +114,12 @@
   }
   function colsSeq() {
     var s = [];
-    for (var c = 0; c < 3; c++) for (var r = 0; r < NROWS; r++) s.push([r, c]);
+    for (var c = 0; c < T.letters.length; c++) for (var r = 0; r < T.nrows; r++) s.push([r, c]);
     return s;
   }
   function rowsSeq() {
     var s = [];
-    for (var r = 0; r < NROWS; r++) for (var c = 0; c < 3; c++) s.push([r, c]);
+    for (var r = 0; r < T.nrows; r++) for (var c = 0; c < T.letters.length; c++) s.push([r, c]);
     return s;
   }
 
@@ -193,7 +204,7 @@
   function pickOne(arr) { return arr.length ? arr[Math.floor(Math.random() * arr.length)] : null; }
 
   function buildQuiz() {
-    return shuffle(state.mode === 'word' ? QUIZ_WORDS : SYLS).slice(0, 10);
+    return shuffle(state.mode === 'word' ? QUIZ_WORDS : T.syls).slice(0, 10);
   }
 
   function optionsFor(t) {
@@ -201,15 +212,15 @@
       var others = shuffle(QUIZ_WORDS.filter(function (x) { return x.text !== t.text; })).slice(0, 3);
       return shuffle([t].concat(others));
     }
-    var sameLetter = SYLS.filter(function (x) { return x.c === t.c && x.rowId !== t.rowId; });
-    var sameRow = SYLS.filter(function (x) { return x.rowId === t.rowId && x.c !== t.c; });
+    var sameLetter = T.syls.filter(function (x) { return x.c === t.c && x.rowId !== t.rowId; });
+    var sameRow = T.syls.filter(function (x) { return x.rowId === t.rowId && x.c !== t.c; });
     var chosen = [t];
     function add(x) { if (x && chosen.every(function (y) { return y.text !== x.text; })) chosen.push(x); }
     add(pickOne(sameLetter));
     add(pickOne(sameRow));
     add(pickOne(sameLetter));
     var guard = 0;
-    while (chosen.length < 4 && guard++ < 50) add(pickOne(SYLS));
+    while (chosen.length < 4 && guard++ < 50) add(pickOne(T.syls));
     return shuffle(chosen);
   }
 
@@ -374,7 +385,7 @@
   /* Après un changement de voix : on la fait entendre sur l'élément courant */
   function onVoiceChange() {
     state.interacted = true;
-    if (state.mode === 'study' && state.sel) speakItem(GRID[state.sel.r][state.sel.c], 0.7);
+    if (state.mode === 'study' && state.sel) speakItem(T.grid[state.sel.r][state.sel.c], 0.7);
     else if (state.mode === 'alpha') speak(ALPHA[state.letter].disp, 0.7, null);
     else if ((state.mode === 'syl' || state.mode === 'word') && cur()) speakItem(cur(), 0.75);
   }
@@ -392,7 +403,46 @@
     }
   });
 
+  /* ---------- Choix des lettres du tableau ---------- */
+  function buildPicker() {
+    var box = $('pick');
+    box.innerHTML = '';
+    ALPHA.forEach(function (l, i) {
+      var b = h('button', 'pk', l.disp);
+      b.type = 'button';
+      b.lang = 'ar';
+      b.setAttribute('aria-label', l.n);
+      b.setAttribute('aria-pressed', String(letters.indexOf(i) >= 0));
+      b.addEventListener('click', function () {
+        var k = letters.indexOf(i);
+        state.interacted = true;
+        if (k >= 0) { if (letters.length === 1) return; letters.splice(k, 1); }
+        else {
+          if (letters.length >= MAX_LETTERS) { showPickNote('Huit lettres au plus à la fois : retirez-en une.'); return; }
+          letters.push(i);
+        }
+        letters.sort(function (a, b2) { return a - b2; });
+        applyLetters();
+      });
+      box.appendChild(b);
+    });
+    $('pickNote').hidden = true;
+  }
+  function showPickNote(t) { $('pickNote').textContent = t; $('pickNote').hidden = false; }
+  function applyLetters() {
+    stopReading();
+    voice.stop();
+    try { localStorage.setItem(KEY, JSON.stringify(letters)); } catch (e) { /* stockage indisponible */ }
+    T = A.build(letters);
+    state.sel = null;
+    buildPicker();
+    buildGrid();
+    selectCell(0, 0, false);
+  }
+  $('pickReset').addEventListener('click', function () { state.interacted = true; letters = BOOK.slice(); applyLetters(); });
+
   /* ---------- Démarrage ---------- */
+  buildPicker();
   buildGrid();
   selectCell(0, 0, false);
   buildAlpha();

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Sommeil et réveil</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/sommeil.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Sommeil et réveil</li></ol></nav>
+
+  <header>
+    <h1 class="title">Sommeil et réveil</h1>
+    <p class="sub">Le sommeil s’enchaîne en cycles d’environ 1 h 30. Voici des heures de coucher ou de réveil qui tombent à la fin d’un cycle.</p>
+  </header>
+
+  <section class="card" aria-label="Calcul">
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-mode">Je connais</span>
+        <div class="seg" id="mode" role="group" aria-labelledby="lab-mode">
+          <button type="button" data-v="reveil" aria-pressed="true">Mon heure de réveil</button>
+          <button type="button" data-v="coucher" aria-pressed="false">Mon heure de coucher</button>
+        </div>
+      </div>
+    </div>
+    <div class="inputs">
+      <div class="field narrow"><label for="heure" id="lab-heure">Je me réveille à</label><input type="time" id="heure" value="07:00"></div>
+      <div class="field narrow"><label for="age">Âge</label><input type="number" id="age" min="6" max="100" step="1" value="30" inputmode="numeric"></div>
+      <div class="field"><label for="latence" id="lab-latence">Temps pour m’endormir : <b id="latence-v">15</b> min</label><input type="range" id="latence" min="0" max="45" step="5" value="15"></div>
+    </div>
+    <div class="actions"><button type="button" class="btn ghost" id="maintenant">Je me couche maintenant</button></div>
+  </section>
+
+  <section class="card" aria-label="Résultat" aria-live="polite">
+    <h2 id="titre"></h2>
+    <div class="times" id="times"></div>
+    <p class="hint" id="reco"></p>
+    <p class="hint">Méthode : cycles de 90 minutes, plus le temps pour s’endormir.</p>
+  </section>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

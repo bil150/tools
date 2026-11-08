@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Minuteur d’intervalles</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/minuteur.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Minuteur d’intervalles</li></ol></nav>
+
+  <header>
+    <h1 class="title">Minuteur d’intervalles</h1>
+    <p class="sub">Travail et repos qui s’enchaînent, avec un signal sonore. Idéal pour le fractionné, le tabata ou le repos entre séries.</p>
+  </header>
+
+  <section class="card minu ph-prep" id="minu" aria-label="Minuteur" aria-live="off">
+    <span class="phase" id="phase">Prêt</span>
+    <b class="temps" id="temps" role="timer">00:00</b>
+    <span class="tour" id="tour"></span>
+    <div class="meter" id="barre"><div class="meter-bar"><i></i></div></div>
+    <div class="actions">
+      <button type="button" class="btn" id="go">Démarrer</button>
+      <button type="button" class="btn ghost" id="raz">Remettre à zéro</button>
+      <button type="button" class="btn ghost" id="son" aria-pressed="true">🔔 Son</button>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Réglages">
+    <h2>⚙️ Réglages</h2>
+    <div class="inputs">
+      <div class="field narrow"><label for="r-prep">Préparation (s)</label><input type="number" id="r-prep" min="0" max="60" step="1" value="5" inputmode="numeric"></div>
+      <div class="field narrow"><label for="r-trav">Travail (s)</label><input type="number" id="r-trav" min="0" max="3600" step="5" value="40" inputmode="numeric"></div>
+      <div class="field narrow"><label for="r-rep">Repos (s)</label><input type="number" id="r-rep" min="0" max="3600" step="5" value="20" inputmode="numeric"></div>
+      <div class="field narrow"><label for="r-tours">Tours</label><input type="number" id="r-tours" min="1" max="99" step="1" value="8" inputmode="numeric"></div>
+    </div>
+    <p class="hint" id="resume"></p>
+  </section>
+
+  <section class="card" aria-label="Préréglages">
+    <h2>💡 Préréglages</h2>
+    <div class="bento" id="presets"></div>
+  </section>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

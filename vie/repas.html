@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Compositeur de repas</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/repas.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Compositeur de repas</li></ol></nav>
+
+  <header>
+    <h1 class="title">Compositeur de repas</h1>
+    <p class="sub">Cochez ce que vous avez sous la main : des idées de repas se composent avec, et chaque aliment a ses variantes (pomme de terre ou patate douce, en dés, en rondelles, en purée…).</p>
+  </header>
+
+  <section class="card" aria-label="Ce que j’ai">
+    <h2>Ce que j’ai</h2>
+    <div class="field small">
+      <span class="lab" id="lab-regime">Régime</span>
+      <div class="seg" id="regime" role="group" aria-labelledby="lab-regime">
+        <button type="button" data-v="tout" aria-pressed="true">Tout</button>
+        <button type="button" data-v="vege" aria-pressed="false">Sans viande ni poisson</button>
+        <button type="button" data-v="vegan" aria-pressed="false">Végétal</button>
+      </div>
+    </div>
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-vue">Affichage</span>
+        <div class="seg" id="vue" role="group" aria-labelledby="lab-vue">
+          <button type="button" data-v="grille" aria-pressed="true">Grille</button>
+          <button type="button" data-v="pastilles" aria-pressed="false">Pastilles</button>
+          <button type="button" data-v="liste" aria-pressed="false">Liste</button>
+        </div>
+      </div>
+      <div class="field"><label for="cherche">Chercher</label><input type="text" id="cherche" placeholder="Poulet, riz, brocoli…" autocomplete="off"></div>
+    </div>
+    <div id="pantry"></div>
+    <div class="actions">
+      <button type="button" class="btn" id="idees">Trouver des idées</button>
+      <button type="button" class="btn ghost" id="decocher">Tout décocher</button>
+    </div>
+    <div class="field small">
+      <span class="lab" id="lab-vue-idees">Idées en</span>
+      <div class="seg" id="vue-idees" role="group" aria-labelledby="lab-vue-idees">
+        <button type="button" data-v="grille" aria-pressed="true">Grille</button>
+        <button type="button" data-v="liste" aria-pressed="false">Liste</button>
+      </div>
+    </div>
+    <p class="hint" id="pantry-hint"></p>
+  </section>
+
+  <div id="ideas" aria-live="polite"></div>
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

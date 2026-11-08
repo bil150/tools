@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Programme course à pied</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/vie/glisser.js" defer></script>
+<script src="../assets/js/vie/calendrier.js" defer></script>
+<script src="../assets/js/pages/course.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Programme course à pied</li></ol></nav>
+
+  <header>
+    <h1 class="title">Programme course à pied</h1>
+    <p class="sub">Un exemple de semaine, selon votre niveau et le nombre de jours où vous voulez courir.</p>
+  </header>
+
+  <section class="card" aria-label="Votre semaine">
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-niveau">Niveau</span>
+        <div class="seg" id="niveau" role="group" aria-labelledby="lab-niveau">
+          <button type="button" data-v="0" aria-pressed="false">Débutant</button>
+          <button type="button" data-v="1" aria-pressed="true">Intermédiaire</button>
+          <button type="button" data-v="2" aria-pressed="false">Confirmé</button>
+        </div>
+      </div>
+      <div class="field small">
+        <span class="lab" id="lab-jours">Jours par semaine</span>
+        <div class="seg" id="jours" role="group" aria-labelledby="lab-jours">
+          <button type="button" data-v="2" aria-pressed="false">2</button>
+          <button type="button" data-v="3" aria-pressed="true">3</button>
+          <button type="button" data-v="4" aria-pressed="false">4</button>
+          <button type="button" data-v="5" aria-pressed="false">5</button>
+          <button type="button" data-v="6" aria-pressed="false">6</button>
+        </div>
+      </div>
+      <div class="field small">
+        <label for="objectif">Objectif</label>
+        <select id="objectif">
+          <option value="0">Rester en forme</option>
+          <option value="1">5 km</option>
+          <option value="2">10 km</option>
+          <option value="3">Semi-marathon</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Ma semaine" aria-live="polite">
+    <h2 id="titre">🏃 Ma semaine</h2>
+    <div class="week" id="week"></div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="edition" aria-pressed="false">✏️ Composer moi-même</button>
+      <button type="button" class="btn ghost" id="vide" hidden>Semaine vide</button>
+      <button type="button" class="btn ghost" id="remise" hidden>Remettre la semaine d’origine</button>
+    </div>
+    <p class="hint">Déplacez une séance : glissez ⠿ vers un autre jour, ou touchez la séance puis le jour voulu. « Composer moi-même » permet d’en ajouter, d’en retirer et de régler la durée.</p>
+    <p class="hint">Exemple à adapter à vos sensations.</p>
+  </section>
+
+  <section class="card" aria-label="Calendrier">
+    <h2>📅 Calendrier</h2>
+    <div class="inputs">
+      <div class="field narrow"><label for="cal-heure">Heure de début</label><input type="time" id="cal-heure" value="18:00"></div>
+      <div class="field narrow"><label for="cal-sem">Semaines</label><input type="number" id="cal-sem" min="1" max="52" step="1" value="8" inputmode="numeric"></div>
+      <button type="button" class="btn" id="cal-export">Exporter (.ics)</button>
+    </div>
+    <p class="hint">Fichier standard, créé sur votre appareil : rien n’est envoyé. Il s’ouvre dans n’importe quel agenda.</p>
+  </section>
+
+  <details class="card" aria-label="Suggestions">
+    <summary>💡 Suggestions</summary>
+    <div class="bento" id="sugg"></div>
+  </details>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

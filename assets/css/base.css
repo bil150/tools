@@ -65,6 +65,7 @@ header { display: flex; flex-direction: column; gap: 8px; }
 .sub { color: var(--muted); max-width: 54ch; }
 .muted { color: var(--muted); }
 footer { font-size: 13px; color: var(--muted); }
+footer a { color: inherit; text-underline-offset: 2px; }
 
 /* Liste de liens (pages d'accueil) */
 .tiles { display: flex; flex-direction: column; gap: 12px; }

@@ -1,11 +1,12 @@
 /* Composer : écrire une suite d'accords (pour noter une idée ou pour avoir un accompagnement) et la jouer en boucle avec
-   un groupe : un ou plusieurs instruments (guitare, piano, basse…) et la batterie.
+   un groupe : un ou plusieurs instruments (guitare, piano, basse…) et la boîte à rythmes (page à part, voir batterie.js).
    Expose Musique.Composer. Dépend de musique/core.js et musique/batterie.js. Il ne connaît aucun instrument en particulier :
    la page lui donne la liste de ceux qu'elle propose (voir Musique.instruments).
 
    Musique.Composer.mount(container, opts) construit toute l'interface et renvoie un contrôleur.
    opts : id (clé de sauvegarde, ex. « guitare »), instruments (liste), diagram (instrument dont on montre les schémas),
-          onIdeas (facultatif : fonction appelée par le bouton « Besoin d'idées ? »).
+          onIdeas (facultatif : fonction appelée par le bouton « Besoin d'idées ? »),
+          noun (facultatif : « note » pour que la carte d'ajout parle de notes et non d'accords, comme sur la basse).
    Contrôleur : setSteps(ids), getSteps(), render(), stop(), isPlaying(). */
 (function () {
   'use strict';
@@ -39,7 +40,7 @@
 
     /* ----- Sauvegarde ----- */
     function save() {
-      M.store.set(key, { steps: st.steps, bpm: st.bpm, beats: st.beats, loop: st.loop, diagram: st.diagram, quality: st.quality, voices: st.voices, drums: D.data() });
+      M.store.set(key, { steps: st.steps, bpm: st.bpm, beats: st.beats, loop: st.loop, diagram: st.diagram, quality: st.quality, voices: st.voices });
     }
     function load() {
       var d = M.store.get(key, null);
@@ -59,17 +60,17 @@
           if (isFinite(v.vol)) st.voices[inst.id].vol = clamp(Math.round(v.vol), 0, 100);
         });
       }
-      D.apply(d.drums);
     }
     load();
 
     /* ================= Interface ================= */
-    var cardAdd = el('section', 'card'), cardSeq = el('section', 'card'), cardBand = el('section', 'card'), drumHost = el('div');
+    var cardAdd = el('section', 'card'), cardSeq = el('section', 'card'), cardBand = el('section', 'card'), cardDrums = el('section', 'card');
     var idBpm = M.uid('bpm');
 
     /* ----- Ajouter un accord ----- */
-    cardAdd.setAttribute('aria-label', 'Ajouter un accord');
-    cardAdd.appendChild(el('h2', '', 'Ajouter un accord'));
+    var noun = opts.noun === 'note' ? 'note' : 'accord', addTitle = 'Ajouter ' + (noun === 'note' ? 'une note' : 'un accord');
+    cardAdd.setAttribute('aria-label', addTitle);
+    cardAdd.appendChild(el('h2', '', addTitle));
     var addBar = el('div', 'inputs'), qSeg = el('div', 'seg'), dSeg = el('div', 'seg'), grid = el('div', 'chords');
     qSeg.setAttribute('role', 'group'); qSeg.setAttribute('aria-label', 'Famille d’accords');
     dSeg.setAttribute('role', 'group'); dSeg.setAttribute('aria-label', 'Schémas affichés');
@@ -90,7 +91,7 @@
     /* ----- Ma suite d'accords ----- */
     cardSeq.setAttribute('aria-label', 'Ma suite d’accords');
     cardSeq.appendChild(el('h2', '', 'Ma suite d’accords'));
-    var empty = el('p', 'muted', 'Touchez un accord ci-dessus pour l’ajouter. Écrivez une suite pour noter une idée, ou pour avoir un accompagnement : elle est gardée dans ce navigateur.');
+    var empty = el('p', 'muted', 'Touchez ' + (noun === 'note' ? 'une note' : 'un accord') + ' ci-dessus pour l’ajouter. Écrivez une suite pour noter une idée, ou pour avoir un accompagnement : elle est gardée dans ce navigateur.');
     var seq = el('ol', 'seq'), seqText = el('p', 'seqtext'), edit = el('div', 'actions');
     seq.setAttribute('aria-label', 'Suite d’accords');
     function mk(label, aria) { var b = el('button', 'btn ghost', label); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); return b; }
@@ -137,7 +138,7 @@
     container.appendChild(cardAdd);
     container.appendChild(cardSeq);
     container.appendChild(cardBand);
-    container.appendChild(drumHost);
+    container.appendChild(cardDrums);
 
     /* ----- Dessin ----- */
     function tile(inst, c) {
@@ -217,7 +218,7 @@
       loopIn.checked = st.loop;
       M.setPressed(beatsSeg.querySelectorAll('button'), function (b) { return Number(b.getAttribute('data-beats')) === st.beats; });
       play.disabled = !has && !st.playing;
-      hint.textContent = !hasSound() ? 'Aucun son : cochez un instrument ou la batterie.' : '';
+      hint.textContent = !hasSound() ? 'Aucun son : cochez un instrument ou la boîte à rythmes.' : '';
     }
 
     function renderBand() {
@@ -244,7 +245,7 @@
       });
     }
 
-    function render() { renderPalette(); renderSeq(); renderBand(); drums.render(); }
+    function render() { renderPalette(); renderSeq(); renderBand(); renderDrums(); }
 
     /* ----- Son ----- */
     function applyVolumes() {
@@ -306,8 +307,8 @@
     loopIn.addEventListener('change', function () { st.loop = loopIn.checked; save(); });
 
     /* ----- Lecture ----- */
-    /* Coups d'un accord pour tous les instruments cochés, plus ceux de la batterie, triés par instant.
-       p0 : position (en temps) de ce passage dans la mesure, pour que la batterie reste calée sur les mesures. */
+    /* Coups d'un accord pour tous les instruments cochés, plus ceux de la boîte à rythmes, triés par instant.
+       p0 : position (en temps) de ce passage dans le motif de la boîte à rythmes (une ou plusieurs mesures), pour qu'elle reste calée. */
     function stepEvents(id, beats, p0) {
       var evs = [];
       instruments.forEach(function (inst) {
@@ -324,7 +325,7 @@
     function loadStep() {
       if (st.idx >= st.steps.length) st.idx = 0;
       if (!st.steps.length) { stop(); return; }
-      st.evs = stepEvents(st.steps[st.idx], st.beats, (st.idx * st.beats) % 4);
+      st.evs = stepEvents(st.steps[st.idx], st.beats, (st.idx * st.beats) % D.length());
       st.ev = 0;
       var idx = st.idx;
       setTimeout(function () { if (st.playing) markNow(idx); }, Math.max(0, (st.stepStart - M.audio().currentTime) * 1000));
@@ -376,21 +377,35 @@
     play.addEventListener('click', function () { if (st.playing) stop(); else start(); });
     window.addEventListener('pagehide', stop);
 
-    /* ----- Batterie ----- */
-    var drums = D.mount(drumHost, {
-      getTempo: function () { return st.bpm; },
-      onChange: function () { syncTransport(); save(); },
-      beforePlay: function () { stop(); },
-      onSuggest: function (style) {
-        setBpm(style.bpm);
+    /* ----- Boîte à rythmes : elle se règle sur sa propre page ; ici on choisit seulement de s'en servir ----- */
+    function renderDrums() {
+      var style = D.style(D.state.style), v = D.variations(style.id)[D.state.variation] || D.variations(style.id)[0];
+      var label = el('label', 'check'), box = el('input'), info = el('p', 'muted'), acts = el('div', 'actions');
+      var link = el('a', 'btn ghost', 'Modifier la boîte à rythmes'), suggest = mk('Tempo et rythmes conseillés');
+      cardDrums.replaceChildren();
+      cardDrums.setAttribute('aria-label', 'Boîte à rythmes');
+      cardDrums.appendChild(el('h2', '', 'Boîte à rythmes'));
+      box.type = 'checkbox';
+      box.checked = D.state.on;
+      box.addEventListener('change', function () { D.state.on = box.checked; D.save(); syncTransport(); });
+      label.appendChild(box);
+      label.appendChild(document.createTextNode(' Jouer avec la boîte à rythmes'));
+      cardDrums.appendChild(label);
+      info.textContent = style.name + ' · ' + v.name + ' · ' + D.state.bars + (D.state.bars > 1 ? ' mesures' : ' mesure') + (D.state.dirty ? ' (modifié)' : '') + '. Le style, les variations et les mesures se choisissent dans la boîte à rythmes.';
+      cardDrums.appendChild(info);
+      link.href = 'boite-a-rythmes.html';
+      suggest.addEventListener('click', function () {
+        setBpm(D.tempoOf(style.id, D.state.variation));
         instruments.forEach(function (inst) {
           var r = style.accomp && style.accomp[inst.id];
           if (r && inst.rhythms.some(function (x) { return x.id === r; })) st.voices[inst.id].rhythm = r;
         });
         renderBand();
         save();
-      }
-    });
+      });
+      acts.appendChild(link); acts.appendChild(suggest);
+      cardDrums.appendChild(acts);
+    }
 
     M.onNotation(function () { renderPalette(); renderSeq(); });
     render();

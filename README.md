@@ -36,18 +36,32 @@ it/
   aide-cron.html                 explication d'une expression cron, prochaines exécutions
   comparateur-textes.html        différences entre deux textes (diff)
 
+vie/
+  vie.html                       menu Santé/Condition Physique
+  proteines.html                 besoin en calories et en protéines selon le sport et l'objectif ; sources animales et végétales
+  repas.html                     compositeur de repas : idées à partir de ce qu'on a, avec variantes d'aliment et de préparation
+  sommeil.html                   heures de coucher ou de réveil en cycles de sommeil de 90 min
+  courses.html                   liste de courses : ingrédients des idées de repas ou aliments à la main, par rayon, à cocher
+  allure.html                    calculateur d'allure (distance, temps, allure) et estimation sur d'autres distances
+  minuteur.html                  minuteur d'intervalles (travail, repos, tours) avec signal sonore
+  course.html                    programme de course à pied de la semaine (niveau, jours, objectif)
+  muscu.html                     programme de musculation de la semaine (corps entier, haut/bas, push/pull/jambes)
+
 musique/
   musique.html                   menu musique
   guitare.html                   guitare : accords ouverts, guitare virtuelle (six lignes à balayer), manche et gammes,
                                  accordeur (micro), Composer, suites harmoniques
   basse.html                     basse : mêmes onglets que la guitare (quatre cordes)
+  oud.html                       oud : notes, oud virtuel, manche et gammes, accordeur (six chœurs, accordage arabe, sans frettes) ; ni Composer ni suites harmoniques
   piano.html                     piano : mêmes onglets, sans accordeur ; clavier virtuel
+  boite-a-rythmes.html           boîte à rythmes : styles, variations, mesures éditables, tempo (accompagne aussi le Composer)
   testeur-midi.html              testeur de clavier MIDI (API Web MIDI)
 
 assets/
   css/
     base.css                     variables, thème clair/sombre, reset, composants communs
-    musique.css                  styles communs des pages d'instruments (onglets, schémas, Composer, batterie, roue, gammes…)
+    vie.css                      styles communs des pages « Santé/Condition Physique » (chiffres clés, barres, tableaux)
+    musique.css                  styles communs des pages d'instruments (onglets, schémas, Composer, boîte à rythmes, roue, gammes…)
     arabe.css                    styles communs aux pages d'arabe
     memento.css                  feuilles A4 paysage imprimables (mémentos IT)
     pages/                       un fichier par page : arabe, cartes, dictee, ecriture,
@@ -57,6 +71,9 @@ assets/
     arabe-core.js                données de l'arabe et voix, partagées par les 4 pages d'arabe
     memento.js                   nombre de pages, échelle et impression des feuilles
     musique/                     modules communs des pages d'instruments (voir « Pages d'instruments »)
+    vie/aliments.js              base d'aliments (calories et macros pour 100 g) et aides communes aux pages « Santé/Condition Physique »
+    vie/calendrier.js            export d'une semaine de séances au format iCalendar (.ics), créé sur l'appareil
+    vie/glisser.js               déplacer une séance d'un jour à l'autre (glisser ou toucher) pour les programmes course et musculation
     pages/                       un fichier par page, même noms que dans css/pages/
   icons/                         favicon.svg, icon-192/512.png, maskable-512.png, apple-touch-icon.png
 ```
@@ -65,25 +82,26 @@ Chaque page de `it/`, `langues/` et `musique/` (hors pages d'instruments, décri
 puis son script dans `assets/js/pages/` (même nom). Les mémentos utilisent `memento.css` et `memento.js`.
 Correspondance des noms : syllabes → `arabe`, quiz-vocabulaire → `quiz-nl`, calculateur-reseau → `reseau`, comparateur-textes → `diff`, aide-cron → `cron`, testeur-manette → `manette`, testeur-midi → `midi` ; les autres pages portent leur propre nom.
 
-## Pages d'instruments (guitare, basse, piano)
+## Pages d'instruments (guitare, basse, oud, piano)
 
-Les trois pages ont les mêmes onglets et partagent leur code, rangé dans `assets/js/musique/`. Une page d'instrument ne contient
+Les pages ont les mêmes onglets et partagent leur code, rangé dans `assets/js/musique/`. Une page d'instrument ne contient
 que ce qui est propre à l'instrument ; tout le reste est un module qui construit sa propre interface dans un conteneur.
 Tous les modules s'attachent à `window.Musique` et se chargent avec `defer`, dans cet ordre.
 
 ```
 core.js                  noyau : aides DOM, stockage, théorie (notes, gammes, accords), audio (un « bus » par instrument),
                          notation A B C / Do Ré Mi, onglets
-batterie.js              batterie : sons synthétisés, 15 styles, grille éditable (Musique.Drums)
-instrument-guitare.js    un fichier par instrument : doigtés, schéma d'accord, son, rythmes (guitare, piano, basse)
+batterie.js              boîte à rythmes : sons synthétisés, 22 styles à variations, mesures éditables, sauvegarde commune (Musique.Drums)
+instrument-guitare.js    un fichier par instrument : doigtés, schéma d'accord, son, rythmes (guitare, piano, basse, oud)
 instrument-piano.js
 instrument-basse.js
+instrument-oud.js
 clavier.js               clavier de piano cliquable, touches de l'ordinateur
 gammes.js                onglet « gammes » : notes naturelles, gammes, décalages ; afficheurs manche à cordes et clavier
 accordeur.js             onglet « accordeur » : micro, détection de hauteur, notes de référence
 cordes.js                instrument virtuel fait de lignes à balayer (N cordes)
 fiche.js                 fiche des accords d'un instrument (12 fondamentales × familles) avec leurs schémas
-composer.js              Composer : suite d'accords jouée par un ou plusieurs instruments et la batterie
+composer.js              Composer : suite d'accords jouée par un ou plusieurs instruments et la boîte à rythmes
 harmonie.js              roue des accords, accords de chaque tonalité et suites classiques
 ```
 

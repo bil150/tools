@@ -110,6 +110,23 @@
     });
   }
 
+  /* ---------- Tableau pour des lettres au choix ----------
+     idx : indices dans ALPHA, une colonne par lettre. Les lignes sont celles du livre (voyelles, tanwîn, soukoun, chadda, prolongations) ;
+     la ligne des mots du livre n'existe que pour ب ت ث. */
+  function build(idx) {
+    var letters = idx.map(function (i) { return ALPHA[i]; }), grid = [], syls = [], book = idx.join(',') === '1,2,3', words = [];
+    ROWS.forEach(function (row, r) {
+      grid[r] = [];
+      letters.forEach(function (l, c) {
+        var m = row.mk(l), item = { kind: 'syl', parts: m.parts, tr: m.tr, text: textOf(m.parts), r: r, c: c, rowId: row.id, desc: row.name + ' · ' + row.hint };
+        grid[r][c] = item;
+        syls.push(item);
+      });
+    });
+    if (book) { words = WORDS.map(function (w, c) { return wordItem(w, { r: ROWS.length, c: c }); }); grid[ROWS.length] = words; }
+    return { letters: letters, grid: grid, syls: syls, words: words, nrows: ROWS.length + (book ? 1 : 0) };
+  }
+
   /* ---------- Petits outils ---------- */
   function h(tag, cls, text) {
     var el = document.createElement(tag);
@@ -222,6 +239,6 @@
   window.Arabe = {
     F: F, D: D, K: K, FT: FT, DT: DT, KT: KT, SU: SU, SH: SH, ALIF: ALIF, WAW: WAW, YA: YA, ZWJ: ZWJ,
     LETTERS: LETTERS, ROWS: ROWS, GRID: GRID, SYLS: SYLS, WORD_ITEMS: WORD_ITEMS, QUIZ_WORDS: QUIZ_WORDS, NROWS: NROWS,
-    ALPHA: ALPHA, textOf: textOf, variationsFor: variationsFor, h: h, arEl: arEl, shuffle: shuffle, createVoice: createVoice
+    ALPHA: ALPHA, build: build, textOf: textOf, variationsFor: variationsFor, h: h, arEl: arEl, shuffle: shuffle, createVoice: createVoice
   };
 })();

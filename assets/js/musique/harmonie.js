@@ -138,7 +138,7 @@
 
     cardProgs.setAttribute('aria-label', 'Suites possibles');
     cardProgs.appendChild(el('h2', '', 'Suites possibles'));
-    cardProgs.appendChild(el('p', 'muted', 'Chaque suite est donnée en degrés (chiffres romains : majuscule = majeur, minuscule = mineur, ° = diminué), puis dans la tonalité choisie. Écoutez-la, ou envoyez-la dans Composer pour la jouer avec un rythme et une batterie.'));
+    cardProgs.appendChild(el('p', 'muted', 'Chaque suite est donnée en degrés (chiffres romains : majuscule = majeur, minuscule = mineur, ° = diminué), puis dans la tonalité choisie. Écoutez-la, ou envoyez-la dans Composer pour la jouer avec un rythme et la boîte à rythmes.'));
     cardProgs.appendChild(progs);
     container.appendChild(cardWheel); container.appendChild(cardTiles); container.appendChild(cardProgs);
 

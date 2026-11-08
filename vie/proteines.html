@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Protéines et besoins</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/vie.css">
+<script src="../assets/js/vie/aliments.js" defer></script>
+<script src="../assets/js/pages/proteines.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="vie.html">Santé/Condition Physique</a></li><li aria-current="page">Protéines et besoins</li></ol></nav>
+
+  <header>
+    <h1 class="title">Protéines et besoins</h1>
+    <p class="sub">Où trouver les protéines, puis votre besoin par jour selon votre sport et votre objectif.</p>
+  </header>
+
+  <section class="card" aria-label="Sources de protéines">
+    <h2>🍗 Où trouver les protéines</h2>
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-regime">Afficher</span>
+        <div class="seg" id="regime" role="group" aria-labelledby="lab-regime">
+          <button type="button" data-v="tout" aria-pressed="true">Tout</button>
+          <button type="button" data-v="vege" aria-pressed="false">Sans viande ni poisson</button>
+          <button type="button" data-v="vegan" aria-pressed="false">Végétal</button>
+        </div>
+      </div>
+      <div class="field small">
+        <span class="lab" id="lab-vue">Vue</span>
+        <div class="seg" id="vue" role="group" aria-labelledby="lab-vue">
+          <button type="button" data-v="grille" aria-pressed="true">Grille</button>
+          <button type="button" data-v="cartes" aria-pressed="false">Cartes</button>
+          <button type="button" data-v="tableau" aria-pressed="false">Tableau</button>
+        </div>
+      </div>
+      <div class="field small">
+        <label for="tri">Trier par</label>
+        <div class="tri-ligne">
+          <select id="tri">
+            <option value="p">Protéines pour 100 g</option>
+            <option value="d">Protéines pour 100 kcal</option>
+            <option value="k">Calories</option>
+            <option value="a">Ordre alphabétique</option>
+          </select>
+          <button type="button" class="btn ghost sens" id="sens" aria-label="Inverser l’ordre" title="Inverser l’ordre">↓</button>
+        </div>
+      </div>
+    </div>
+    <div id="tables"></div>
+    <p class="hint">Repères : valeurs moyennes pour 100 g.</p>
+  </section>
+
+  <section class="card" aria-label="Votre profil">
+    <h2>🧍 Votre profil</h2>
+    <div class="inputs">
+      <div class="field small">
+        <span class="lab" id="lab-sexe">Sexe</span>
+        <div class="seg" id="sexe" role="group" aria-labelledby="lab-sexe">
+          <button type="button" data-v="h" aria-pressed="true">Homme</button>
+          <button type="button" data-v="f" aria-pressed="false">Femme</button>
+        </div>
+      </div>
+      <div class="field narrow"><label for="age">Âge</label><input type="number" id="age" min="15" max="100" step="1" value="30" inputmode="numeric"></div>
+      <div class="field narrow"><label for="poids">Poids (kg)</label><input type="number" id="poids" min="35" max="250" step="0.5" value="70" inputmode="decimal"></div>
+      <div class="field narrow"><label for="taille">Taille (cm)</label><input type="number" id="taille" min="130" max="230" step="1" value="175" inputmode="numeric"></div>
+    </div>
+    <div class="inputs">
+      <div class="field">
+        <label for="sport">Type de sport</label>
+        <select id="sport">
+          <option value="aucun">Aucun sport régulier</option>
+          <option value="endurance">Endurance (course, vélo, natation…)</option>
+          <option value="force">Force (musculation, haltérophilie…)</option>
+          <option value="mixte" selected>Mixte (sports collectifs, crossfit, arts martiaux…)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="freq">Activité par semaine</label>
+        <select id="freq">
+          <option value="0">Sédentaire, peu de marche</option>
+          <option value="1">1 à 3 séances</option>
+          <option value="2" selected>3 à 5 séances</option>
+          <option value="3">6 à 7 séances</option>
+          <option value="4">2 séances par jour, ou métier très physique</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="objectif">Objectif</label>
+        <select id="objectif">
+          <option value="maintien">Garder mon poids</option>
+          <option value="muscle">Prendre du muscle</option>
+          <option value="perte">Perdre de la graisse</option>
+        </select>
+      </div>
+      <div class="field small">
+        <span class="lab" id="lab-repas">Repas par jour</span>
+        <div class="seg" id="repas" role="group" aria-labelledby="lab-repas">
+          <button type="button" data-v="1" aria-pressed="false">1</button>
+          <button type="button" data-v="2" aria-pressed="false">2</button>
+          <button type="button" data-v="3" aria-pressed="true">3</button>
+          <button type="button" data-v="4" aria-pressed="false">4</button>
+          <button type="button" data-v="5" aria-pressed="false">5</button>
+        </div>
+      </div>
+    </div>
+    <p class="err" id="err" role="alert" hidden></p>
+  </section>
+
+  <section class="card" id="result" aria-label="Résultat" aria-live="polite">
+    <h2>🎯 Votre besoin par jour</h2>
+    <div class="bento" id="stats"></div>
+    <p class="hint">Méthode : métabolisme de base (Mifflin-St Jeor) × niveau d’activité ; protéines en g/kg selon le sport et l’objectif.</p>
+  </section>
+
+  <footer>Repères généraux, pas un avis médical. Pour un besoin particulier (maladie, grossesse, enfant…), demandez conseil à un professionnel de santé.<br>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

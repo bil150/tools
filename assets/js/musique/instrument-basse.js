@@ -29,7 +29,7 @@
   /* ================= Schéma : manche de 4 cordes, 5 cases ================= */
   var X0 = 14, XS = 17, Y0 = 30, YF = 12;
   B.diagram = function (c) {
-    var svg = sv('svg', { viewBox: '0 0 80 100', role: 'img', 'aria-label': 'Basse : fondamentale de ' + M.chordTitle(c), 'class': 'bn' });
+    var svg = sv('svg', { viewBox: '0 0 80 100', role: 'img', 'aria-label': 'Basse : note ' + M.fmt(c.root), 'class': 'bn' });
     var base = c.fret > 4 ? c.fret : 1, s, f, x = X0 + c.string * XS;
     for (f = 0; f <= 5; f++) svg.appendChild(sv('line', { x1: X0, x2: X0 + 3 * XS, y1: Y0 + f * YF, y2: Y0 + f * YF }, 'cd-line'));
     for (s = 0; s < 4; s++) svg.appendChild(sv('line', { x1: X0 + s * XS, x2: X0 + s * XS, y1: Y0, y2: Y0 + 5 * YF }, 'cd-line'));
@@ -136,7 +136,7 @@
 
   B.describe = function (c) {
     var string = M.fmtName(['E', 'A', 'D', 'G'][c.string]), f = c.fret === 0 ? 'corde à vide' : 'case ' + c.fret;
-    return ['Fondamentale : ' + M.noteName(c.midi, c.tones) + ' (corde de ' + string + ', ' + f + ')'];
+    return ['Note : ' + M.noteName(c.midi, c.tones) + ' (corde de ' + string + ', ' + f + ')'];
   };
 
   B.play = function (e, c, when, spb) { note(e.midi, when, e.vol, e.dur * spb); };

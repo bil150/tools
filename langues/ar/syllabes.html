@@ -48,6 +48,12 @@
   <section class="card" id="study" aria-label="Tableau des syllabes">
     <h2>Touchez une syllabe pour l'entendre</h2>
     <p class="hintline">Comme dans le livre : lisez d'abord en colonne, de haut en bas, puis en ligne, de droite à gauche. En rouge : la lettre qui allonge la voyelle.</p>
+    <div class="pickwrap">
+      <span class="lab">Lettres du tableau</span>
+      <div class="pick" id="pick" role="group" aria-label="Lettres du tableau"></div>
+      <button type="button" class="btn ghost" id="pickReset">Revenir à <span lang="ar" dir="rtl">ب ت ث</span> (le livre)</button>
+      <p class="hintline" id="pickNote" role="status" hidden></p>
+    </div>
     <div class="detail" id="detail" aria-live="polite">
       <span class="ar" id="dAr" lang="ar" dir="rtl"></span>
       <div class="detail-txt"><span class="tr" id="dTr"></span><span class="dsc" id="dDsc"></span></div>

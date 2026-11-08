@@ -76,3 +76,10 @@
 .vcard:hover { border-color: var(--ink); }
 .vcard.on { border-color: var(--ink); background: var(--hi); color: var(--ink); }
 .vcard.on small { color: var(--ink); }
+
+/* Choix des lettres du tableau */
+.pickwrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.pick { display: flex; flex-wrap: wrap; gap: 6px; direction: rtl; }
+.pk { min-width: 44px; min-height: 44px; padding: 0 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); color: var(--ink); font: 700 24px/1 'Noto Naskh Arabic', serif; }
+.pk:hover { border-color: var(--ink); }
+.pk[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
