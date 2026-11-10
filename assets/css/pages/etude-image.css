@@ -18,7 +18,7 @@
 .app { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; align-items: start; }
 .views { min-width: 0; }
 
-.rail-col { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.rail-col { position: sticky; top: 16px; z-index: 30; display: flex; flex-direction: column; gap: 8px; }
 .rail {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2);
@@ -193,7 +193,8 @@ input[type="number"] {
 .tube .tbtn.del:hover { border-color: var(--bad); color: var(--bad); }
 
 /* Paramètres */
-.settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 10px; max-width: 760px; }
+.settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 10px; max-width: 760px; }
+.settings .wide { grid-column: 1 / -1; }   /* le réglage et son explication : toute la largeur, sans trou à côté */
 #setMsg { max-width: 760px; margin-bottom: 10px; }
 .big { font: 700 28px/1.1 var(--body); }
 .meter { display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 14%, transparent); overflow: hidden; }
@@ -218,7 +219,7 @@ input[type="number"] {
 /* Mobile : le menu devient une rangée d'icônes en haut */
 @media (max-width: 640px) {
   .app { grid-template-columns: minmax(0, 1fr); }
-  .rail-col { top: 0; z-index: 10; flex-direction: row; gap: 8px; }
+  .rail-col { top: 0; flex-direction: row; gap: 8px; }
   .rail { flex-direction: row; justify-content: space-between; }
   .rail:not(.rail-layout) { flex: 1 1 auto; }
   .rail-tabs, .rail-layout, .rail-group { flex-direction: row; }
@@ -229,7 +230,7 @@ input[type="number"] {
 
 /* Lettres de la grille, sélection de carreaux et export */
 .bt label.switch { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 500; opacity: 1; }
-.switch input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+.switch input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
 #chunkRefs { min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2); width: 100%; font: 500 14px/1 var(--mono); text-transform: uppercase; }
 #chunkRefs::placeholder { text-transform: none; }
 #chunkRefs.bad { border-color: var(--bad); }
@@ -381,3 +382,130 @@ body:has(dialog[open]) { overflow: hidden; }
   .fields div { grid-template-columns: 1fr; }
   .modal { padding: 14px; }
 }
+
+/* Disposition « à droite » : les tuiles s'empilent à leur hauteur naturelle (plus d'égalisation, qui allongeait la colonne),
+   et la colonne reste visible en défilant ; en dernier recours elle défile seule plutôt que la page. */
+.dash[data-layout="right"] .panels {
+  grid-auto-rows: auto; align-content: start;
+  position: sticky; top: 16px; align-self: start;
+  max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto;
+}
+@media (max-width: 860px) {
+  .dash[data-layout="right"] .panels { grid-auto-rows: 1fr; position: static; max-height: none; overflow: visible; }
+}
+@media (max-width: 640px) {
+  .dash[data-layout="right"] .panels { grid-auto-rows: auto; }
+}
+
+/* Couleur cible et recette compactes : la colonne de droite doit tenir à l'écran sans défilement */
+.target { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: start; }
+.target-swatch { width: 64px; height: 64px; min-height: 0; flex: none; border-radius: 12px; }
+.codes { gap: 3px; align-content: start; }
+.codes div { padding-bottom: 3px; gap: 0 12px; }
+.codes dd { font-size: 13px; line-height: 1.3; }
+.codes dt { font-size: 12px; }
+#tNote { font-size: 12px; }
+.duo-sw { height: 48px; }
+.mixlist { gap: 6px; margin-top: 8px; }
+.de { margin-top: 6px; }
+
+/* Tuile « Carreaux » : les deux boutons d'export côte à côte */
+#tileChunks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; align-content: start; }
+#tileChunks > h2, #tileChunks > input, #tileChunks > .rowline { grid-column: 1 / -1; }
+#tileChunks .btn { padding: 0 8px; }
+
+/* Disposition « à droite » : commandes un peu plus serrées pour que la colonne tienne sur un écran de portable */
+.dash[data-layout="right"] .bt { padding: 10px 12px; gap: 8px; }
+.dash[data-layout="right"] .stepper button { min-height: 44px; width: 46px; }
+.dash[data-layout="right"] .bt label.switch { min-height: 34px; }
+.dash[data-layout="right"] .colorbar { height: 38px; min-height: 38px; }
+.dash[data-layout="right"] .seg button { min-height: 36px; }
+
+/* Mode pipette, tuiles sous l'image : la recette est la priorité, elle prend plus de place que la couleur cible (3 parts contre 2) ;
+   la hauteur reste la même. Disposition « à droite » (une seule colonne) et petits écrans : inchangés. */
+@media (min-width: 861px) {
+  .dash[data-mode="pick"]:not([data-layout="right"]) .panels { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+}
+
+/* Conseil : tuile pleine largeur, fermée par défaut ; sa ligne de titre porte déjà le conseil */
+#tileSuggest { view-transition-name: vt-suggest; grid-column: 1 / -1; padding: 0; gap: 0; }
+#tileSuggest > summary { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; list-style: none; border-radius: 18px; min-height: 48px; }
+#tileSuggest > summary::-webkit-details-marker { display: none; }
+#tileSuggest > summary::before { content: "▸"; font-size: 14px; opacity: .6; width: 12px; transition: transform .15s; }
+#tileSuggest[open] > summary::before { transform: rotate(90deg); }
+.sg-title { font-size: 13px; font-weight: 600; opacity: .7; }
+.sg-teaser { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.sg-teaser:empty { display: none; }
+#sgList { display: flex; flex-direction: column; gap: 10px; }
+.sg-body { display: flex; flex-direction: column; gap: 10px; padding: 0 16px 14px; }
+.sglist { display: flex; flex-direction: column; gap: 8px; }
+/* Une suggestion : pastille | nom + ΔE sur la première ligne, recette puis boutons dessous (tient dans une colonne étroite) */
+.sgitem { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: start; gap: 4px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.sgitem:last-child { border-bottom: 0; padding-bottom: 0; }
+.sgitem .chip { grid-row: span 3; width: 32px; height: 32px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+.sgitem .nm { font-weight: 600; overflow-wrap: anywhere; }
+.sgitem .nm .gname-inline { margin-left: 8px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.sgitem .nm .tags { display: inline-flex; margin-left: 8px; vertical-align: middle; }
+.sgde { display: flex; flex-direction: column; align-items: flex-end; font: 500 13px/1.2 var(--mono); }
+.sgde .muted { font-size: 12px; }
+.sgacts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.sgmix { grid-column: 2 / -1; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+/* Mode pipette : les lignes de tuiles ont leur hauteur propre (la tuile de conseil, fermée, est basse) */
+.dash[data-mode="pick"] .panels { grid-auto-rows: auto; }
+
+/* Statut des peintures : je les ai / à acquérir / catalogue (identifiables sans couleur) */
+.listbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.listbar .seg button { min-height: 36px; padding: 0 12px; font-size: 13px; }
+.tube.want { border-style: dashed; border-color: var(--ink); }
+.tag.want { background: var(--ink); color: var(--paper); }
+.tbtn.wantbtn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* Peinture non cochée : seule sa description s'estompe, ses boutons restent bien lisibles ; l'étiquette « À acquérir » reste lisible */
+.tube.off { opacity: 1; }
+.tube.off .chip, .tube.off .meta { opacity: .55; }
+.tube .meta .tag.want { background: var(--ink); color: var(--paper); }
+
+/* Recette : actions et modification de la composition (neutre : aucun aplat, la différence se lit au contraste) */
+.adjactions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.adjactions .tbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 14px; font-size: 14px; font-weight: 600; }
+.adjactions .tbtn { flex: 1 1 220px; }   /* les deux boutons ont la même largeur */
+.adjactions .ic { flex: none; }
+.tbtn.adjnext:disabled { opacity: .4; cursor: not-allowed; }
+.adjactions #adjBtn[aria-expanded="true"] { border-color: var(--ink); }
+.adjfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.adjfoot[hidden] { display: none; }
+.adjfoot select { flex: 1 1 160px; min-width: 0; min-height: 44px; }
+.adjfoot .tbtn { min-height: 44px; }
+.adjnote { margin: 10px 0 0; }
+/* ligne de la recette en modification : peinture et retrait au-dessus, parts, barre et pourcentage dessous */
+.mixitem.editing { grid-template-columns: 32px minmax(0, 1fr); gap: 6px 10px; align-items: start; }
+.mixitem.editing .chip { grid-row: span 2; margin-top: 6px; }
+.medit-head { display: flex; gap: 6px; min-width: 0; }
+.mselect { flex: 1 1 auto; min-width: 0; min-height: 44px; }
+.medit-head .tbtn { min-width: 44px; min-height: 44px; padding: 0; }
+.medit-ctrl { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.medit-ctrl .pstep { min-width: 40px; min-height: 40px; padding: 0; }
+.medit-ctrl .pnum { width: 56px; min-height: 40px; text-align: center; padding: 0 4px; }
+.medit-ctrl .ulabel { font-size: 12px; opacity: .7; min-width: 30px; }
+.medit-ctrl .bar2 { flex: 1 1 40px; min-width: 24px; }
+.medit-ctrl .pc { min-width: 44px; }
+
+/* Liste déroulante avec recherche (choix d'une peinture) */
+.combo-slot { flex: 1 1 160px; min-width: 0; display: flex; }
+.combo-slot[hidden] { display: none; }
+.combo-btn { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); color: var(--ink); text-align: left; cursor: pointer; }
+.combo-btn:hover, .combo-btn[aria-expanded="true"] { border-color: var(--ink); }
+.combo-txt { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.combo-caret { display: inline-flex; flex: none; opacity: .7; }
+.chip.sm { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); }
+.combo-pop { position: fixed; z-index: 1000; display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper-2); box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+.combo-search { width: 100%; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.combo-list { margin: 0; padding: 0; list-style: none; overflow-y: auto; overscroll-behavior: contain; }
+.combo-opt { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 8px; border-radius: 6px; cursor: pointer; }
+.combo-opt.on { background: color-mix(in srgb, var(--ink) 14%, transparent); }
+.combo-opt[aria-selected="true"] .combo-name { font-weight: 700; }
+.combo-name { min-width: 0; overflow-wrap: anywhere; }
+.combo-sub { margin-left: auto; padding-left: 8px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.combo-check { margin-left: 6px; }
+.combo-empty { padding: 10px 8px; color: var(--muted); font-size: 14px; }
+.medit-head .combo-btn { flex: 1 1 auto; }

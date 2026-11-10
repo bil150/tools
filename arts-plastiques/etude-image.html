@@ -88,14 +88,6 @@
 
           <!-- Tuiles : sous l'image par défaut, ou à droite selon la disposition choisie -->
           <div class="panels" id="panels">
-            <div class="bt" id="tileProbe" hidden>
-              <h2>Pixel pointé</h2>
-              <div class="probe">
-                <span class="swatch" id="swatch" aria-hidden="true"></span>
-                <span class="readout" id="readout" aria-live="polite">Cliquez ou touchez l’image.</span>
-              </div>
-            </div>
-
             <div class="bt" id="tileCols">
               <label for="gridCols">Colonnes</label>
               <div class="stepper">
@@ -132,24 +124,10 @@
                 <span class="muted note" id="chunkCount" aria-live="polite"></span>
                 <button type="button" class="tbtn" id="chunkClear" disabled>Effacer</button>
               </div>
-              <button type="button" class="btn" id="chunkSel" disabled>Exporter la sélection</button>
+              <button type="button" class="btn" id="chunkSel" disabled title="Exporter la sélection en PNG">Exporter sélection</button>
               <button type="button" class="btn ghost" id="chunkAll" disabled>Exporter tout</button>
             </div>
 
-            <div class="bt" id="tileTarget" hidden>
-              <h2>Couleur cible</h2>
-              <p class="muted" id="targetEmpty">Aucune couleur choisie.</p>
-              <div class="target" id="target" hidden>
-                <span class="target-swatch" id="tSwatch" role="img" aria-label="Aperçu de la couleur cible"></span>
-                <dl class="codes">
-                  <div><dt>HEX</dt><dd id="tHex"></dd></div>
-                  <div><dt>RVB</dt><dd id="tRgb"></dd></div>
-                  <div><dt>CMJ</dt><dd id="tCmy"></dd></div>
-                  <div><dt>CMJN</dt><dd id="tCmyk"></dd></div>
-                </dl>
-              </div>
-              <p class="muted note" id="tNote" hidden>CMJ et CMJN : repères indicatifs.</p>
-            </div>
             <div class="bt" id="tileRecipe" hidden>
               <h2>Recette</h2>
               <div id="recipeEmptyBox">
@@ -168,9 +146,41 @@
                 </div>
                 <div class="tags" id="rTags" hidden></div>
                 <ul class="mixlist" id="rList"></ul>
-                <p class="muted note">Valeurs indicatives (voir Paramètres).</p>
+                <!-- Actions sur la recette : une autre composition, ou la modifier à la main (la liste devient éditable, la cible reste visible au-dessus) -->
+                <div class="adjactions">
+                  <button type="button" class="tbtn adjnext" id="adjNext" disabled><svg class="ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg><span>Proposer une autre composition</span></button>
+                  <button type="button" class="tbtn" id="adjBtn" aria-expanded="false" aria-controls="adjPanel"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Modifier la composition</span></button>
+                </div>
+                <div class="adjfoot" id="adjPanel" hidden>
+                  <span class="combo-slot" id="adjAddBox"></span>
+                  <button type="button" class="tbtn" id="adjReset">Rétablir</button>
+                </div>
+                <p class="muted note adjnote"><span id="adjCount"></span>Valeurs indicatives (voir Paramètres).</p>
               </div>
             </div>
+            <div class="bt" id="tileTarget" hidden>
+              <h2>Couleur cible</h2>
+              <p class="muted" id="targetEmpty">Cliquez ou touchez l’image.</p>
+              <div class="target" id="target" hidden>
+                <span class="target-swatch" id="tSwatch" role="img" aria-label="Aperçu de la couleur cible"></span>
+                <dl class="codes">
+                  <div><dt>HEX</dt><dd id="tHex"></dd></div>
+                  <div><dt>RVB</dt><dd id="tRgb"></dd></div>
+                  <div><dt>CMJ</dt><dd id="tCmy"></dd></div>
+                  <div><dt>CMJN</dt><dd id="tCmyk"></dd></div>
+                  <div><dt>Pixel</dt><dd id="tPos"></dd></div>
+                </dl>
+              </div>
+              <p class="muted note" id="tNote" hidden>CMJ et CMJN : repères indicatifs.</p>
+            </div>
+            <!-- Conseil : fermé par défaut ; il faut l'ouvrir pour le voir (la recherche ne se fait qu'à l'ouverture) -->
+            <details class="bt" id="tileSuggest" hidden>
+              <summary><span class="sg-title">Conseil</span></summary>
+              <div class="sg-body" id="sgBody">
+                <p class="sg-teaser" id="sgTeaser" aria-live="polite"></p>
+                <div id="sgList"></div>
+              </div>
+            </details>
           </div>
         </div>
       </section>
@@ -201,6 +211,12 @@
                   <option value="II">II – Très bonne</option>
                   <option value="III">III – Insuffisante</option>
                 </select></div>
+              <div class="field"><label for="tubeStatus">Statut</label>
+                <select id="tubeStatus">
+                  <option value="have">Je l’ai</option>
+                  <option value="want">À acquérir</option>
+                  <option value="cat">Catalogue seulement</option>
+                </select></div>
               <div class="field"><label for="tubeOpac">Transparence / opacité</label>
                 <select id="tubeOpac">
                   <option value="">Non indiquée</option>
@@ -208,6 +224,14 @@
                   <option value="ST">Semi-transparente</option>
                   <option value="SO">Semi-opaque</option>
                   <option value="O">Opaque</option>
+                </select></div>
+              <div class="field"><label for="tubeEffect">Effet</label>
+                <select id="tubeEffect">
+                  <option value="">Automatique</option>
+                  <option value="none">Aucun effet</option>
+                  <option value="metal">Métallisé</option>
+                  <option value="iri">Irisé</option>
+                  <option value="fluo">Fluorescent</option>
                 </select></div>
             </div>
             <div class="colorrow">
@@ -223,6 +247,18 @@
               <button type="button" class="btn ghost" id="tubeCancel">Annuler</button>
             </div>
           </form>
+
+          <!-- Statut des peintures : je les ai (cochées), à acquérir, ou simple catalogue -->
+          <div class="listbar" id="listBar" hidden>
+            <div class="seg" id="tubeFilter" role="group" aria-label="Filtrer les peintures">
+              <button type="button" data-filter="all" aria-pressed="true">Tous</button>
+              <button type="button" data-filter="have" aria-pressed="false">Je les ai</button>
+              <button type="button" data-filter="want" aria-pressed="false">À acquérir</button>
+              <button type="button" data-filter="cat" aria-pressed="false">Catalogue</button>
+            </div>
+            <button type="button" class="tbtn" id="wantCopy" hidden>Copier la liste à acquérir</button>
+            <span class="muted note" id="wantCopyMsg" aria-live="polite"></span>
+          </div>
 
           <div class="tubes" id="tubes"></div>
         </div>
@@ -275,6 +311,16 @@
         <p id="setMsg" class="notice" role="status" hidden></p>
         <div class="settings">
 
+          <div class="bt wide">
+            <h2>Calcul</h2>
+            <label class="switch"><input type="checkbox" id="optBlack" checked><span>Pas de tubes noirs (noirs chromatiques uniquement)</span></label>
+            <span class="muted note">Actif par défaut : on ne propose jamais de tube noir, le noir se fabrique en mélangeant des couleurs (noir chromatique).</span>
+            <p class="notice why"><b>Pourquoi ?</b> Un noir en tube tend à paraître plat. Un noir fabriqué avec des couleurs (un bleu foncé et un brun, par exemple) garde une dominante chaude ou froide et s’accorde mieux au reste de la peinture. Et l’outil ne connaît d’un tube que sa couleur : il ne peut pas savoir si un noir est déjà un mélange. Les noirs restent dans votre liste, simplement écartés du calcul.</p>
+            <label class="switch"><input type="checkbox" id="optEffects" checked><span>Pas de tubes métallisés, irisés ni fluorescents</span></label>
+            <span class="muted note">Actif par défaut : on ne propose jamais de peinture métallisée, irisée, nacrée ou fluorescente.</span>
+            <p class="notice why"><b>Pourquoi ?</b> L’aspect d’une peinture métallisée ou irisée change avec l’angle de la lumière, et une peinture fluorescente émet de la lumière en plus de celle qu’elle réfléchit : une seule couleur à l’écran ne peut pas les représenter, et le mélange calculé ne serait pas fiable. Ces peintures restent dans votre liste, simplement écartées du calcul. L’effet est détecté d’après le nom ou le code pigment ; le champ « Effet » du tube le corrige.</p>
+          </div>
+
           <div class="bt">
             <h2>Stockage</h2>
             <b class="big" id="storeUsed">—</b>
@@ -283,16 +329,16 @@
           </div>
 
           <div class="bt">
+            <h2>Maintenance</h2>
+            <button type="button" class="btn ghost" id="clearCache">Vider le cache</button>
+            <span class="muted note">Efface l’image de référence, le nuancier et la sélection. Vos tubes sont conservés.</span>
+          </div>
+
+          <div class="bt">
             <h2>Sauvegarde</h2>
             <button type="button" class="btn" id="expCouleurs">Exporter les tubes (JSON)</button>
             <button type="button" class="btn ghost" id="impCouleurs">Importer des tubes (JSON)</button>
             <input type="file" id="impFile" accept=".json,application/json" hidden>
-          </div>
-
-          <div class="bt">
-            <h2>Maintenance</h2>
-            <button type="button" class="btn ghost" id="clearCache">Vider le cache</button>
-            <span class="muted note">Efface l’image de référence, le nuancier et la sélection. Vos tubes sont conservés.</span>
           </div>
 
           <div class="bt danger">
@@ -310,7 +356,9 @@
             <div><dt>Couleur lue</dt><dd>Valeur RVB exacte du pixel pointé, dans l’image réduite à 1 600 px au plus. Elle dépend de l’appareil photo, de la lumière, de l’écran et de son profil : aucune n’est corrigée ici.</dd></div>
             <div><dt>Écart entre deux couleurs</dt><dd>Les couleurs sont converties en CIE L*a*b* (blanc D65), puis comparées par l’écart ΔE CIEDE2000. Vers 1, la différence est à peine visible ; au-delà de 5, elle se voit nettement.</dd></div>
             <div><dt>Mélange de peinture</dt><dd>Modèle de Kubelka-Munk, calculé séparément pour le rouge, le vert et le bleu. Un tube n’est connu que par sa couleur de référence : on en déduit son absorption (K/S), et sa diffusion (S) est estimée d’après sa clarté. Le calcul ignore les spectres réels, la transparence et l’opacité, le liant, l’épaisseur de la couche, et le changement de teinte au séchage.</dd></div>
-            <div><dt>Recherche de la recette</dt><dd>Parmi les tubes cochés, l’outil teste toutes les combinaisons de 1 à 3 tubes et cherche les proportions qui minimisent l’écart ΔE. À qualité proche, il préfère la recette la plus simple (0,35 ΔE de pénalité par tube ajouté). Les proportions sont des parts relatives.</dd></div>
+            <div><dt>Recherche de la recette</dt><dd>Parmi les tubes cochés, l’outil teste les combinaisons de 1 à 3 tubes et cherche les proportions qui minimisent l’écart ΔE. La recette proposée est celle qui a le meilleur ΔE ; si plusieurs l’égalent (à 0,3 près, invisible), il garde celle qui contient le moins de peintures. Les proportions sont des parts relatives. D’autres compositions sont proposées ensuite.</dd></div>
+            <div><dt>Pas de tubes noirs (noir chromatique)</dt><dd>Par défaut, les tubes noirs (pigment PBk, ou couleur neutre très sombre) sont écartés du calcul et du Conseil : le noir se fabrique en mélangeant des couleurs, comme on le fait à l’atelier. Le réglage se change dans Paramètres, section Calcul.</dd></div>
+            <div><dt>Pas de tubes métallisés, irisés ni fluorescents</dt><dd>Par défaut, les peintures métallisées, irisées, nacrées ou fluorescentes sont écartées du calcul et du Conseil : leur aspect dépend de la lumière (angle pour les métallisés et irisés, lumière émise pour les fluorescents), ce qu’une couleur unique ne peut pas représenter. Le réglage se change dans Paramètres, section Calcul.</dd></div>
             <div><dt>Durabilité et transparence / opacité</dt><dd>Informations saisies d’après la fiche du fabricant (durabilité sur l’échelle ASTM, transparence ou opacité). Elles ne servent pas au calcul : elles s’affichent à côté des tubes et de la recette. La durabilité d’un mélange est celle de son tube le moins durable.</dd></div>
             <div><dt>CMJ et CMJN</dt><dd>Simple conversion à partir du RVB (1 − valeur), sans profil d’impression.</dd></div>
             <div><dt>Nuancier du fabricant</dt><dd>Moyenne d’un carré de 5 × 5 pixels, lue à l’écran ou sur le zoom. Pour un PDF, la page est d’abord dessinée par le lecteur de PDF, qui convertit lui-même les couleurs CMJN en RVB de façon approchée.</dd></div>
@@ -367,6 +415,7 @@
       <div><dt><code>pigment</code></dt><dd>Code(s) Colour Index : <code>"PB29"</code> ou <code>"PR122/PV19"</code>, 20 caractères au maximum.</dd></div>
       <div><dt><code>light</code></dt><dd>Durabilité, échelle ASTM : <code>"I"</code>, <code>"II"</code> ou <code>"III"</code>. Autre chose : vide.</dd></div>
       <div><dt><code>opac</code></dt><dd>Transparence / opacité : <code>"T"</code> transparente, <code>"ST"</code> semi-transparente, <code>"SO"</code> semi-opaque, <code>"O"</code> opaque.</dd></div>
+      <div><dt><code>effect</code></dt><dd>Effet de surface : <code>"metal"</code> métallisé, <code>"iri"</code> irisé ou nacré, <code>"fluo"</code> fluorescent, <code>"none"</code> aucun (impose une peinture ordinaire). Vide : l’outil le déduit du nom ou du code pigment.</dd></div>
       <div><dt><code>type</code>, <code>version</code></dt><dd>Facultatifs : <code>"nuancier"</code> et <code>1</code>.</dd></div>
     </dl>
     <h3>À l’import</h3>
@@ -392,6 +441,7 @@
     </div>
   </section>
 </dialog>
+
 </main>
 </body>
 </html>

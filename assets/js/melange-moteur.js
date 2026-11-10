@@ -14,8 +14,10 @@
   var RAD = Math.PI / 180;
   var R_MIN = 0.004, R_MAX = 0.996;      // bornes de réflectance (évite K/S infini ou nul)
   var MAX_TUBES_IN_MIX = 3;
-  var TUBE_PENALTY = 0.35;               // ΔE « payé » par tube supplémentaire : à qualité égale, la recette la plus simple gagne
+  var TUBE_PENALTY = 0.35;               // ΔE « payé » par tube supplémentaire : sert à ordonner les autres compositions
+  var SAME_ENOUGH = 0.3;                 // ΔE : à 0,3 près de la meilleure recette, c'est équivalent (invisible) ; la plus simple est alors proposée
   var MIN_SHARE = 0.02;                  // en dessous de 2 %, un tube est écarté
+  var MAX_VARIANTS = 5;                  // nombre de recettes différentes proposées (la meilleure et ses alternatives)
 
   /* ---------- Conversions ---------- */
 
@@ -211,33 +213,85 @@
       return { idx: c.idx, w: w, e: best };
     }
 
-    var finalists = pool.slice(0, 12).map(refine);
-    finalists.forEach(function (c) { c.score = c.e + TUBE_PENALTY * (c.idx.length - 1); });
-    finalists.sort(function (a, b) { return a.score - b.score; });
-    var win = finalists[0];
+    // Une part sous MIN_SHARE n'est pas dosable : on écarte ce tube puis on réaffine les autres (et non l'inverse :
+    // retirer la part après coup, sans réajuster, fausserait le mélange — une pointe de pigment fort pèse lourd).
+    function prune(c) {
+      var cur = refine(c);
+      while (cur.idx.length > 1) {
+        var lo = 0, q;
+        for (q = 1; q < cur.w.length; q++) if (cur.w[q] < cur.w[lo]) lo = q;
+        if (cur.w[lo] >= MIN_SHARE) break;
+        var idx = cur.idx.slice(), w = cur.w.slice();
+        idx.splice(lo, 1); w.splice(lo, 1);
+        var tot = w.reduce(function (x, y) { return x + y; }, 0);
+        cur = refine({ idx: idx, w: w.map(function (v) { return v / tot; }) });
+      }
+      return cur;
+    }
 
-    // On écarte les parts minuscules, puis on renormalise et on recalcule l'écart réel.
-    var idx = [], w = [];
-    for (i = 0; i < win.idx.length; i++) if (win.w[i] >= MIN_SHARE) { idx.push(win.idx[i]); w.push(win.w[i]); }
-    var tot = w.reduce(function (a, b) { return a + b; }, 0);
-    w = w.map(function (v) { return v / tot; });
-    var order = idx.map(function (_, q) { return q; }).sort(function (a, b) { return w[b] - w[a]; });
-    idx = order.map(function (q) { return idx[q]; });
-    w = order.map(function (q) { return w[q]; });
+    // Candidates : les meilleures de chaque taille (1, 2 et 3 tubes), pour que la recette la plus simple ne soit jamais écartée d'avance
+    var bySize = [[], [], [], []];
+    pool.forEach(function (c) { bySize[c.idx.length].push(c); });   // pool est déjà trié par écart
+    var finalists = bySize[1].slice(0, 3).concat(bySize[2].slice(0, 6), bySize[3].slice(0, 6)).map(prune);
 
+    // Une recette terminée : parts minuscules écartées, proportions renormalisées et triées, écart réel recalculé.
+    function finish(c) {
+      var idx = [], w = [], i;
+      for (i = 0; i < c.idx.length; i++) if (c.w[i] >= MIN_SHARE) { idx.push(c.idx[i]); w.push(c.w[i]); }
+      var tot = w.reduce(function (x, y) { return x + y; }, 0);
+      w = w.map(function (v) { return v / tot; });
+      var order = idx.map(function (_, q) { return q; }).sort(function (x, y) { return w[y] - w[x]; });
+      idx = order.map(function (q) { return idx[q]; });
+      w = order.map(function (q) { return w[q]; });
+      mix(P, idx, w, tmp);
+      var lab = labFromLinear(tmp[0], tmp[1], tmp[2]);
+      return {
+        items: idx.map(function (ti, q) { return { index: ti, id: tubes[ti].id, weight: w[q] }; }),
+        mixRgb: { r: toSrgb8(tmp[0]), g: toSrgb8(tmp[1]), b: toSrgb8(tmp[2]) },
+        de: deltaE2000(lab, tLab),
+        parts: parts(w)
+      };
+    }
+
+    // Toutes les recettes terminées, une seule par ensemble de tubes (la plus proche de la cible)
+    var byKey = {}, all = [];
+    finalists.forEach(function (c) {
+      var r = finish(c), key = r.items.map(function (it) { return it.id; }).sort().join('|');
+      if (!byKey[key] || r.de < byKey[key].de) byKey[key] = r;
+    });
+    Object.keys(byKey).forEach(function (k) { all.push(byKey[k]); });
+
+    // La recette proposée : celle qui a le meilleur ΔE ; parmi celles qui l'égalent (à SAME_ENOUGH près, invisible), celle qui contient
+    // le moins de peintures ; à nombre égal de peintures, la plus proche de la cible.
+    var bestDe = all.reduce(function (m, r) { return Math.min(m, r.de); }, Infinity);
+    var main = all.filter(function (r) { return r.de <= bestDe + SAME_ENOUGH; }).sort(function (a, b) {
+      return a.items.length - b.items.length || a.de - b.de;
+    })[0];
+    // Les autres compositions : d'autres ensembles de tubes, des plus simples et proches aux plus éloignées
+    var others = all.filter(function (r) { return r !== main; }).sort(function (a, b) {
+      return (a.de + TUBE_PENALTY * (a.items.length - 1)) - (b.de + TUBE_PENALTY * (b.items.length - 1));
+    });
+    var result = main;
+    result.alternatives = [main].concat(others).slice(0, MAX_VARIANTS);
+    return result;
+  }
+
+  /* Évalue une recette composée à la main : tubes [{ rgb }] et proportions (relatives, de somme quelconque > 0).
+     Retourne { mixRgb, de } avec le même calcul que le solveur, ou null si toutes les proportions sont nulles. */
+  function evaluate(target, tubes, weights) {
+    var tot = weights.reduce(function (x, y) { return x + y; }, 0);
+    if (!(tot > 0) || !tubes.length) return null;
+    var P = tubes.map(function (t) { return prepareTube(t.rgb); });
+    var idx = tubes.map(function (_, i) { return i; });
+    var w = weights.map(function (v) { return v / tot; }), tmp = [0, 0, 0];
     mix(P, idx, w, tmp);
     var lab = labFromLinear(tmp[0], tmp[1], tmp[2]);
-    return {
-      items: idx.map(function (ti, q) { return { index: ti, id: tubes[ti].id, weight: w[q] }; }),
-      mixRgb: { r: toSrgb8(tmp[0]), g: toSrgb8(tmp[1]), b: toSrgb8(tmp[2]) },
-      de: deltaE2000(lab, tLab),
-      parts: parts(w)
-    };
+    return { mixRgb: { r: toSrgb8(tmp[0]), g: toSrgb8(tmp[1]), b: toSrgb8(tmp[2]) }, de: deltaE2000(lab, rgbToLab(target)) };
   }
 
   var api = {
     rgbToLab: rgbToLab, deltaE76: deltaE76, deltaE2000: deltaE2000,
-    prepareTube: prepareTube, solve: solve, parts: parts
+    prepareTube: prepareTube, solve: solve, evaluate: evaluate, parts: parts
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else g.MelangeMoteur = api;

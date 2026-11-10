@@ -29,6 +29,30 @@
     return OPAC.indexOf(t) !== -1 ? t : '';
   }
 
+  // Effet de surface : 'metal' (métallisé), 'iri' (irisé, nacré), 'fluo' (fluorescent), 'none' (aucun, imposé) ou '' (non indiqué : détection automatique).
+  function effectOf(v) {
+    var t = String(v == null ? '' : v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    if (/^(metal|metallic|metallique|metallise|metallisee)$/.test(t)) return 'metal';
+    if (/^(iri|iridescent|iridescente|irise|irisee|pearl|pearlescent|nacre|nacree|interference)$/.test(t)) return 'iri';
+    if (/^(fluo|fluorescent|fluorescente|neon|dayglo|day-glo)$/.test(t)) return 'fluo';
+    if (/^(none|aucun|aucune|normal|non)$/.test(t)) return 'none';
+    return '';
+  }
+  // Effet retenu pour un tube : celui qui est indiqué ; sinon, d'après le nom ou le code pigment (PM… métalliques, PW20 mica).
+  // Retourne 'metal', 'iri', 'fluo' ou '' (aucun). L'indication « none » l'emporte sur la détection.
+  function effectKind(t) {
+    var e = effectOf(t && t.effect);
+    if (e === 'metal' || e === 'iri' || e === 'fluo') return e;
+    if (e === 'none') return '';
+    var name = String((t && t.name) || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''), pig = String((t && t.pigment) || '');
+    if (/fluo|neon|day-?glo/.test(name)) return 'fluo';
+    if (/irid|irise|pearl|perle|nacr|interfer|shimmer/.test(name) || /(^|[^A-Za-z])PW20(?![0-9])/i.test(pig)) return 'iri';
+    // « (imit) » : imitation, une couleur ordinaire qui imite le métal (pas de pigment métallique) ; « Green Gold » : un jaune-vert ordinaire
+    var plain = /\bimit(ation)?\b/.test(name), nm = name.replace(/\b(green|yellow|olive|brown|red|orange)\s+(gold|copper|bronze|silver)\b/g, ' ');
+    if (!plain && (/metal|glitter|paillet|\b(gold|silver|copper|bronze)\b/.test(nm) || /(^|[^A-Za-z])PM[0-9]/i.test(pig))) return 'metal';
+    return '';
+  }
+
   // Un tube brut → { tube } nettoyé, ou { error } avec la raison du refus.
   function cleanTube(t, fileGroup) {
     if (!t || typeof t !== 'object' || Array.isArray(t)) return { error: 'entrée invalide (un objet est attendu)' };
@@ -43,6 +67,7 @@
         hex: hex,
         light: lightOf(t.light),
         opac: opacOf(t.opac),
+        effect: effectOf(t.effect),
         group: str(t.group != null && t.group !== '' ? t.group : fileGroup, MAX.group)
       }
     };
@@ -89,6 +114,7 @@
       var o = {};
       if (group === null && t.group) o.group = t.group;
       o.name = t.name; o.pigment = t.pigment || ''; o.hex = t.hex; o.light = t.light || ''; o.opac = t.opac || '';
+      if (t.effect) o.effect = t.effect;
       return o;
     });
     return out;
@@ -114,7 +140,7 @@
       'Format exact :',
       JSON.stringify({
         type: 'nuancier', version: 1, group: '<nom de la marque>',
-        tubes: [{ name: '<nom commercial>', pigment: '<codes Colour Index séparés par « / », ou "">', hex: '<#RRGGBB>', light: '<I, II, III ou "">', opac: '<T, ST, SO, O ou "">' }]
+        tubes: [{ name: '<nom commercial>', pigment: '<codes Colour Index séparés par « / », ou "">', hex: '<#RRGGBB>', light: '<I, II, III ou "">', opac: '<T, ST, SO, O ou "">', effect: '<metal, iri, fluo ou "">' }]
       }, null, 2),
       '',
       'Règles :',
@@ -124,14 +150,15 @@
       '4. "pigment" : le ou les codes Colour Index (ex. "PB29", "PR122/PV19"), 20 caractères au maximum.',
       '5. "light" : la durabilité sur l’échelle ASTM : "I" (excellente), "II" (très bonne) ou "III" (insuffisante). Si le fabricant utilise une autre échelle (étoiles, Blue Wool, lettres…), ne la convertis pas : "".',
       '6. "opac" : "T" (transparente), "ST" (semi-transparente), "SO" (semi-opaque) ou "O" (opaque), sinon "".',
-      '7. "group" au niveau du fichier : la marque, 40 caractères au maximum. Si le document mélange plusieurs marques, ajoute un champ "group" dans chaque tube à la place.',
-      '8. Un seul objet par tube, dans l’ordre du document, sans doublon (même nom dans le même groupe).',
+      '7. "effect" : "metal" si le fabricant indique une peinture métallisée (or, argent, cuivre, bronze, métallique), "iri" si elle est irisée, nacrée ou à interférence, "fluo" si elle est fluorescente, sinon "" (peinture ordinaire ou non indiqué).',
+      '8. "group" au niveau du fichier : la marque, 40 caractères au maximum. Si le document mélange plusieurs marques, ajoute un champ "group" dans chaque tube à la place.',
+      '9. Un seul objet par tube, dans l’ordre du document, sans doublon (même nom dans le même groupe).',
       '',
       'Mon document :'
     ].join('\n');
   }
 
-  var api = { parse: parse, build: build, cleanTube: cleanTube, example: example, prompt: prompt, MAX: MAX, LIGHT: LIGHT, OPAC: OPAC, parseHex: parseHex };
+  var api = { parse: parse, build: build, cleanTube: cleanTube, effectOf: effectOf, effectKind: effectKind, example: example, prompt: prompt, MAX: MAX, LIGHT: LIGHT, OPAC: OPAC, parseHex: parseHex };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else g.Nuancier = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -9,6 +9,7 @@
   var KEY_TUBES = NS + 'atelier'; // clé d'origine conservée : les tubes déjà saisis restent lisibles
   var KEY_GRID = NS + 'grille';
   var KEY_LAYOUT = NS + 'disposition';
+  var KEY_OPTS = NS + 'reglages';
   var MAX_TUBES = 1000;
 
   var $ = function (id) { return document.getElementById(id); };
@@ -535,7 +536,7 @@
   var sideTiles = {
     grid: ['tileCols', 'tileColor', 'tileLine', 'tileChunks'],
     values: [],
-    pick: ['tileProbe', 'tileTarget', 'tileRecipe']
+    pick: ['tileRecipe', 'tileTarget']   // la recette d'abord : c'est l'essentiel
   };
   var allTiles = sideTiles.grid.concat(sideTiles.pick);
   // Adresses courtes, utilisées par les liens du menu Arts plastiques (etude-image.html#grille…).
@@ -567,6 +568,7 @@
       render();
     }
     $('layoutBox').hidden = panelOf[v] !== 'viewMix'; // la disposition ne concerne que la vue de l'image
+    updateSuggest();
     if (v === 'settings') updateStorageInfo();
     if (!keepHash && window.history && history.replaceState) {
       try { history.replaceState(null, '', '#' + slugOf[v]); } catch (_) { /* sans importance */ }
@@ -616,9 +618,6 @@
 
   /* ---------- Pipette : un clic (ou un toucher) fixe le point, le simple survol ne change rien ---------- */
 
-  var swatch = $('swatch'), readout = $('readout');
-  var READOUT_HINT = 'Cliquez ou touchez l’image.';
-
   function pointFrom(e) {
     var r = canvas.getBoundingClientRect();
     var x = Math.floor((e.clientX - r.left) * canvas.width / r.width);
@@ -633,17 +632,6 @@
   function pixelAt(pt) {
     var d = sourceCtx.getImageData(pt.x, pt.y, 1, 1).data;
     return { r: d[0], g: d[1], b: d[2] };
-  }
-
-  function updateReadout() {
-    if (!picked || !source) {
-      swatch.style.background = '';
-      readout.textContent = READOUT_HINT;
-      return;
-    }
-    var c = pixelAt(picked);
-    swatch.style.background = rgbCss(c);
-    readout.textContent = 'RVB ' + c.r + ', ' + c.g + ', ' + c.b + ' — pixel ' + picked.x + ', ' + picked.y;
   }
 
   /* ---------- Couleur cible ---------- */
@@ -675,11 +663,11 @@
     $('tRgb').textContent = target.r + ', ' + target.g + ', ' + target.b;
     $('tCmy').textContent = cmy.map(pct).join(' · ');
     $('tCmyk').textContent = cmyk.map(pct).join(' · ');
+    $('tPos').textContent = picked.x + ', ' + picked.y;
   }
 
   function refresh() {
     render();
-    updateReadout();
     updateTarget();
   }
 
@@ -792,7 +780,8 @@
     if (r.error) return null;
     var c = r.tube;
     c.id = typeof t.id === 'string' && t.id ? t.id.slice(0, 40) : newId();
-    c.active = t.active !== false;
+    c.active = t.active !== false;               // « je l'ai » : la peinture sert au calcul
+    c.want = t.want === true && !c.active;       // « à acquérir » : jamais en même temps que « je l'ai »
     return c;
   }
 
@@ -807,6 +796,29 @@
     });
   }
 
+  /* Réglage « noir chromatique uniquement » : actif par défaut. Un tube noir (pigment PBk, ou couleur neutre très sombre) n'est alors
+     ni utilisé dans le calcul ni proposé : le noir se fabrique en mélangeant des couleurs. */
+  var opts = { chromaticBlack: true, noEffects: true };
+  (function () { var o = readJSON(KEY_OPTS); opts.chromaticBlack = !(o && o.chromaticBlack === false); opts.noEffects = !(o && o.noEffects === false); })();
+  function saveOpts() { writeJSON(KEY_OPTS, opts); }
+  var blackCache = {};
+  function isBlackTube(t) {
+    var k = t.hex + '|' + t.pigment;
+    if (blackCache.hasOwnProperty(k)) return blackCache[k];
+    var black = /(^|[^a-z])PBk/i.test(t.pigment || '');
+    if (!black && window.MelangeMoteur) {
+      var lab = window.MelangeMoteur.rgbToLab(parseHex(t.hex));
+      black = lab[0] <= 25 && Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]) <= 12;   // sombre et sans teinte
+    }
+    return (blackCache[k] = black);
+  }
+  function blackExcluded(t) { return opts.chromaticBlack && isBlackTube(t); }
+
+  /* Réglage « sans métallisé ni irisé » : actif par défaut. L'effet vient du tube (champ « Effet ») ou, à défaut, de son nom ou de son
+     code pigment (Nuancier.effectKind). Un tube à effet n'est alors ni utilisé ni proposé : une couleur unique ne peut pas le représenter. */
+  function effectExcluded(t) { return opts.noEffects && !!Nuancier.effectKind(t); }
+  function excludedTube(t) { return blackExcluded(t) || effectExcluded(t); }
+
   function loadTubes() {
     var d = readJSON(KEY_TUBES);
     return d && Array.isArray(d.tubes) ? cleanTubeList(d.tubes) : [];
@@ -818,16 +830,54 @@
   }
 
   function updateCount() {
-    var n = tubes.length, a = tubes.filter(function (t) { return t.active; }).length;
+    var n = tubes.length, a = tubes.filter(function (t) { return t.active; }).length, w = tubes.filter(function (t) { return t.want; }).length;
     $('tubeCount').textContent = n
-      ? n + (n > 1 ? ' tubes' : ' tube') + ' · ' + a + (a > 1 ? ' activés' : ' activé')
+      ? n + (n > 1 ? ' tubes' : ' tube') + ' · ' + a + (a > 1 ? ' activés' : ' activé') + (w ? ' · ' + w + ' à acquérir' : '')
       : 'Aucun tube pour l’instant.';
+    updateListBar();
   }
+
+  /* Statut d'une peinture : « je l'ai » (cochée, sert au calcul), « à acquérir » ou « catalogue » (ni l'un ni l'autre). */
+  var listFilter = 'all';   // filtre de la liste : all | have | want | cat
+  function statusOf(t) { return t.active ? 'have' : t.want ? 'want' : 'cat'; }
+  function setStatus(t, st) { t.active = st === 'have'; t.want = st === 'want'; }
+  function matchesFilter(t) { return listFilter === 'all' || statusOf(t) === listFilter; }
+
+  // Barre de filtre : effectifs, et copie de la liste à acquérir (liste de courses)
+  function updateListBar() {
+    var bar = $('listBar'), cnt = { all: tubes.length, have: 0, want: 0, cat: 0 };
+    tubes.forEach(function (t) { cnt[statusOf(t)]++; });
+    bar.hidden = !tubes.length;
+    Array.prototype.forEach.call(document.querySelectorAll('#tubeFilter [data-filter]'), function (b) {
+      var k = b.dataset.filter;
+      b.textContent = ({ all: 'Tous', have: 'Je les ai', want: 'À acquérir', cat: 'Catalogue' })[k] + ' · ' + cnt[k];
+      b.setAttribute('aria-pressed', String(k === listFilter));
+    });
+    $('wantCopy').hidden = !cnt.want;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#tubeFilter [data-filter]'), function (b) {
+    b.addEventListener('click', function () { listFilter = b.dataset.filter; renderTubes(); });
+  });
+  $('wantCopy').addEventListener('click', function () {
+    var list = tubes.filter(function (t) { return t.want; });
+    var lines = ['À acquérir (' + list.length + ')'].concat(list.map(function (t) {
+      return (t.group ? t.group + ' · ' : '') + t.name + (t.pigment ? ' (' + t.pigment + ')' : '') + ' · ' + t.hex.toUpperCase();
+    }));
+    copyText(lines.join('\n'), $('wantCopyMsg'));
+  });
 
   // Pastilles « ASTM I » et « Opaque » d'un tube (null si rien n'est indiqué).
   function tubeTags(t) {
-    if (!t.light && !t.opac) return null;
+    var noir = blackExcluded(t), ef = Nuancier.effectKind(t);
+    if (!t.light && !t.opac && !t.want && !noir && !ef) return null;
     var box = el('span', 'tags');
+    if (noir) { var n = el('span', 'tag', 'Noir exclu'); n.title = 'Pas de tubes noirs (Paramètres) : ce tube n’est ni utilisé ni proposé'; box.appendChild(n); }
+    if (ef) {
+      var ex = opts.noEffects, en = el('span', 'tag', (ef === 'metal' ? 'Métallisé' : ef === 'iri' ? 'Irisé' : 'Fluorescent') + (ex ? ' exclu' : ''));
+      en.title = 'Aspect qui dépend de la lumière : une couleur unique ne peut pas le représenter' + (ex ? ' (Paramètres : pas de tubes métallisés, irisés ni fluorescents) — ce tube n’est ni utilisé ni proposé' : '');
+      box.appendChild(en);
+    }
+    if (t.want) { var w = el('span', 'tag want', 'À acquérir'); w.title = 'Peinture à acquérir : elle ne sert pas au calcul tant qu’elle n’est pas cochée'; box.appendChild(w); }
     if (t.light) { var a = el('span', 'tag', LIGHT[t.light][0]); a.title = 'Durabilité : ' + LIGHT[t.light][0] + ' – ' + LIGHT[t.light][1]; box.appendChild(a); }
     if (t.opac) { var b = el('span', 'tag', OPAC[t.opac]); b.title = 'Transparence / opacité : ' + OPAC[t.opac]; box.appendChild(b); }
     return box;
@@ -844,15 +894,20 @@
   }
 
   function tubeItem(t) {
-    var li = el('li', 'tube' + (t.active ? '' : ' off'));
+    var li = el('li', 'tube' + (t.active ? '' : t.want ? ' want' : ' off'));
     var use = el('label', 'use');
     var cb = document.createElement('input');
     cb.type = 'checkbox'; cb.checked = t.active;
-    cb.setAttribute('aria-label', 'Utiliser « ' + t.name + ' » dans le calcul');
+    cb.setAttribute('aria-label', 'Je possède « ' + t.name + ' » : l’utiliser dans le calcul');
     cb.addEventListener('change', function () {
+      var hadWant = t.want;
       t.active = cb.checked;
+      if (t.active) t.want = false;   // on l'a : ce n'est plus « à acquérir »
+      saveTubes();
+      if ((hadWant && t.active) || listFilter !== 'all') { renderTubes(); return; }   // l'étiquette ou la liste filtrée change
       li.classList.toggle('off', !t.active);
-      saveTubes(); updateCount(); updateGroupStates();
+      wantBtn.hidden = t.active;
+      updateCount(); updateGroupStates();
     });
     use.appendChild(cb);
 
@@ -865,6 +920,14 @@
     if (tg) meta.appendChild(tg);
 
     var acts = el('span', 'acts');
+    var wantBtn = el('button', 'tbtn wantbtn', 'À acquérir'); wantBtn.type = 'button';
+    wantBtn.setAttribute('aria-pressed', String(!!t.want));
+    wantBtn.hidden = t.active;   // une peinture qu'on a ne peut pas être « à acquérir » : le bouton n'est pas affiché
+    wantBtn.setAttribute('aria-label', (t.want ? 'Retirer « ' : 'Marquer « ') + t.name + (t.want ? ' » des peintures à acquérir' : ' » à acquérir'));
+    wantBtn.addEventListener('click', function () {
+      setStatus(t, t.want ? 'cat' : 'want');
+      saveTubes(); renderTubes();
+    });
     var edit = el('button', 'tbtn', 'Modifier'); edit.type = 'button';
     edit.setAttribute('aria-label', 'Modifier « ' + t.name + ' »');
     edit.addEventListener('click', function () { openForm(t); });
@@ -876,7 +939,7 @@
       if (editingId === t.id) closeForm();
       saveTubes(); renderTubes();
     });
-    acts.appendChild(edit); acts.appendChild(del);
+    acts.appendChild(wantBtn); acts.appendChild(edit); acts.appendChild(del);
 
     li.appendChild(use); li.appendChild(chip); li.appendChild(meta); li.appendChild(acts);
     return li;
@@ -888,7 +951,8 @@
       var a = u.list.filter(function (t) { return t.active; }).length;
       u.box.checked = a > 0 && a === u.list.length;
       u.box.indeterminate = a > 0 && a < u.list.length;
-      u.cnt.textContent = a + ' / ' + u.list.length;
+      var all = u.all || u.list, aAll = all.filter(function (t) { return t.active; }).length, w = all.filter(function (t) { return t.want; }).length;
+      u.cnt.textContent = aAll + ' / ' + all.length + (w ? ' · ' + w + ' à acquérir' : '');
     });
   }
 
@@ -902,14 +966,18 @@
   function renderTubes() {
     tubeList.textContent = '';
     groupUI = [];
-    if (!tubes.some(function (t) { return t.group; })) {
+    if (tubes.length && !tubes.some(matchesFilter)) {
+      tubeList.appendChild(el('p', 'muted', 'Aucun tube dans cette liste.'));
+    } else if (!tubes.some(function (t) { return t.group; })) {
       // aucun groupe : liste simple, comme avant
       var flat = el('ul', 'glist');
-      tubes.forEach(function (t) { flat.appendChild(tubeItem(t)); });
+      tubes.filter(matchesFilter).forEach(function (t) { flat.appendChild(tubeItem(t)); });
       tubeList.appendChild(flat);
     } else {
       groupNames().concat(tubes.some(function (t) { return !t.group; }) ? [''] : []).forEach(function (g) {
-        var list = tubes.filter(function (t) { return t.group === g; });
+        var all = tubes.filter(function (t) { return t.group === g; });
+        var list = all.filter(matchesFilter);   // ce que la liste montre, selon le filtre
+        if (!list.length) return;
         var det = el('details', 'grp');
         det.open = openGroups.hasOwnProperty(g) ? openGroups[g] : list.length <= 40;   // un grand nuancier s'ouvre fermé
         det.addEventListener('toggle', function () { openGroups[g] = det.open; });
@@ -921,7 +989,7 @@
         box.setAttribute('aria-label', 'Utiliser tous les tubes de « ' + (g || 'sans groupe') + ' »');
         lab.addEventListener('click', function (e) { e.stopPropagation(); });   // la case ne doit pas plier le groupe
         box.addEventListener('change', function () {
-          list.forEach(function (t) { t.active = box.checked; });
+          list.forEach(function (t) { t.active = box.checked; if (t.active) t.want = false; });   // on les a : plus « à acquérir »
           saveTubes(); renderTubes();
         });
         lab.appendChild(box);
@@ -935,7 +1003,7 @@
         list.forEach(function (t) { ul.appendChild(tubeItem(t)); });
         det.appendChild(sum); det.appendChild(ul);
         tubeList.appendChild(det);
-        groupUI.push({ list: list, box: box, cnt: cnt });
+        groupUI.push({ list: list, all: all, box: box, cnt: cnt });
       });
     }
     updateGroupStates();
@@ -990,6 +1058,8 @@
     $('tubeGroup').value = t ? t.group : lastGroup;   // un nouveau tube reprend le groupe du précédent
     $('tubeLight').value = t ? t.light : '';
     $('tubeOpac').value = t ? t.opac : '';
+    $('tubeEffect').value = t ? t.effect || '' : '';
+    $('tubeStatus').value = t ? statusOf(t) : 'have';
     setFormColor(parseHex(t ? t.hex : '#808080'));
     showFormError('');
     tubeForm.hidden = false;
@@ -1019,12 +1089,17 @@
     var found = editingId && tubes.filter(function (x) { return x.id === editingId; })[0];
     var light = $('tubeLight').value, opac = $('tubeOpac').value;
     light = LIGHT.hasOwnProperty(light) ? light : ''; opac = OPAC.hasOwnProperty(opac) ? opac : '';
+    var effect = Nuancier.effectOf($('tubeEffect').value);
     var group = $('tubeGroup').value.replace(/\s+/g, ' ').trim().slice(0, Nuancier.MAX.group);
     lastGroup = group;
+    var st = ['have', 'want', 'cat'].indexOf($('tubeStatus').value) !== -1 ? $('tubeStatus').value : 'have';
     if (found) {
-      found.name = name; found.pigment = pigment; found.hex = toHex(c); found.light = light; found.opac = opac; found.group = group;
+      found.name = name; found.pigment = pigment; found.hex = toHex(c); found.light = light; found.opac = opac; found.effect = effect; found.group = group;
+      setStatus(found, st);
     } else {
-      tubes.push({ id: newId(), name: name, pigment: pigment, hex: toHex(c), light: light, opac: opac, group: group, active: true });
+      var nt = { id: newId(), name: name, pigment: pigment, hex: toHex(c), light: light, opac: opac, effect: effect, group: group, active: true, want: false };
+      setStatus(nt, st);
+      tubes.push(nt);
     }
     saveTubes(); renderTubes(); closeForm();
   });
@@ -1089,11 +1164,11 @@
       var k = tkey(p);
       if (at.hasOwnProperty(k)) {
         var t = next[at[k]];
-        t.name = p.name; t.pigment = p.pigment; t.hex = p.hex; t.light = p.light; t.opac = p.opac; t.group = p.group;
+        t.name = p.name; t.pigment = p.pigment; t.hex = p.hex; t.light = p.light; t.opac = p.opac; t.effect = p.effect; t.group = p.group;
         updated++;
       } else {
         var o = old[k];
-        next.push({ id: o ? o.id : newId(), name: p.name, pigment: p.pigment, hex: p.hex, light: p.light, opac: p.opac, group: p.group, active: o ? o.active : opts.activate });
+        next.push({ id: o ? o.id : newId(), name: p.name, pigment: p.pigment, hex: p.hex, light: p.light, opac: p.opac, effect: p.effect, group: p.group, active: o ? o.active : opts.activate, want: o ? o.want : false });
         at[k] = next.length - 1;
         if (o) updated++; else added++;
       }
@@ -1610,6 +1685,7 @@
   }
 
   function showRecipeMessage(msg, withCouleurs) {
+    lastRecipe = null; solved = adj = null; adjOpen = false; updateEditBtn(); updateSuggest(); updateNext();
     $('recipe').hidden = true;
     $('recipeEmptyBox').hidden = false;
     $('recipeEmpty').textContent = msg;
@@ -1624,13 +1700,253 @@
   function computeRecipe() {
     if (!Moteur) return;
     if (!target) { showRecipeMessage('Fixez une couleur.', false); return; }
-    var active = tubes.filter(function (t) { return t.active; });
+    var active = tubes.filter(function (t) { return t.active && !excludedTube(t); });
     if (!active.length) {
-      showRecipeMessage(tubes.length ? 'Activez des tubes.' : 'Ajoutez des tubes.', true);
+      var some = tubes.filter(function (t) { return t.active; });   // des tubes cochés, mais tous écartés ?
+      var hasB = some.some(blackExcluded), hasE = some.some(effectExcluded);
+      showRecipeMessage(some.length ? (hasB && hasE ? 'Ni noirs ni effets (métallisés, irisés, fluorescents) : cochez des couleurs.' : hasB ? 'Pas de tubes noirs : cochez des couleurs.' : 'Pas de métallisés, irisés ni fluorescents : cochez des couleurs.') : tubes.length ? 'Activez des tubes.' : 'Ajoutez des tubes.', true);
       return;
     }
     var res = Moteur.solve(target, active.map(function (t) { return { id: t.id, rgb: parseHex(t.hex) }; }));
+    solved = { res: res, active: active }; adj = null;   // nouvelle couleur ou nouveaux tubes : on repart de la recette calculée
     renderRecipe(res, active);
+  }
+
+  /* ---------- Liste déroulante avec recherche : défilante, filtrée au fil de la frappe, utilisable au clavier ---------- */
+
+  var COMBO_MAX = 150;   // lignes affichées au plus (la recherche affine le reste)
+  var comboOpen = null;  // liste actuellement ouverte : { close }
+  function normText(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  var CARET = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+  // o : { options: [{ id, label, name, sub, hex, key }], value, placeholder, label, fk, onPick(id) } → bouton qui ouvre la liste
+  function makeCombo(o) {
+    var cur = null;
+    o.options.forEach(function (x) { if (x.id === o.value) cur = x; });
+    var btn = el('button', 'combo-btn'); btn.type = 'button';
+    btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', o.label);
+    if (o.fk) btn.dataset.fk = o.fk;
+    if (cur) { var c0 = el('span', 'chip sm'); c0.style.background = cur.hex; btn.appendChild(c0); }
+    btn.appendChild(el('span', 'combo-txt', cur ? cur.label : o.placeholder));
+    var caret = el('span', 'combo-caret'); caret.innerHTML = CARET; btn.appendChild(caret);
+
+    var pop = null, input, list, shown = [], act = 0, uid = 'cb' + Math.random().toString(36).slice(2, 8);
+
+    function place() {
+      var r = btn.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
+      var w = Math.min(Math.max(r.width, 260), vw - 16), left = Math.min(Math.max(8, r.left), vw - w - 8);
+      var below = vh - r.bottom - 8, above = r.top - 8, up = below < 220 && above > below;
+      pop.style.width = w + 'px'; pop.style.left = left + 'px';
+      list.style.maxHeight = Math.max(120, Math.min(300, (up ? above : below) - 64)) + 'px';
+      if (up) { pop.style.top = 'auto'; pop.style.bottom = (vh - r.top + 4) + 'px'; }
+      else { pop.style.bottom = 'auto'; pop.style.top = (r.bottom + 4) + 'px'; }
+    }
+    function setAct(k, scroll) {
+      var items = list.querySelectorAll('[role="option"]');
+      if (!items.length) { input.removeAttribute('aria-activedescendant'); return; }
+      act = Math.max(0, Math.min(items.length - 1, k));
+      Array.prototype.forEach.call(items, function (li, q) { li.classList.toggle('on', q === act); });
+      input.setAttribute('aria-activedescendant', items[act].id);
+      if (scroll) items[act].scrollIntoView({ block: 'nearest' });
+    }
+    function pick(x) { close(true); if (x.id !== o.value) o.onPick(x.id); }
+    function render(first) {
+      var words = normText(input.value).split(/\s+/).filter(Boolean);
+      shown = o.options.filter(function (x) { return words.every(function (w) { return x.key.indexOf(w) !== -1; }); });
+      list.textContent = '';
+      shown.slice(0, COMBO_MAX).forEach(function (x, k) {
+        var li = el('li', 'combo-opt'); li.id = uid + '-' + k; li.setAttribute('role', 'option'); li.dataset.id = x.id;
+        li.setAttribute('aria-selected', String(x.id === o.value));
+        var ch = el('span', 'chip sm'); ch.style.background = x.hex;
+        li.appendChild(ch); li.appendChild(el('span', 'combo-name', x.name));
+        if (x.sub) li.appendChild(el('span', 'combo-sub', x.sub));
+        if (x.id === o.value) li.appendChild(el('span', 'combo-check', '✓'));
+        li.addEventListener('mousedown', function (e) { e.preventDefault(); });   // garde le focus dans le champ de recherche
+        li.addEventListener('click', function () { pick(x); });
+        li.addEventListener('mousemove', function () { if (act !== k) setAct(k, false); });
+        list.appendChild(li);
+      });
+      if (!shown.length) list.appendChild(el('li', 'combo-empty', 'Aucune peinture'));
+      else if (shown.length > COMBO_MAX) list.appendChild(el('li', 'combo-empty', 'Affinez la recherche (' + shown.length + ' résultats)'));
+      var sel = first ? shown.slice(0, COMBO_MAX).map(function (x) { return x.id; }).indexOf(o.value) : -1;
+      setAct(sel < 0 ? 0 : sel, true);
+    }
+    function onOutside(e) { if (pop && !pop.contains(e.target) && !btn.contains(e.target)) close(false); }
+    function onMove(e) { if (pop && !(e.target && e.target.nodeType === 1 && pop.contains(e.target))) place(); }
+    function close(focusBtn) {
+      if (!pop) return;
+      document.removeEventListener('pointerdown', onOutside, true);
+      window.removeEventListener('resize', onMove);
+      document.removeEventListener('scroll', onMove, true);
+      pop.remove(); pop = null; comboOpen = null;
+      btn.setAttribute('aria-expanded', 'false');
+      if (focusBtn && document.contains(btn)) btn.focus();
+    }
+    function open() {
+      if (comboOpen) comboOpen.close(false);
+      pop = el('div', 'combo-pop');
+      input = document.createElement('input');
+      input.type = 'search'; input.className = 'combo-search'; input.placeholder = 'Rechercher…'; input.autocomplete = 'off'; input.spellcheck = false;
+      input.setAttribute('role', 'combobox'); input.setAttribute('aria-expanded', 'true'); input.setAttribute('aria-controls', uid + '-list');
+      input.setAttribute('aria-label', 'Rechercher une peinture');
+      list = el('ul', 'combo-list'); list.id = uid + '-list'; list.setAttribute('role', 'listbox'); list.setAttribute('aria-label', o.label);
+      pop.appendChild(input); pop.appendChild(list);
+      document.body.appendChild(pop);
+      btn.setAttribute('aria-expanded', 'true');
+      comboOpen = { close: close };
+      input.addEventListener('input', function () { render(false); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown') { e.preventDefault(); setAct(act + 1, true); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setAct(act - 1, true); }
+        else if (e.key === 'Enter') { e.preventDefault(); var x = shown[act]; if (x) pick(x); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+        else if (e.key === 'Tab') close(false);
+      });
+      render(true); place();
+      document.addEventListener('pointerdown', onOutside, true);
+      window.addEventListener('resize', onMove);
+      document.addEventListener('scroll', onMove, true);
+      input.focus();
+    }
+    btn.addEventListener('click', function () { if (pop) close(true); else open(); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' && !pop) { e.preventDefault(); open(); } });
+    return btn;
+  }
+  // Tri colorimétrique, pour cette liste seulement : d'abord les neutres du plus clair au plus sombre, puis les teintes dans l'ordre
+  // de l'arc-en-ciel (rouge, orange, jaune, vert, cyan, bleu, violet, magenta), de la plus claire à la plus sombre à teinte voisine.
+  var HUE_STEP = 14;    // degrés : des teintes voisines sont rangées par clarté
+  var NEUTRAL_C = 9;    // chroma L*C*h en dessous duquel une couleur est considérée neutre
+  function sortPaints(list) {
+    var info = list.map(function (o) {
+      var lab = window.MelangeMoteur ? window.MelangeMoteur.rgbToLab(parseHex(o.hex)) : [50, 0, 0];
+      var c = Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]), h = (Math.atan2(lab[2], lab[1]) * 180 / Math.PI + 360) % 360;
+      return { o: o, L: lab[0], neutral: c < NEUTRAL_C, bucket: Math.floor(h / HUE_STEP) };
+    });
+    info.sort(function (a, b) {
+      if (a.neutral !== b.neutral) return a.neutral ? -1 : 1;
+      if (!a.neutral && a.bucket !== b.bucket) return a.bucket - b.bucket;
+      return (b.L - a.L) || a.o.name.localeCompare(b.o.name, 'fr');
+    });
+    return info.map(function (x) { return x.o; });
+  }
+  function paintOption(t) { return { id: t.id, label: tubeLabel(t), name: t.name, sub: t.group, hex: t.hex, key: normText(t.name + ' ' + t.group + ' ' + t.pigment) }; }
+
+  /* ---------- Modifier la composition : une autre composition, ou la liste éditable (peinture et parts) ---------- */
+
+  var solved = null;     // dernière recette calculée : { res, active }
+  var adj = null;        // composition modifiée : { rows: [{ id, parts }], variant: numéro de la composition choisie ou null (à la main), exact } ; null = celle du calcul
+  var adjOpen = false;   // la liste de la recette est en cours de modification
+  var adjFocus = null;   // contrôle à re-focaliser après l'affichage (la liste est reconstruite à chaque changement)
+  var adjBtn = $('adjBtn'), adjPanel = $('adjPanel');
+  var IC_EDIT = adjBtn.querySelector('svg').outerHTML;
+  var IC_DONE = '<svg class="ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
+
+  function gcdN(a, b) { return b ? gcdN(b, a % b) : a; }
+  function activeById(id) { var a = solved ? solved.active : []; for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i]; return null; }
+  function rowsFromRes(res) {
+    var p = res.parts || res.items.map(function (it) { return Math.max(1, Math.round(it.weight * 10)); });
+    return res.items.map(function (it, i) { return { id: it.id, parts: p[i] }; });
+  }
+  function adjRowsNow() { return adj ? adj.rows : rowsFromRes(solved.res); }
+  function touchAdj(a) { a.variant = null; a.exact = null; }   // modifiée à la main : plus une composition du calcul
+  function ensureAdj() { if (!adj) adj = { rows: rowsFromRes(solved.res), variant: 0 }; return adj; }
+
+  // Affiche la composition (même calcul que le solveur : Moteur.evaluate) ; le Conseil suit la recette affichée.
+  function showAdj() {
+    if (!solved) return;
+    if (adj && adj.exact) { renderRecipe(adj.exact, solved.active); return; }   // composition choisie : le résultat exact du calcul
+    var rows = adj ? adj.rows.filter(function (r) { return activeById(r.id); }) : [];
+    if (!adj || !rows.length) { adj = null; renderRecipe(solved.res, solved.active); return; }
+    var tot = rows.reduce(function (s, r) { return s + r.parts; }, 0), g = rows.reduce(function (a, r) { return gcdN(a, r.parts); }, 0);
+    var ev = Moteur.evaluate(target, rows.map(function (r) { return { rgb: parseHex(activeById(r.id).hex) }; }), rows.map(function (r) { return r.parts; }));
+    var res = {
+      items: rows.map(function (r) { return { index: solved.active.indexOf(activeById(r.id)), id: r.id, weight: r.parts / tot }; }),
+      mixRgb: ev.mixRgb, de: ev.de, parts: rows.map(function (r) { return r.parts / g; })
+    };
+    renderRecipe(res, solved.active);
+  }
+
+  function altsNow() { return solved ? (solved.res.alternatives || []) : []; }
+  function curVariant() { return adj && adj.variant != null ? adj.variant : 0; }   // à la main : on repart de la première
+
+  function pickVariant(k) {
+    var a = altsNow()[k];
+    adj = !a || k === 0 ? null : { rows: rowsFromRes(a), variant: k, exact: a };
+    showAdj();
+  }
+
+  // « Proposer une autre composition » : éteint s'il n'y en a pas d'autre avec les peintures cochées, actif sinon ; chaque clic passe à la suivante
+  function updateNext() {
+    var n = altsNow().length, b = $('adjNext'), manual = !!adj && adj.variant == null;
+    b.disabled = n < 2;
+    b.title = n < 2 ? 'Aucune autre composition avec vos peintures cochées' : 'Composition ' + (curVariant() + 1) + ' sur ' + n + ' : cliquer pour la suivante';
+    $('adjCount').textContent = manual ? 'Modifiée · ' : n > 1 ? (curVariant() + 1) + ' sur ' + n + ' · ' : '';
+  }
+  $('adjNext').addEventListener('click', function () { var n = altsNow().length; if (n > 1) pickVariant((curVariant() + 1) % n); });
+
+  // Le bouton change avec l'état : « Modifier la composition » (fermé) / « Terminer » (ouvert)
+  function updateEditBtn() {
+    adjBtn.setAttribute('aria-expanded', String(adjOpen));
+    adjBtn.innerHTML = (adjOpen ? IC_DONE : IC_EDIT) + '<span>' + (adjOpen ? 'Terminer' : 'Modifier la composition') + '</span>';
+    adjBtn.title = adjOpen ? 'Terminer la modification' : 'Changer les peintures et les parts à la main';
+  }
+  adjBtn.addEventListener('click', function () { adjOpen = !adjOpen; updateEditBtn(); showAdj(); });
+
+  // Pied de la liste en modification : ajouter une peinture, rétablir
+  function renderAdjFoot() {
+    adjPanel.hidden = !adjOpen || !solved;
+    if (adjPanel.hidden) return;
+    var rows = adjRowsNow(), box = $('adjAddBox');
+    var rest = solved.active.filter(function (t) { return !rows.some(function (r) { return r.id === t.id; }); });
+    box.textContent = '';
+    box.hidden = !rest.length || rows.length >= 6;   // 6 peintures au plus
+    if (!box.hidden) {
+      box.appendChild(makeCombo({
+        options: sortPaints(rest.map(paintOption)), value: null, placeholder: 'Ajouter une peinture…', label: 'Ajouter une peinture à la composition',
+        onPick: function (id) { edit(function (a) { a.rows.push({ id: id, parts: 1 }); }, 'num:' + rows.length); }
+      }));
+    }
+    $('adjReset').disabled = !adj;
+  }
+  function edit(fn, fk) { var a = ensureAdj(); fn(a); touchAdj(a); adjFocus = fk || null; showAdj(); }
+  $('adjReset').addEventListener('click', function () { adj = null; adjFocus = 'next'; showAdj(); });
+
+  // Une ligne de la recette en modification : peinture (liste), parts (− / saisie / +), retrait
+  function editRow(it, i, res, active) {
+    var rows = adjRowsNow(), r = rows[i], t = active[it.index];
+    var li = el('li', 'mixitem editing');
+    var chip = el('span', 'chip'); chip.style.background = t.hex;
+    var head = el('span', 'medit-head'), ctrl = el('span', 'medit-ctrl');
+
+    var sel = makeCombo({
+      options: sortPaints(active.filter(function (u) { return u.id === r.id || !rows.some(function (q) { return q.id === u.id; }); }).map(paintOption)),
+      value: r.id, placeholder: '', label: 'Peinture de la ligne ' + (i + 1), fk: 'sel:' + i,
+      onPick: function (id) { edit(function (a) { a.rows[i].id = id; }, 'sel:' + i); }
+    });
+    sel.classList.add('mselect');
+    var del = el('button', 'tbtn', '✕'); del.type = 'button'; del.dataset.fk = 'del:' + i;
+    del.setAttribute('aria-label', 'Retirer « ' + t.name + ' » de la composition');
+    del.disabled = rows.length < 2;
+    del.addEventListener('click', function () { edit(function (a) { a.rows.splice(i, 1); }, 'sel:' + Math.max(0, Math.min(i, rows.length - 2))); });
+    head.appendChild(sel); head.appendChild(del);
+
+    var minus = el('button', 'tbtn pstep', '−'), plus = el('button', 'tbtn pstep', '+'), num = document.createElement('input');
+    minus.type = plus.type = 'button'; minus.dataset.fk = 'minus:' + i; plus.dataset.fk = 'plus:' + i;
+    minus.setAttribute('aria-label', 'Moins de parts'); plus.setAttribute('aria-label', 'Plus de parts');
+    num.type = 'number'; num.min = '1'; num.max = '99'; num.step = '1'; num.value = String(r.parts); num.className = 'pnum'; num.dataset.fk = 'num:' + i;
+    num.setAttribute('aria-label', 'Parts de ' + t.name); num.setAttribute('inputmode', 'numeric');
+    function setParts(v, fk) { edit(function (a) { a.rows[i].parts = clampInt(v, 1, 99, a.rows[i].parts); }, fk); }
+    minus.addEventListener('click', function () { setParts(r.parts - 1, 'minus:' + i); });
+    plus.addEventListener('click', function () { setParts(r.parts + 1, 'plus:' + i); });
+    num.addEventListener('change', function () { setParts(num.value, 'num:' + i); });
+    var bar = el('span', 'bar2'), fill = document.createElement('i');
+    fill.style.width = Math.round(it.weight * 100) + '%'; bar.appendChild(fill);
+    ctrl.appendChild(minus); ctrl.appendChild(num); ctrl.appendChild(plus);
+    ctrl.appendChild(el('span', 'ulabel', r.parts > 1 ? 'parts' : 'part'));
+    ctrl.appendChild(bar); ctrl.appendChild(el('span', 'pc', Math.round(it.weight * 100) + ' %'));
+
+    li.appendChild(chip); li.appendChild(head); li.appendChild(ctrl);
+    return li;
   }
 
   // Durabilité du mélange, à titre d'information : celle du tube le moins durable parmi ceux qui en ont une.
@@ -1654,6 +1970,7 @@
   }
 
   function renderRecipe(res, active) {
+    lastRecipe = { res: res, active: active }; updateSuggest(); updateNext();
     $('recipeEmptyBox').hidden = true;
     $('recipe').hidden = false;
     $('rTarget').style.background = rgbCss(target);
@@ -1671,6 +1988,7 @@
     list.textContent = '';
     res.items.forEach(function (it, i) {
       var t = active[it.index];
+      if (adjOpen && solved) { list.appendChild(editRow(it, i, res, active)); return; }
       var li = el('li', 'mixitem');
       var chip = el('span', 'chip'); chip.style.background = t.hex;
       var nm = el('span', 'nm', t.name);
@@ -1684,6 +2002,128 @@
       li.appendChild(chip); li.appendChild(nm); li.appendChild(pc); li.appendChild(bar); li.appendChild(pt);
       list.appendChild(li);
     });
+    renderAdjFoot();
+    if (adjFocus) {   // la liste vient d'être reconstruite : on rend le focus au contrôle utilisé
+      var k = adjFocus, f = k === 'next' ? $('adjNext') : $('rList').querySelector('[data-fk="' + k + '"]');
+      adjFocus = null;
+      if (f && !f.disabled) f.focus();
+    }
+  }
+
+  /* ---------- Conseil : peintures de la collection (non cochées) qui rapprocheraient la couleur ---------- */
+
+  // Quand l'écart ΔE de la recette atteint SUGGEST_FROM, la tuile « Conseil » apparaît, fermée. À l'ouverture seulement, on cherche
+  // parmi les tubes des nuanciers qu'on n'a pas cochés celui qui, ajouté aux tubes cochés, donnerait la couleur la plus proche.
+  // Même moteur que la recette, rien de plus.
+  var SUGGEST_FROM = 2.5;     // à partir de cet écart ΔE, on conseille
+  var SUGGEST_TOP = 5;        // nombre de conseils montrés quand la tuile est ouverte
+  var SUGGEST_OWNED = 5;      // tubes cochés les plus proches de la cible, gardés avec ceux de la recette (+ les plus clairs et sombres)
+  var SUGGEST_NEAR = 60;      // peintures candidates les plus proches de la cible par leur propre couleur
+  var SUGGEST_EXTREME = 4;    // + les plus claires et les plus sombres (blancs et noirs règlent la clarté)
+  var SUGGEST_MIN_GAIN = 0.3; // gain de ΔE minimal pour qu'une peinture soit conseillée
+  var lastRecipe = null;      // { res, active } : dernier calcul de recette
+  var suggestToken = 0;       // change à chaque nouveau calcul : un calcul périmé s'arrête
+
+  function fmtDe(v) { return v.toFixed(1).replace('.', ','); }
+  function tubeLabel(t) { return t.name + (t.group ? ' (' + t.group + ')' : ''); }
+
+  function updateSuggest() {
+    var tile = $('tileSuggest');
+    var show = !!(lastRecipe && Moteur && mode === 'pick' && panelOf[view] === 'viewMix' && lastRecipe.res.de >= SUGGEST_FROM);
+    tile.hidden = !show;
+    suggestToken++;   // annule le calcul en cours
+    $('sgTeaser').textContent = ''; $('sgList').textContent = '';   // l'ancien conseil n'est plus valable
+    if (show && tile.open) runSuggest();   // fermée : rien n'est calculé, et rien n'est montré
+  }
+  $('tileSuggest').addEventListener('toggle', function () {
+    if (this.open && !this.hidden && lastRecipe) { suggestToken++; runSuggest(); }
+    else suggestToken++;   // refermée : on arrête la recherche
+  });
+
+  function runSuggest() {
+    var token = suggestToken, base = lastRecipe.res, active = lastRecipe.active;
+    var teaser = $('sgTeaser'), body = $('sgList');
+    body.textContent = '';
+    var inactive = tubes.filter(function (t) { return !t.active && !excludedTube(t); });
+    if (!inactive.length) {
+      teaser.textContent = 'Importez un nuancier pour recevoir un conseil.';
+      var b = el('button', 'btn ghost', 'Nuanciers'); b.type = 'button';
+      b.addEventListener('click', function () { openNuancierModal('imp'); });
+      body.appendChild(el('p', 'muted', 'Les peintures de vos nuanciers que vous n’avez pas cochées sont comparées à la couleur cible.'));
+      body.appendChild(b);
+      return;
+    }
+    teaser.textContent = 'Recherche de peintures…';
+
+    var tl = Moteur.rgbToLab(target), labs = {};
+    function labOf(t) { return labs[t.id] || (labs[t.id] = Moteur.rgbToLab(parseHex(t.hex))); }
+    function dist(t) { return Moteur.deltaE76(labOf(t), tl); }
+    function uniq(list) { var seen = {}; return list.filter(function (t) { if (seen[t.id]) return false; seen[t.id] = true; return true; }); }
+    function byL(a, b) { return labOf(a)[0] - labOf(b)[0]; }
+
+    // tubes cochés gardés : ceux de la recette, les plus proches de la cible, le plus clair et le plus sombre
+    var ownedSub = uniq(base.items.map(function (it) { return active[it.index]; })
+      .concat(active.slice().sort(function (a, b) { return dist(a) - dist(b); }).slice(0, SUGGEST_OWNED))
+      .concat(active.slice().sort(byL).slice(0, 2), active.slice().sort(byL).slice(-2)));
+    // peintures candidates : les plus proches de la cible, et les extrêmes de clarté
+    var sortedL = inactive.slice().sort(byL);
+    var cands = uniq(inactive.slice().sort(function (a, b) { return dist(a) - dist(b); }).slice(0, SUGGEST_NEAR)
+      .concat(sortedL.slice(0, SUGGEST_EXTREME), sortedL.slice(-SUGGEST_EXTREME)));
+
+    var found = [], i = 0;
+    (function step() {
+      if (token !== suggestToken) return;   // la couleur ou les tubes ont changé : ce calcul est périmé
+      var end = Math.min(cands.length, i + 6);
+      for (; i < end; i++) {
+        var c = cands[i];
+        var r = Moteur.solve(target, ownedSub.map(toEng).concat([toEng(c)]));
+        if (r.items.some(function (it) { return it.id === c.id; }) && base.de - r.de >= SUGGEST_MIN_GAIN) found.push({ t: c, res: r });
+      }
+      if (i < cands.length) { teaser.textContent = 'Recherche de peintures… ' + Math.round(i / cands.length * 100) + ' %'; setTimeout(step, 0); return; }
+      showSuggestions(found.sort(function (a, b) { return a.res.de - b.res.de; }).slice(0, SUGGEST_TOP), base, ownedSub);
+    })();
+  }
+  function toEng(t) { return { id: t.id, rgb: parseHex(t.hex) }; }
+
+  function showSuggestions(list, base, ownedSub) {
+    var teaser = $('sgTeaser'), body = $('sgList');
+    body.textContent = '';
+    if (!list.length) {
+      teaser.textContent = 'Aucune peinture de vos nuanciers ne rapproche la couleur.';
+      return;
+    }
+    var first = list[0];
+    teaser.textContent = 'Ajoutez « ' + tubeLabel(first.t) + ' » : ΔE ' + fmtDe(base.de) + ' → ' + fmtDe(first.res.de);
+    var byId = {};
+    ownedSub.concat(list.map(function (x) { return x.t; })).forEach(function (t) { byId[t.id] = t; });
+    var ul = el('ul', 'sglist');
+    list.forEach(function (x) {
+      var li = el('li', 'sgitem');
+      var chip = el('span', 'chip'); chip.style.background = x.t.hex;
+      var nm = el('span', 'nm', x.t.name);
+      if (x.t.group) nm.appendChild(el('span', 'gname-inline', x.t.group));
+      var tg = tubeTags(x.t); if (tg) nm.appendChild(tg);
+      var de = el('span', 'sgde');
+      de.appendChild(el('b', null, 'ΔE ' + fmtDe(x.res.de)));
+      de.appendChild(el('span', 'muted', '−' + fmtDe(base.de - x.res.de)));
+      // Deux façons de s'en servir : je l'ai (elle entre dans la recette) ou je dois l'acquérir (marquée, hors calcul)
+      var acts = el('span', 'sgacts');
+      var add = el('button', 'tbtn', 'Ajouter inventaire'); add.type = 'button';
+      add.setAttribute('aria-label', 'Ajouter « ' + tubeLabel(x.t) + ' » à l’inventaire : l’utiliser dans la recette');
+      add.addEventListener('click', function () { setStatus(x.t, 'have'); saveTubes(); renderTubes(); });
+      acts.appendChild(add);
+      if (!x.t.want) {
+        var want = el('button', 'tbtn', 'Ajouter à la liste de courses'); want.type = 'button';
+        want.setAttribute('aria-label', 'Ajouter « ' + tubeLabel(x.t) + ' » à la liste de courses');
+        want.addEventListener('click', function () { setStatus(x.t, 'want'); saveTubes(); renderTubes(); });
+        acts.appendChild(want);
+      }
+      var mix = el('span', 'sgmix', x.res.items.map(function (it) { return (byId[it.id] ? byId[it.id].name : '?') + ' ' + Math.round(it.weight * 100) + ' %'; }).join(' · '));
+      li.appendChild(chip); li.appendChild(nm); li.appendChild(de); li.appendChild(mix); li.appendChild(acts);
+      ul.appendChild(li);
+    });
+    body.appendChild(ul);
+    body.appendChild(el('p', 'muted note', 'Indicatif : même calcul que la recette, avec une peinture de plus.'));
   }
 
   $('goCouleurs').addEventListener('click', function () { setView('couleurs'); tabs.couleurs.focus(); });
@@ -1770,6 +2210,20 @@
     say('Images (référence et nuancier) et sélection effacées. Vos tubes sont conservés.', false);
   });
 
+  // Calcul : noir chromatique uniquement
+  $('optBlack').checked = opts.chromaticBlack;
+  $('optBlack').addEventListener('change', function () {
+    opts.chromaticBlack = this.checked;
+    saveOpts();
+    renderTubes(); scheduleRecipe();
+  });
+  $('optEffects').checked = opts.noEffects;
+  $('optEffects').addEventListener('change', function () {
+    opts.noEffects = this.checked;
+    saveOpts();
+    renderTubes(); scheduleRecipe();
+  });
+
   // Zone de danger : efface les données de cet outil sur cet appareil (et seulement elles)
   $('wipeAll').addEventListener('click', function () {
     if (!window.confirm('Supprimer toutes les données de cet outil sur cet appareil (tubes, réglages de grille, image) ?\n\nCette action est définitive. Pensez à exporter vos tubes avant.')) return;
@@ -1782,6 +2236,8 @@
       keys.forEach(function (k) { localStorage.removeItem(k); });
     } catch (e) { storageOk = false; }
     tubes = [];
+    opts.chromaticBlack = true; $('optBlack').checked = true;   // les réglages par défaut reviennent
+    opts.noEffects = true; $('optEffects').checked = true;
     grid = cleanGrid(null);
     closeForm();
     clearImage();
@@ -1798,7 +2254,6 @@
   $('storeWarn').hidden = storageOk;
   renderTubes();
   syncGridUI();
-  updateReadout();
 
   // Vue de départ : celle de l'adresse (#grille, #valeurs, #pipette, #couleurs, #parametres), sinon la grille.
   setLayout(layout, true, true);
