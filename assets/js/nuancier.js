@@ -46,9 +46,10 @@
     if (e === 'none') return '';
     var name = String((t && t.name) || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''), pig = String((t && t.pigment) || '');
     if (/fluo|neon|day-?glo/.test(name)) return 'fluo';
-    if (/irid|irise|pearl|perle|nacr|interfer|shimmer/.test(name) || /(^|[^A-Za-z])PW20(?![0-9])/i.test(pig)) return 'iri';
-    // « (imit) » : imitation, une couleur ordinaire qui imite le métal (pas de pigment métallique) ; « Green Gold » : un jaune-vert ordinaire
-    var plain = /\bimit(ation)?\b/.test(name), nm = name.replace(/\b(green|yellow|olive|brown|red|orange)\s+(gold|copper|bronze|silver)\b/g, ' ');
+    if (/irid|irise|pearl|perle|\bnacr|interfer|shimmer/.test(name) || /(^|[^A-Za-z])PW20(?![0-9])/i.test(pig)) return 'iri';   // « \bnacr » : pas « quinacridone »
+    // « (imit) » : imitation, une couleur ordinaire qui imite le métal (pas de pigment métallique) ;
+    // « Green Gold », « Gold yellow », « Gold ochre » : des couleurs ordinaires dont le nom évoque l'or
+    var plain = /\bimit(ation)?\b/.test(name), nm = name.replace(/\b(green|yellow|olive|brown|red|orange)\s+(gold|copper|bronze|silver)\b/g, ' ').replace(/\b(gold|copper|bronze)\s+(yellow|ochre|orange|brown|green|red)\b/g, ' ');
     if (!plain && (/metal|glitter|paillet|\b(gold|silver|copper|bronze)\b/.test(nm) || /(^|[^A-Za-z])PM[0-9]/i.test(pig))) return 'metal';
     return '';
   }
