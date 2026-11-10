@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Étude d’image</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/etude-image.css">
+<script src="../assets/js/melange-moteur.js" defer></script>
+<script src="../assets/js/nuancier.js" defer></script>
+<script src="../assets/js/lecture-tube.js" defer></script>
+<script src="../assets/js/pages/etude-image.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="arts-plastiques.html">Arts plastiques</a></li><li aria-current="page">Étude d’image</li></ol></nav>
+
+  <header>
+    <h1 class="title">Étude d’image</h1>
+  </header>
+
+  <div class="app">
+    <!-- Menu latéral : une icône par sous-vue -->
+    <div class="rail-col">
+    <div class="rail">
+    <div class="rail-tabs" role="tablist" aria-orientation="vertical" aria-label="Sections">
+      <button type="button" role="tab" id="tabGrid" aria-controls="viewMix" aria-selected="true" aria-label="Mise en grille" title="Mise en grille" data-label="Mise en grille">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabValues" aria-controls="viewMix" aria-selected="false" tabindex="-1" aria-label="Perception des valeurs" title="Perception des valeurs" data-label="Perception des valeurs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabPick" aria-controls="viewMix" aria-selected="false" tabindex="-1" aria-label="Aperçu et pipette" title="Aperçu et pipette" data-label="Aperçu et pipette">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+      </button>
+      <span class="rail-sep" aria-hidden="true"></span>
+      <button type="button" role="tab" id="tabCouleurs" aria-controls="viewCouleurs" aria-selected="false" tabindex="-1" aria-label="Couleurs physiques – Peinture" title="Couleurs physiques – Peinture" data-label="Couleurs physiques – Peinture">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.7 0 2-1.2 1.4-2.2-.6-1 0-2.3 1.4-2.3H17a4 4 0 0 0 4-4c0-5-4-9.5-9-9.5z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="15" cy="8" r="1"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabSettings" aria-controls="viewSettings" aria-selected="false" tabindex="-1" aria-label="Paramètres" title="Paramètres" data-label="Paramètres">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      </button>
+    </div>
+    </div>
+    <!-- Disposition rapide : sa propre tuile, juste sous le menu (réglages dessous, à droite, image seule) -->
+    <div class="rail rail-layout" id="layoutBox">
+      <div class="rail-group" role="group" aria-label="Disposition">
+        <button type="button" data-layout="below" aria-pressed="true" aria-label="Réglages sous l’image" title="Réglages sous l’image" data-label="Réglages dessous">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15h18"/></svg>
+        </button>
+        <button type="button" data-layout="right" aria-pressed="false" aria-label="Réglages à droite de l’image" title="Réglages à droite" data-label="Réglages à droite">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg>
+        </button>
+        <button type="button" data-layout="focus" aria-pressed="false" aria-label="Image seule" title="Image seule" data-label="Image seule">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        </button>
+      </div>
+    </div>
+    </div>
+
+    <div class="views">
+      <!-- Vue image (Mise en grille, Perception des valeurs, Aperçu & pipette) : l'image garde toujours la même grande zone -->
+      <section id="viewMix" role="tabpanel" aria-labelledby="tabGrid">
+        <div class="dash" id="dash">
+          <section class="card pane-image" aria-label="Image de référence">
+            <div class="drop" id="drop">
+              <canvas id="canvas" hidden aria-label="Image de référence"></canvas>
+              <div class="drop-msg" id="dropMsg">
+                <p><strong>Déposez une image</strong></p>
+              </div>
+            </div>
+            <p class="err" id="err" role="alert" hidden></p>
+            <!-- Actions sur l'image : sous l'image, pas dans une colonne à part -->
+            <div class="imgbar">
+              <input type="file" id="file" accept="image/*" hidden>
+              <button type="button" class="btn" id="pick">Choisir une image</button>
+              <button type="button" class="btn ghost" id="exportBtn" disabled>Exporter en PNG</button>
+              <span class="muted info" id="info" aria-live="polite"></span>
+            </div>
+          </section>
+
+          <!-- Tuiles : sous l'image par défaut, ou à droite selon la disposition choisie -->
+          <div class="panels" id="panels">
+            <div class="bt" id="tileProbe" hidden>
+              <h2>Pixel pointé</h2>
+              <div class="probe">
+                <span class="swatch" id="swatch" aria-hidden="true"></span>
+                <span class="readout" id="readout" aria-live="polite">Cliquez ou touchez l’image.</span>
+              </div>
+            </div>
+
+            <div class="bt" id="tileCols">
+              <label for="gridCols">Colonnes</label>
+              <div class="stepper">
+                <button type="button" data-for="gridCols" data-step="-1" aria-label="Moins de colonnes">−</button>
+                <input type="number" id="gridCols" min="1" max="40" step="1" value="4" inputmode="numeric">
+                <button type="button" data-for="gridCols" data-step="1" aria-label="Plus de colonnes">+</button>
+              </div>
+              <span class="muted note" id="rowsInfo" aria-live="polite"></span>
+              <label class="switch"><input type="checkbox" id="gridLetters"><span>Lettres</span></label>
+            </div>
+            <div class="bt" id="tileColor">
+              <label for="gridColor">Couleur</label>
+              <input type="color" id="gridColor" class="colorbar" value="#000000">
+            </div>
+            <div class="bt" id="tileLine">
+              <h2>Trait</h2>
+              <div class="rowline">
+                <input type="range" id="gridWidth" min="0.5" max="8" step="0.5" value="1.5" aria-label="Épaisseur du trait">
+                <output id="gridWidthVal" for="gridWidth">1,5 px</output>
+              </div>
+              <div class="rowline">
+                <div class="seg dashes" role="group" aria-label="Style du trait">
+                  <button type="button" data-dash="solid" aria-pressed="true" aria-label="Trait plein" title="Plein"><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M2 6h24"/></svg></button>
+                  <button type="button" data-dash="dash" aria-pressed="false" aria-label="Tirets" title="Tirets"><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M2 6h6M11 6h6M20 6h6"/></svg></button>
+                  <button type="button" data-dash="dot" aria-pressed="false" aria-label="Points" title="Points"><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M3 6h.01M9 6h.01M15 6h.01M21 6h.01M27 6h.01"/></svg></button>
+                </div>
+              </div>
+            </div>
+            <!-- Carreaux : sélection (clic sur l'image ou saisie A1, B2, C1:C3) et export en PNG, un par carreau -->
+            <div class="bt" id="tileChunks">
+              <h2>Carreaux</h2>
+              <input type="text" id="chunkRefs" placeholder="A1, B2, C1:C3" spellcheck="false" autocapitalize="characters" autocomplete="off" aria-label="Carreaux sélectionnés">
+              <div class="rowline">
+                <span class="muted note" id="chunkCount" aria-live="polite"></span>
+                <button type="button" class="tbtn" id="chunkClear" disabled>Effacer</button>
+              </div>
+              <button type="button" class="btn" id="chunkSel" disabled>Exporter la sélection</button>
+              <button type="button" class="btn ghost" id="chunkAll" disabled>Exporter tout</button>
+            </div>
+
+            <div class="bt" id="tileTarget" hidden>
+              <h2>Couleur cible</h2>
+              <p class="muted" id="targetEmpty">Aucune couleur choisie.</p>
+              <div class="target" id="target" hidden>
+                <span class="target-swatch" id="tSwatch" role="img" aria-label="Aperçu de la couleur cible"></span>
+                <dl class="codes">
+                  <div><dt>HEX</dt><dd id="tHex"></dd></div>
+                  <div><dt>RVB</dt><dd id="tRgb"></dd></div>
+                  <div><dt>CMJ</dt><dd id="tCmy"></dd></div>
+                  <div><dt>CMJN</dt><dd id="tCmyk"></dd></div>
+                </dl>
+              </div>
+              <p class="muted note" id="tNote" hidden>CMJ et CMJN : repères indicatifs.</p>
+            </div>
+            <div class="bt" id="tileRecipe" hidden>
+              <h2>Recette</h2>
+              <div id="recipeEmptyBox">
+                <p class="muted" id="recipeEmpty">Fixez une couleur.</p>
+                <button type="button" class="btn ghost" id="goCouleurs" hidden>Ouvrir Couleurs physiques</button>
+              </div>
+              <div id="recipe" hidden>
+                <div class="duo">
+                  <figure><span class="duo-sw" id="rTarget" role="img" aria-label="Couleur cible"></span><figcaption>Cible</figcaption></figure>
+                  <figure><span class="duo-sw" id="rMix" role="img" aria-label="Couleur du mélange"></span><figcaption>Mélange</figcaption></figure>
+                </div>
+                <div class="de" id="rDe">
+                  <span class="de-val" id="rDeVal"></span>
+                  <span class="de-lab" id="rDeLab"></span>
+                  <span class="de-bar" aria-hidden="true"><i id="rDeFill"></i></span>
+                </div>
+                <div class="tags" id="rTags" hidden></div>
+                <ul class="mixlist" id="rList"></ul>
+                <p class="muted note">Valeurs indicatives (voir Paramètres).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vue Couleurs physiques – Peinture -->
+      <section id="viewCouleurs" role="tabpanel" aria-labelledby="tabCouleurs" hidden>
+        <div class="couleurs">
+        <div class="card">
+          <h2>Couleurs physiques – Peinture</h2>
+          <p class="notice" id="storeWarn" role="status" hidden>Stockage du navigateur indisponible : les tubes ne seront pas conservés.</p>
+          <div class="bar">
+            <button type="button" class="btn" id="tubeNew">Ajouter un tube</button>
+            <button type="button" class="btn ghost" id="nmOpen">Nuanciers</button>
+            <span class="muted info" id="tubeCount" aria-live="polite"></span>
+          </div>
+          <p class="notice" id="tubeNote" role="status" hidden></p>
+
+          <form class="tube-form" id="tubeForm" autocomplete="off" novalidate hidden>
+            <h3 id="tubeFormTitle">Nouveau tube</h3>
+            <div class="field"><label for="tubeName">Nom</label><input type="text" id="tubeName" maxlength="60" required></div>
+            <div class="field"><label for="tubeGroup">Groupe (marque)</label><input type="text" id="tubeGroup" list="groupList" maxlength="40" placeholder="Facultatif" autocomplete="off"><datalist id="groupList"></datalist></div>
+            <div class="field"><label for="tubePig">Pigment CI</label><input type="text" id="tubePig" maxlength="20" placeholder="PB29 (facultatif)" spellcheck="false" autocapitalize="characters"></div>
+            <div class="selrow">
+              <div class="field"><label for="tubeLight">Durabilité (échelle ASTM)</label>
+                <select id="tubeLight">
+                  <option value="">Non indiquée</option>
+                  <option value="I">I – Excellente</option>
+                  <option value="II">II – Très bonne</option>
+                  <option value="III">III – Insuffisante</option>
+                </select></div>
+              <div class="field"><label for="tubeOpac">Transparence / opacité</label>
+                <select id="tubeOpac">
+                  <option value="">Non indiquée</option>
+                  <option value="T">Transparente</option>
+                  <option value="ST">Semi-transparente</option>
+                  <option value="SO">Semi-opaque</option>
+                  <option value="O">Opaque</option>
+                </select></div>
+            </div>
+            <div class="colorrow">
+              <div class="field picker"><label for="tubePick">Couleur</label><input type="color" id="tubePick" value="#808080"></div>
+              <div class="field hexf"><label for="tubeHex">HEX</label><input type="text" id="tubeHex" maxlength="7" value="#808080" spellcheck="false" autocapitalize="off"></div>
+              <div class="field num"><label for="tubeR">R</label><input type="number" id="tubeR" min="0" max="255" step="1" value="128" inputmode="numeric"></div>
+              <div class="field num"><label for="tubeG">V</label><input type="number" id="tubeG" min="0" max="255" step="1" value="128" inputmode="numeric"></div>
+              <div class="field num"><label for="tubeB">B</label><input type="number" id="tubeB" min="0" max="255" step="1" value="128" inputmode="numeric"></div>
+            </div>
+            <p class="err" id="tubeErr" role="alert" hidden></p>
+            <div class="bar">
+              <button type="submit" class="btn" id="tubeSave">Ajouter le tube</button>
+              <button type="button" class="btn ghost" id="tubeCancel">Annuler</button>
+            </div>
+          </form>
+
+          <div class="tubes" id="tubes"></div>
+        </div>
+
+        <!-- Nuancier du fabricant (image ou PDF) : chargé une fois, il sert à tous les ajouts -->
+        <section class="card chart" id="chartCard" aria-label="Nuancier du fabricant">
+          <h2>Nuancier du fabricant</h2>
+          <div class="drop mode-pick" id="chartDrop">
+            <div class="zoomwrap" id="chartZoom" hidden>
+              <canvas id="chart" hidden aria-label="Nuancier du fabricant"></canvas>
+              <div class="zonebox" id="zoneBox" hidden></div>
+            </div>
+            <div class="drop-msg" id="chartMsg">
+              <p><strong>Déposez le nuancier</strong></p>
+              <p class="muted">Image ou PDF</p>
+            </div>
+          </div>
+          <p class="err" id="chartErr" role="alert" hidden></p>
+          <p class="muted note" id="zoneInfo" aria-live="polite" hidden></p>
+          <div class="imgbar">
+            <input type="file" id="chartFile" accept="image/*,application/pdf,.pdf" hidden>
+            <button type="button" class="btn" id="chartPick">Choisir le nuancier</button>
+            <span class="pager" id="chartPager" role="group" aria-label="Pages du PDF" hidden>
+              <button type="button" class="tbtn" id="pgPrev" aria-label="Page précédente">‹</button>
+              <span class="readout" id="pgInfo" aria-live="polite">1 / 1</span>
+              <button type="button" class="tbtn" id="pgNext" aria-label="Page suivante">›</button>
+            </span>
+            <span class="zoombar" id="zoombar" role="group" aria-label="Zoom du nuancier" hidden>
+              <button type="button" class="tbtn" id="zoomOut" aria-label="Zoom arrière" title="Zoom arrière" disabled>−</button>
+              <button type="button" class="tbtn" id="zoomLevel" aria-label="Ajuster à la fenêtre" title="Ajuster à la fenêtre">×1</button>
+              <button type="button" class="tbtn" id="zoomIn" aria-label="Zoom avant" title="Zoom avant (Ctrl + molette, ou deux doigts)">+</button>
+            </span>
+            <button type="button" class="tbtn" id="chartZone" aria-pressed="false" aria-label="Lire une zone : remplit le tube en cours" title="Lire une zone : remplit le tube en cours d'ajout">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5" stroke-dasharray="3 2.5"/><path d="M8 10h8M8 14h5"/></svg>
+            </button>
+            <button type="button" class="tbtn" id="chartWide" aria-pressed="false" aria-label="Agrandir le nuancier" title="Agrandir le nuancier" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
+            <span class="probe">
+              <span class="swatch sm" id="chartSwatch" aria-hidden="true"></span>
+              <span class="readout" id="chartHex" aria-live="polite">—</span>
+            </span>
+          </div>
+        </section>
+        </div>
+      </section>
+
+      <!-- Vue Paramètres -->
+      <section id="viewSettings" role="tabpanel" aria-labelledby="tabSettings" hidden>
+        <p id="setMsg" class="notice" role="status" hidden></p>
+        <div class="settings">
+
+          <div class="bt">
+            <h2>Stockage</h2>
+            <b class="big" id="storeUsed">—</b>
+            <span class="meter" aria-hidden="true"><i id="storeBarFill"></i></span>
+            <span class="muted note" id="storeDetail"></span>
+          </div>
+
+          <div class="bt">
+            <h2>Sauvegarde</h2>
+            <button type="button" class="btn" id="expCouleurs">Exporter les tubes (JSON)</button>
+            <button type="button" class="btn ghost" id="impCouleurs">Importer des tubes (JSON)</button>
+            <input type="file" id="impFile" accept=".json,application/json" hidden>
+          </div>
+
+          <div class="bt">
+            <h2>Maintenance</h2>
+            <button type="button" class="btn ghost" id="clearCache">Vider le cache</button>
+            <span class="muted note">Efface l’image de référence, le nuancier et la sélection. Vos tubes sont conservés.</span>
+          </div>
+
+          <div class="bt danger">
+            <h2>Zone de danger</h2>
+            <button type="button" class="btn danger" id="wipeAll">Supprimer les données sur cet appareil</button>
+            <span class="muted note">Tubes, réglages de grille et image : définitif.</span>
+          </div>
+        </div>
+
+        <!-- Méthode de calcul : ce que fait l'outil, et ses limites -->
+        <section class="card method" id="method" aria-labelledby="methodTitle">
+          <h2 id="methodTitle">Méthode de calcul</h2>
+          <p class="notice strong">Les résultats sont donnés à titre indicatif et ne peuvent jamais être totalement précis. La seule valeur sûre est la perception objective de plusieurs personnes, devant la peinture réelle sous un même éclairage. L’ordinateur n’est qu’un outil de calcul.</p>
+          <dl class="steps">
+            <div><dt>Couleur lue</dt><dd>Valeur RVB exacte du pixel pointé, dans l’image réduite à 1 600 px au plus. Elle dépend de l’appareil photo, de la lumière, de l’écran et de son profil : aucune n’est corrigée ici.</dd></div>
+            <div><dt>Écart entre deux couleurs</dt><dd>Les couleurs sont converties en CIE L*a*b* (blanc D65), puis comparées par l’écart ΔE CIEDE2000. Vers 1, la différence est à peine visible ; au-delà de 5, elle se voit nettement.</dd></div>
+            <div><dt>Mélange de peinture</dt><dd>Modèle de Kubelka-Munk, calculé séparément pour le rouge, le vert et le bleu. Un tube n’est connu que par sa couleur de référence : on en déduit son absorption (K/S), et sa diffusion (S) est estimée d’après sa clarté. Le calcul ignore les spectres réels, la transparence et l’opacité, le liant, l’épaisseur de la couche, et le changement de teinte au séchage.</dd></div>
+            <div><dt>Recherche de la recette</dt><dd>Parmi les tubes cochés, l’outil teste toutes les combinaisons de 1 à 3 tubes et cherche les proportions qui minimisent l’écart ΔE. À qualité proche, il préfère la recette la plus simple (0,35 ΔE de pénalité par tube ajouté). Les proportions sont des parts relatives.</dd></div>
+            <div><dt>Durabilité et transparence / opacité</dt><dd>Informations saisies d’après la fiche du fabricant (durabilité sur l’échelle ASTM, transparence ou opacité). Elles ne servent pas au calcul : elles s’affichent à côté des tubes et de la recette. La durabilité d’un mélange est celle de son tube le moins durable.</dd></div>
+            <div><dt>CMJ et CMJN</dt><dd>Simple conversion à partir du RVB (1 − valeur), sans profil d’impression.</dd></div>
+            <div><dt>Nuancier du fabricant</dt><dd>Moyenne d’un carré de 5 × 5 pixels, lue à l’écran ou sur le zoom. Pour un PDF, la page est d’abord dessinée par le lecteur de PDF, qui convertit lui-même les couleurs CMJN en RVB de façon approchée.</dd></div>
+            <div><dt>Lecture d’une zone</dt><dd>Sur un PDF contenant du texte, la zone entourée est lue directement dans le texte du PDF (pas de reconnaissance de caractères) : nom, code pigment, durabilité, transparence ou opacité. Seul le tube en cours d’ajout est rempli, et rien n’est deviné. Une lecture peut se tromper ou se tromper de ligne : vérifiez toujours avant d’enregistrer.</div>
+          </dl>
+        </section>
+      </section>
+    </div>
+  </div>
+
+<!-- Fenêtre « Nuanciers » : importer, exporter, format JSON et prompt pour une IA -->
+<dialog id="nuancierModal" class="modal" aria-labelledby="nmTitle">
+  <div class="modal-head">
+    <h2 id="nmTitle">Nuanciers</h2>
+    <button type="button" class="tbtn" id="nmClose" aria-label="Fermer">✕</button>
+  </div>
+  <p class="muted note">Un nuancier regroupe les tubes d’une marque (le « groupe »). Il s’échange en JSON.</p>
+  <div class="seg" role="tablist" aria-label="Nuanciers">
+    <button type="button" role="tab" id="nmTabImp" aria-controls="nmImp" aria-selected="true">Importer</button>
+    <button type="button" role="tab" id="nmTabExp" aria-controls="nmExp" aria-selected="false" tabindex="-1">Exporter</button>
+    <button type="button" role="tab" id="nmTabDoc" aria-controls="nmDoc" aria-selected="false" tabindex="-1">Format et prompt</button>
+  </div>
+
+  <section id="nmImp" role="tabpanel" aria-labelledby="nmTabImp" class="modal-body">
+    <div class="field"><label for="nmFile">Fichier JSON</label><input type="file" id="nmFile" accept=".json,application/json,text/plain"></div>
+    <div class="field"><label for="nmPaste">… ou coller le JSON</label><textarea id="nmPaste" rows="6" spellcheck="false" placeholder='{ "group": "Ma marque", "tubes": [ { "name": "…", "hex": "#RRGGBB" } ] }'></textarea></div>
+    <label class="switch"><input type="checkbox" id="nmActivate"><span>Cocher les tubes importés</span></label>
+    <label class="switch"><input type="checkbox" id="nmReplace"><span>Remplacer les tubes de ces groupes</span></label>
+    <div id="nmPreview" class="notice" role="status" hidden></div>
+    <ul class="errlist" id="nmErrors"></ul>
+    <div class="bar">
+      <button type="button" class="btn" id="nmDoImport" disabled>Importer</button>
+      <button type="button" class="btn ghost" id="nmClear">Effacer</button>
+    </div>
+  </section>
+
+  <section id="nmExp" role="tabpanel" aria-labelledby="nmTabExp" class="modal-body" hidden>
+    <div class="field"><label for="nmGroup">Groupe (marque)</label><select id="nmGroup"></select></div>
+    <p class="muted note" id="nmExpInfo" aria-live="polite"></p>
+    <div class="bar">
+      <button type="button" class="btn" id="nmDownload">Télécharger (.json)</button>
+      <button type="button" class="btn ghost" id="nmCopy">Copier</button>
+      <span class="muted note" id="nmCopyMsg" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="nmDoc" role="tabpanel" aria-labelledby="nmTabDoc" class="modal-body" hidden>
+    <h3>Format du fichier</h3>
+    <dl class="fields">
+      <div><dt><code>tubes</code></dt><dd>Liste des tubes (1 000 au maximum). <b>Obligatoire.</b></dd></div>
+      <div><dt><code>name</code></dt><dd>Nom commercial du tube, 60 caractères au maximum. <b>Obligatoire.</b></dd></div>
+      <div><dt><code>hex</code></dt><dd>Couleur en sRGB : <code>#RRGGBB</code> (ou <code>#RGB</code>). <b>Obligatoire.</b> Un tube sans couleur valide est refusé.</dd></div>
+      <div><dt><code>group</code></dt><dd>Marque, 40 caractères au maximum. Au niveau du fichier, elle s’applique à tous les tubes ; dans un tube, elle est prioritaire.</dd></div>
+      <div><dt><code>pigment</code></dt><dd>Code(s) Colour Index : <code>"PB29"</code> ou <code>"PR122/PV19"</code>, 20 caractères au maximum.</dd></div>
+      <div><dt><code>light</code></dt><dd>Durabilité, échelle ASTM : <code>"I"</code>, <code>"II"</code> ou <code>"III"</code>. Autre chose : vide.</dd></div>
+      <div><dt><code>opac</code></dt><dd>Transparence / opacité : <code>"T"</code> transparente, <code>"ST"</code> semi-transparente, <code>"SO"</code> semi-opaque, <code>"O"</code> opaque.</dd></div>
+      <div><dt><code>type</code>, <code>version</code></dt><dd>Facultatifs : <code>"nuancier"</code> et <code>1</code>.</dd></div>
+    </dl>
+    <h3>À l’import</h3>
+    <ul class="rules">
+      <li>Un tube du même groupe et du même nom qu’un tube existant le met à jour (il garde son état coché).</li>
+      <li>Les tubes nouveaux ne sont cochés que si vous le demandez : cochez ceux que vous possédez, seuls ils servent au calcul.</li>
+      <li>Les entrées invalides sont ignorées et listées avec leur raison avant l’import.</li>
+      <li>Le JSON peut être collé tel quel, même entouré de texte ou de balises <code>```json</code>.</li>
+      <li>Rien n’est envoyé nulle part : tout reste dans ce navigateur.</li>
+    </ul>
+    <h3>Exemple</h3>
+    <pre class="code" id="nmExample"></pre>
+    <div class="bar">
+      <button type="button" class="btn ghost" id="nmCopyExample">Copier l’exemple</button>
+      <button type="button" class="btn ghost" id="nmModel">Télécharger un modèle</button>
+    </div>
+    <h3>Prompt pour une IA</h3>
+    <p class="muted note">Copiez ce texte dans une IA, puis joignez le document du fabricant (PDF, capture, tableau). Collez sa réponse dans « Importer » et vérifiez l’aperçu.</p>
+    <textarea id="nmPrompt" rows="12" readonly spellcheck="false"></textarea>
+    <div class="bar">
+      <button type="button" class="btn" id="nmCopyPrompt">Copier le prompt</button>
+      <span class="muted note" id="nmDocMsg" aria-live="polite"></span>
+    </div>
+  </section>
+</dialog>
+</main>
+</body>
+</html>

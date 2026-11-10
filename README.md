@@ -8,7 +8,7 @@ En HTML, CSS et JS, sans compte. Site statique : aucune donnée n'est collectée
 ## Structure
 
 ```
-index.html                       accueil : Langues, IT et Musique (le seul index)
+index.html                       accueil : Langues, IT, Santé/Condition Physique, Musique et Arts plastiques (le seul index)
 manifest.webmanifest             nom, couleurs et icônes du raccourci mobile
 .nojekyll                        désactive Jekyll sur GitHub Pages
 README.md
@@ -57,6 +57,10 @@ musique/
   boite-a-rythmes.html           boîte à rythmes : styles, variations, mesures éditables, tempo (accompagne aussi le Composer)
   testeur-midi.html              testeur de clavier MIDI (API Web MIDI)
 
+arts-plastiques/
+  arts-plastiques.html           menu arts plastiques : section « Étude d'image » (tuiles vers les sous-vues de l'outil : #grille, #valeurs, #pipette, #couleurs)
+  etude-image.html               étude d'image : menu latéral d'icônes (Mise en grille, Perception des valeurs, Aperçu & pipette, Couleurs physiques – Peinture, Paramètres)
+
 assets/
   css/
     base.css                     variables, thème clair/sombre, reset, composants communs
@@ -65,17 +69,22 @@ assets/
     arabe.css                    styles communs aux pages d'arabe
     memento.css                  feuilles A4 paysage imprimables (mémentos IT)
     pages/                       un fichier par page : arabe, cartes, dictee, ecriture,
-                                 manette, midi, guitare, basse, piano, reseau, convertisseurs, cron, diff, quiz-nl
+                                 manette, midi, guitare, basse, piano, reseau, convertisseurs, cron, diff, quiz-nl,
+                                 arts-plastiques (menu), etude-image
   js/
     app.js                       thème clair/sombre (icône), bouton « Installer »
     arabe-core.js                données de l'arabe et voix, partagées par les 4 pages d'arabe
     memento.js                   nombre de pages, échelle et impression des feuilles
+    melange-moteur.js            moteur de l'étude d'image (mélange de peinture), sans DOM : CIE L*a*b*, écart ΔE2000, mélange Kubelka-Munk, solveur
+    lecture-tube.js              lecture du texte d'un tube (nom, code pigment, durabilité, opacité), sans DOM
+    nuancier.js                  nuanciers : validation d'un tube, lecture et écriture du JSON d'échange, prompt pour une IA, sans DOM
     musique/                     modules communs des pages d'instruments (voir « Pages d'instruments »)
     vie/aliments.js              base d'aliments (calories et macros pour 100 g) et aides communes aux pages « Santé/Condition Physique »
     vie/calendrier.js            export d'une semaine de séances au format iCalendar (.ics), créé sur l'appareil
     vie/glisser.js               déplacer une séance d'un jour à l'autre (glisser ou toucher) pour les programmes course et musculation
     pages/                       un fichier par page, même noms que dans css/pages/
   icons/                         favicon.svg, icon-192/512.png, maskable-512.png, apple-touch-icon.png
+  vendor/pdfjs/                  pdf.js 3.11.174 (Mozilla, Apache-2.0) : copie locale, chargée seulement pour lire un nuancier PDF (voir « Étude d'image »)
 ```
 
 Chaque page de `it/`, `langues/` et `musique/` (hors pages d'instruments, décrites plus haut) charge `base.css`, puis sa feuille de style dédiée dans `assets/css/pages/`,
@@ -115,6 +124,30 @@ Une page assemble ces modules (voir `assets/js/pages/guitare.js`) : `M.initNotat
 arrête ce qui sonne quand on change d'onglet. Dans le HTML, chaque onglet est un bouton `#tab-<nom>` et un panneau
 `#panel-<nom>` contenant un conteneur vide.
 
+## Étude d'image
+
+Importer une image, pointer une couleur, obtenir la recette à mélanger avec ses propres tubes. Tout se calcule dans le navigateur.
+
+- **Vues** : Mise en grille (carreaux carrés : colonnes, couleur, épaisseur et style du trait, lettres A1, B1… ; export PNG avec la grille ; carreaux choisis au clic ou saisis « A1, C1:C3 », exportés en PNG un par un, en ZIP s'il y en a plusieurs), Perception des valeurs (niveaux de gris),
+  Aperçu & pipette (un clic ou un toucher fixe le pixel ; le simple survol ne change rien), Couleurs physiques – Peinture (tubes et nuancier du fabricant, image ou PDF), Paramètres.
+  Chaque vue a une adresse (`etude-image.html#grille`, `#valeurs`, `#pipette`, `#couleurs`, `#parametres`).
+- **Résultats indicatifs** : jamais totalement précis ; la seule valeur sûre est la perception de plusieurs personnes devant la peinture réelle. La méthode et ses limites sont expliquées dans Paramètres.
+- **Moteur** (`assets/js/melange-moteur.js`) : couleurs en CIE L*a*b*, écart en ΔE2000, mélange Kubelka-Munk par canal
+  (rouge, vert, bleu en lumière linéaire). Chaque tube n'est connu que par sa couleur de référence : K/S s'en déduit, et la diffusion S
+  est estimée d'après la clarté du tube. C'est une approximation à vérifier sur la palette, pas une mesure.
+  Le solveur teste les tubes activés (1 à 3 par recette), cherche les proportions qui minimisent ΔE2000 et préfère la recette la plus simple à qualité proche.
+- **Aucun tube préenregistré** : l'utilisateur saisit les siens (nom, code pigment CI facultatif, couleur de référence), à la main ou en cliquant sur le **nuancier du fabricant**
+  (une image ou un PDF, chargé une fois et gardé pour tous les ajouts ; moyenne de 5 × 5 pixels ; pages d'un PDF au choix ; zoom ×1 à ×8 : boutons, Ctrl + molette, deux doigts, glisser, clavier). Le PDF est lu par pdf.js, chargé seulement à ce moment-là.
+- **Lecture d'une zone** (`assets/js/lecture-tube.js`) : sur un PDF contenant du texte, on entoure l'entrée d'un tube ; le texte de la zone est lu dans le PDF (aucun OCR) et rempli dans le formulaire du tube en cours d'ajout : nom, code pigment (Colour Index), durabilité (ASTM I à III), transparence / opacité. Rien n'est deviné ni créé en dehors de ce formulaire ; la couleur se lit toujours d'un clic. Les images (photo, scan) n'ont pas de texte lisible sans OCR : non pris en charge.
+- **Nuanciers et groupes** (`assets/js/nuancier.js`) : un tube peut avoir un **groupe**, qui est la marque, saisie par l'utilisateur (rien n'est préenregistré). La liste se regroupe par marque (case pour cocher tout un groupe). La fenêtre « Nuanciers » permet d'**importer** un JSON (fichier ou texte collé, aperçu avant import, entrées refusées listées avec leur raison, mise à jour sans doublon par groupe + nom, option « remplacer les tubes de ces groupes », tubes importés non cochés par défaut), d'**exporter** un groupe ou tous (téléchargement ou copie) et d'afficher le **format du fichier avec un prompt à donner à une IA** pour fabriquer un nuancier à partir du document d'un fabricant. 1 000 tubes au maximum. Le module `nuancier.js` est aussi la seule source des règles de validation d'un tube.
+- **Durabilité et transparence / opacité** : saisies pour chaque tube d'après la fiche du fabricant, affichées en pastilles ; la recette indique la durabilité du tube le moins durable. Ce sont des informations : elles n'entrent pas dans le calcul.
+- **Disposition et animations** : une tuile de disposition rapide sous le menu (réglages sous l'image, à droite, ou image seule). Les changements de vue et de disposition sont animés
+  par le navigateur (View Transitions : fondu, déplacement et changement de taille des blocs ; repli en fondu CSS ailleurs ; rien si l'utilisateur demande moins d'animations).
+  Aucune couleur sur les tuiles ni autour des images (gris neutre) : on y juge des couleurs.
+- **Stockage** (`localStorage`, clés `tools:arts:melangeur:atelier`, `…:grille` et `…:disposition` (préfixe d'origine conservé)) : tubes et réglages de grille. Les images ne sont jamais enregistrées.
+  Paramètres : espace utilisé, export / import des tubes en JSON, « Vider le cache » (image de travail et sélection, tubes conservés),
+  « Supprimer les données sur cet appareil » (uniquement les clés de cet outil : les autres outils du site partagent la même origine et gardent les leurs).
+
 ## Publication sur GitHub Pages
 
 Le site est servi dans un sous-dossier (`https://<utilisateur>.github.io/<depot>/`) : tous les chemins sont donc **relatifs**, sans `/` au début.
@@ -144,7 +177,8 @@ Le thème suit l'appareil. Le bouton en forme de lune ou de soleil, en haut à d
 - Les couleurs viennent des variables de `base.css` (`light-dark()`). Les feuilles imprimées et le clavier de piano gardent des couleurs fixes.
 - Un mémento = `<header class="toolbar">` + des `<div class="sheet" id data-face data-cols>`.
   `memento.js` construit les barres de réglage et peut répartir le contenu sur 1 à 8 pages.
-- Du code écrit pour ce projet, sans bibliothèque ni service externe (hors la police arabe), et sans nom de marque dans les outils.
+- **Poids du projet : 5 Mo au maximum** (hors .git ; 2,3 Mo aujourd'hui, dont 1,4 Mo pour pdf.js). Tout ajout de fichier lourd (bibliothèque, données de langue, images) doit tenir dans ce plafond.
+- Du code écrit pour ce projet, sans bibliothèque ni service externe (hors la police arabe, et pdf.js en copie locale pour lire un nuancier PDF), et sans nom de marque dans les outils.
 
 ## Ajouter une page
 
