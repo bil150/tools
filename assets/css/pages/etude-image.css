@@ -391,6 +391,8 @@ body:has(dialog[open]) { overflow: hidden; }
 /* Statut des peintures : je les ai / à acquérir / catalogue (identifiables sans couleur) */
 .listbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .listbar .seg button { min-height: 36px; padding: 0 12px; font-size: 13px; }
+.tsearch { flex: 1 1 100%; }
+.tsearch input { min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); width: 100%; font: inherit; color: inherit; }
 .tube.want { border-style: dashed; border-color: var(--ink); }
 .tag.want { background: var(--ink); color: var(--paper); }
 .tbtn.wantbtn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }

@@ -1034,7 +1034,23 @@
   var listFilter = 'all';   // filtre de la liste : all | have | want | cat
   function statusOf(t) { return t.active ? 'have' : t.want ? 'want' : 'cat'; }
   function setStatus(t, st) { t.active = st === 'have'; t.want = st === 'want'; }
-  function matchesFilter(t) { return listFilter === 'all' || statusOf(t) === listFilter; }
+  // Recherche : nom, groupe, pigment ou code couleur ; sans accents ni majuscules, tous les mots doivent se retrouver
+  var listQuery = [];
+  function fold(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  function matchesQuery(t) {
+    if (!listQuery.length) return true;
+    var hay = fold([t.name, t.group, t.pigment, t.hex].join(' '));
+    return listQuery.every(function (w) { return hay.indexOf(w) !== -1; });
+  }
+  function matchesFilter(t) { return (listFilter === 'all' || statusOf(t) === listFilter) && matchesQuery(t); }
+  var searchBox = $('tubeSearch'), searchTimer = null;
+  searchBox.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () { listQuery = fold(searchBox.value).split(/\s+/).filter(Boolean); renderTubes(); }, 120);
+  });
+  searchBox.addEventListener('keydown', function (e) {   // Échap vide la recherche
+    if (e.key === 'Escape' && searchBox.value) { e.preventDefault(); searchBox.value = ''; listQuery = []; renderTubes(); }
+  });
 
   // Barre de filtre : effectifs, et copie de la liste à acquérir (liste de courses)
   function updateListBar() {
@@ -1171,7 +1187,7 @@
     tubeList.textContent = '';
     groupUI = [];
     if (tubes.length && !tubes.some(matchesFilter)) {
-      tubeList.appendChild(el('p', 'muted', 'Aucun tube dans cette liste.'));
+      tubeList.appendChild(el('p', 'muted', listQuery.length ? 'Aucune peinture ne correspond à la recherche.' : 'Aucun tube dans cette liste.'));
     } else if (!tubes.some(function (t) { return t.group; })) {
       // aucun groupe : liste simple, comme avant
       var flat = el('ul', 'glist');
@@ -1183,8 +1199,9 @@
         var list = all.filter(matchesFilter);   // ce que la liste montre, selon le filtre
         if (!list.length) return;
         var det = el('details', 'grp');
-        det.open = openGroups.hasOwnProperty(g) ? openGroups[g] : list.length <= 40;   // un grand nuancier s'ouvre fermé
-        det.addEventListener('toggle', function () { openGroups[g] = det.open; });
+        // un grand nuancier s'ouvre fermé ; pendant une recherche, les groupes qui ont un résultat s'ouvrent
+        det.open = listQuery.length ? true : openGroups.hasOwnProperty(g) ? openGroups[g] : list.length <= 40;
+        det.addEventListener('toggle', function () { if (!listQuery.length) openGroups[g] = det.open; });
 
         var sum = el('summary');
         var lab = el('label', 'use');
