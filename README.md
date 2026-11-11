@@ -10,7 +10,7 @@ Petits outils pour la maison et les proches, en HTML, CSS et JS : sans compte, s
 | `it/` | mémentos imprimables (GNU/Linux, Windows, Dev), testeur de manette, calculateur réseau, convertisseurs, aide cron, comparateur de textes |
 | `vie/` | Santé/Condition physique : protéines et calories, repas, courses, sommeil, allure, minuteur, programmes course et musculation |
 | `musique/` | guitare, basse, oud, piano, boîte à rythmes, testeur MIDI |
-| `arts-plastiques/` | Étude d'image : grille, valeurs, pipette, recette de mélange de peinture |
+| `arts-plastiques/` | Étude d'image (grille, valeurs, pipette, recette de mélange de peinture) ; Pantin (mannequin 3D, poses, croquis chronométré, lumière) |
 
 `index.html` est le seul index. Dans `assets/` : `css/` (`base.css` commun, un fichier par section, `pages/` une feuille par page), `js/` (`app.js` pour le thème et le bouton « Installer », modules communs, `pages/` un script par page), `icons/` et `vendor/pdfjs/`.
 
@@ -38,6 +38,10 @@ Importer une image, pointer une couleur, obtenir la recette à mélanger avec se
 - **Peintures de l'image** : les tubes qu'il faut pour toute l'image, de 8 couleurs à tous les points ; vos peintures d'abord, puis plusieurs propositions (+1, +2… tubes) avec leur ΔE moyen ; copier, « Ajouter inventaire », « Ajouter à la liste de courses ». Un bouton copier discret accompagne chaque peinture.
 - **Interface** : la page tient à l'écran sans défiler (tablette, ordinateur) ; menu d'icônes, disposition rapide (sous l'image, à droite, image seule) et thèmes (couleurs du site par défaut, gris neutre, papier, contraste) ; changements animés (View Transitions).
 - **Stockage** (`localStorage`, clés `tools:arts:melangeur:*`) : tubes et réglages de grille, jamais les images. Paramètres : espace utilisé, export/import des tubes, vider le cache, supprimer les données de l'outil (et seulement elles).
+
+## Pantin
+
+Mannequin d’atelier en bois (pièces tournées, rotules ; forme masculine ou féminine) en 3D (`arts-plastiques/pantin.html`, three.js r185 en copie locale dans `assets/vendor/three`, chargé seulement sur cette page) : 28 poses dont 7 « Écrans » avec téléphone, tablette, chaise ou borne (`assets/js/pantin-poses.js`, angles du mouvement en degrés ; lien direct `?pose=…&vue=…`) posées au sol automatiquement, rotation et zoom au doigt, vues rapides, proportions de 6 à 9 têtes, croquis chronométré (30 s à 5 min, séance), lumière réglable et rendu en 2 ou 3 valeurs, export PNG. Mêmes menu, dispositions et thèmes qu'Étude d'image (`assets/css/pages/arts-atelier.css`, commun aux deux pages) ; réglages dans `tools:arts:pantin:*`.
 
 ## Publication
 

@@ -1,0 +1,100 @@
+/* Outils d'Arts plastiques (Étude d'image, Pantin) : thèmes, menu d'icônes, infobulles, tuiles et cases communes.
+   S'appuie sur base.css ; chaque page ajoute ensuite ses propres styles. */
+
+.wrap { max-width: 1500px; }
+
+/* Thèmes de la page (sélecteur sous la disposition). Par défaut : les couleurs du site, comme les autres pages.
+   Les autres thèmes remplacent les variables de base.css pour cette page seulement ; « Gris neutre » et « Contraste » n'ont
+   aucune teinte, pour ne pas influencer la perception des couleurs d'une image. Tous suivent le mode clair / sombre du site. */
+:root { --bt: var(--paper-2); }
+:root[data-palette="gris"] {
+  --paper: light-dark(#F4F4F4, #1B1B1B);
+  --paper-2: light-dark(#FFFFFF, #262626);
+  --ink: light-dark(#1D1D1D, #ECECEC);
+  --muted: light-dark(#5E5E5E, #A2A2A2);
+  --line: light-dark(#D6D6D6, #3A3A3A);
+  --hi: light-dark(#E6E6E6, #353535);
+  --bt: light-dark(#E9E9E9, #2D2D2D);
+}
+:root[data-palette="papier"] {
+  --paper: light-dark(#F3EEE3, #1D1A15);
+  --paper-2: light-dark(#FBF8F1, #26221C);
+  --ink: light-dark(#2B261E, #EEE8DC);
+  --muted: light-dark(#6D6455, #AAA190);
+  --line: light-dark(#DCD3C2, #3C362C);
+  --hi: light-dark(#EAE2D1, #39332A);
+  --bt: light-dark(#ECE5D6, #2D2922);
+}
+:root[data-palette="contraste"] {
+  --paper: light-dark(#FFFFFF, #000000);
+  --paper-2: light-dark(#FFFFFF, #0B0B0B);
+  --ink: light-dark(#000000, #FFFFFF);
+  --muted: light-dark(#363636, #CFCFCF);
+  --line: light-dark(#8C8C8C, #6A6A6A);
+  --hi: light-dark(#E2E2E2, #2E2E2E);
+  --bt: light-dark(#F0F0F0, #161616);
+}
+body { background: var(--paper); }
+
+/* Menu latéral d'icônes (sections, puis disposition rapide) + zone de contenu */
+.app { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; align-items: start; }
+.views { min-width: 0; }
+
+.rail-col { position: sticky; top: 16px; z-index: 30; display: flex; flex-direction: column; gap: 8px; }
+.rail {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2);
+}
+.rail-tabs, .rail-layout, .rail-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+/* Pastille d'un thème : son fond et son encre */
+.rail .swatch { width: 18px; height: 18px; fill: initial; stroke: none; }
+.rail .swatch circle { stroke: currentColor; stroke-width: 1; }
+.rail button {
+  position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 8px; background: transparent; color: var(--muted);
+}
+.rail button:hover { background: var(--hi); color: var(--ink); }
+.rail button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.rail-group button { width: 36px; height: 36px; }
+.rail-group button[aria-pressed="true"] { background: color-mix(in srgb, var(--ink) 16%, transparent); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.rail svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.rail-group svg { width: 20px; height: 20px; }
+.rail-sep { width: 24px; height: 1px; background: var(--line); margin: 4px 0; }
+
+/* Infobulle à droite de l'icône (bureau) */
+.rail button::after {
+  content: attr(data-label); position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+  white-space: nowrap; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 500;
+  background: var(--ink); color: var(--paper); opacity: 0; pointer-events: none; z-index: 5;
+}
+.rail button:hover::after, .rail button:focus-visible::after { opacity: 1; }
+
+/* Tuiles « bento » */
+.bt { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px 16px; border-radius: 18px; background: var(--bt); }
+.bt h2 { font: 600 13px/1.3 var(--body); opacity: .7; }
+.bt > label { font-size: 13px; font-weight: 600; opacity: .7; }
+.bt .muted { color: inherit; opacity: .7; }
+.bt .btn { width: 100%; }
+
+.bt label.switch { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 500; opacity: 1; }
+.switch input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+
+/* Mobile : le menu devient une rangée d'icônes en haut, la disposition et les thèmes sur la rangée suivante */
+@media (max-width: 640px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail-col { top: 0; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .rail { flex-direction: row; justify-content: space-between; }
+  .rail:not(.rail-layout):not(.rail-theme) { flex: 1 1 auto; }
+  .rail-tabs, .rail-layout, .rail-group { flex-direction: row; }
+  .rail-sep { width: 1px; height: 24px; margin: 0 4px; }
+  .rail button::after { display: none; }
+  .rail-col { min-width: 0; }
+  .rail { min-width: 0; padding: 4px; }
+  .rail:not(.rail-layout):not(.rail-theme) { flex: 1 1 0; }
+  .rail-col > .rail:first-child { flex: 1 1 100%; }   /* menu sur sa rangée ; disposition et thèmes sur la suivante */
+  .rail-tabs { flex: 1 1 auto; min-width: 0; width: 100%; justify-content: space-between; gap: 2px; }
+  .rail-tabs button { flex: 1 1 0; min-width: 0; width: auto; max-width: 44px; }
+  .rail-group { gap: 2px; }
+  .rail-group button { width: 32px; height: 36px; }
+  .rail-sep { margin: 0 2px; }
+}

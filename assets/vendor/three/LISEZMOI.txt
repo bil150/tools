@@ -1,0 +1,3 @@
+three.js r185 (0.185.0, licence MIT, voir LICENSE).
+Copie locale de three/build/three.module.min.js et three.core.min.js, chargée seulement par la page Pantin.
+Source : https://github.com/mrdoob/three.js
