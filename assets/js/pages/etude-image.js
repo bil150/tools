@@ -9,6 +9,7 @@
   var KEY_TUBES = NS + 'atelier'; // clé d'origine conservée : les tubes déjà saisis restent lisibles
   var KEY_GRID = NS + 'grille';
   var KEY_LAYOUT = NS + 'disposition';
+  var KEY_THEME = NS + 'theme';
   var KEY_OPTS = NS + 'reglages';
   var MAX_TUBES = 1000;
 
@@ -130,7 +131,7 @@
 
   // La grille est toujours carrée : seul le nombre de colonnes se règle, la taille du carreau en découle
   // et le nombre de lignes suit la hauteur de l'image.
-  var GRID_DEFAULT = { cols: 4, color: '#000000', width: 1.5, dash: 'solid', letters: false };
+  var GRID_DEFAULT = { cols: 4, color: '#000000', width: 1, dash: 'solid', letters: false };
   var DASHES = ['solid', 'dash', 'dot'];
 
   function cleanGrid(g) {
@@ -139,9 +140,11 @@
     return {
       cols: clampInt(g.cols, 1, 40, d.cols),
       color: typeof g.color === 'string' && parseHex(g.color) ? toHex(parseHex(g.color)) : d.color,
-      width: clampNum(g.width, 0.5, 8, d.width),
+      // 1,5 px était l'ancien trait par défaut : il passe à 1 px (le nouveau défaut) tant qu'on ne l'a pas réglé depuis (v2)
+      width: g.v !== 2 && g.width === 1.5 ? d.width : clampNum(g.width, 0.5, 8, d.width),
       dash: DASHES.indexOf(g.dash) !== -1 ? g.dash : d.dash,
-      letters: g.letters === true
+      letters: g.letters === true,
+      v: 2
     };
   }
   var grid = cleanGrid(readJSON(KEY_GRID));
@@ -283,6 +286,7 @@
 
   // Un clic sur un carreau (mode Mise en grille) le choisit ou le retire.
   canvas.addEventListener('click', function (e) {
+    if (suppressClick) { suppressClick = false; return; }   // c'était un déplacement de l'image, pas un choix de carreau
     if (mode !== 'grid' || !source) return;
     var p = pointFrom(e), cell = cellSize(), c = Math.min(grid.cols - 1, Math.floor(p.x / cell)), r = Math.floor(p.y / cell);
     if (r >= gridRowCount()) return;
@@ -482,6 +486,7 @@
     ctx.drawImage(base, 0, 0);
     if (mode === 'grid') drawGrid();
     if (mode === 'pick' && picked && !exporting) drawSight(picked);
+    drawThumb(base);
   }
 
   // Quand la taille affichée change, on redessine pour garder des traits fins et nets (au plus une fois par image affichée).
@@ -534,11 +539,11 @@
   var tabOrder = ['grid', 'values', 'pick', 'couleurs', 'settings'];
   var panelOf = { grid: 'viewMix', values: 'viewMix', pick: 'viewMix', couleurs: 'viewCouleurs', settings: 'viewSettings' };
   var sideTiles = {
-    grid: ['tileCols', 'tileColor', 'tileLine', 'tileChunks'],
-    values: [],
-    pick: ['tileRecipe', 'tileTarget']   // la recette d'abord : c'est l'essentiel
+    grid: ['tileCols', 'tileColor', 'tileLine', 'tileChunks', 'tileNav'],
+    values: ['tileNav'],
+    pick: ['tileRecipe', 'tileTarget', 'tileNav']   // la recette d'abord : c'est l'essentiel
   };
-  var allTiles = sideTiles.grid.concat(sideTiles.pick);
+  var allTiles = sideTiles.grid.concat(sideTiles.pick).filter(function (id, i, a) { return a.indexOf(id) === i; });
   // Adresses courtes, utilisées par les liens du menu Arts plastiques (etude-image.html#grille…).
   var slugOf = { grid: 'grille', values: 'valeurs', pick: 'pipette', couleurs: 'couleurs', settings: 'parametres' };
   var viewOfSlug = {};
@@ -564,6 +569,7 @@
       allTiles.forEach(function (id) { $(id).hidden = sideTiles[v].indexOf(id) === -1; });
       drop.classList.toggle('mode-pick', v === 'pick');
       drop.classList.toggle('mode-grid', v === 'grid');
+      drop.classList.toggle('mode-values', v === 'values');
       canvas.tabIndex = v === 'pick' ? 0 : -1;
       render();
     }
@@ -595,6 +601,19 @@
   Array.prototype.forEach.call(document.querySelectorAll('button[data-layout]'), function (b) {
     b.addEventListener('click', function () { setLayout(b.dataset.layout); });
   });
+
+  /* Thème de la page : « site » (défaut, comme les autres pages), « gris » (neutre), « papier », « contraste » */
+  var THEMES = ['site', 'gris', 'papier', 'contraste'];
+  function setTheme(t, noSave) {
+    t = THEMES.indexOf(t) !== -1 ? t : 'site';
+    if (t === 'site') document.documentElement.removeAttribute('data-palette'); else document.documentElement.setAttribute('data-palette', t);
+    if (!noSave) writeJSON(KEY_THEME, t);
+    Array.prototype.forEach.call(document.querySelectorAll('button[data-palette]'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.palette === t)); });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('button[data-palette]'), function (b) {
+    b.addEventListener('click', function () { setTheme(b.dataset.palette); });
+  });
+  setTheme(readJSON(KEY_THEME), true);
 
   window.addEventListener('hashchange', function () {
     var v = viewOfSlug[location.hash.slice(1)];
@@ -671,26 +690,53 @@
     updateTarget();
   }
 
+  /* Pointeurs sur l'image. Pipette : un appui fixe le point, le glisser l'affine (le survol ne change rien).
+     Grille et valeurs : zoomé, un glisser déplace l'image. Partout : deux doigts zooment et déplacent,
+     le bouton du milieu de la souris déplace. */
+  var iPtr = {}, iPinch = null, suppressClick = false, pickBefore = null;
   canvas.addEventListener('pointerdown', function (e) {
-    if (mode !== 'pick' || !source || (e.pointerType === 'mouse' && e.button !== 0)) return;
-    dragging = true;
-    picked = pointFrom(e);
+    if (!source || (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 1)) return;
+    if (Object.keys(iPtr).length >= 2) return;
     try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* sans importance */ }
-    refresh();
+    var middle = e.pointerType === 'mouse' && e.button === 1;
+    if (middle) e.preventDefault();
+    iPtr[e.pointerId] = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, pan: middle || mode !== 'pick' };
+    if (Object.keys(iPtr).length === 2) {
+      // deux doigts : c'est un zoom, pas un pointage ; le premier doigt n'a donc pas déplacé le point
+      if (dragging) { dragging = false; picked = pickBefore; refresh(); }
+      Object.keys(iPtr).forEach(function (id) { iPtr[id].moved = true; });
+      iPinch = izPinchStart(); suppressClick = true;
+      return;
+    }
+    if (mode === 'pick' && !middle) { pickBefore = picked; dragging = true; picked = pointFrom(e); refresh(); }
   });
-  // Bouton enfoncé (ou doigt posé) puis glissé : on affine le point. Sans appui, rien ne change.
   canvas.addEventListener('pointermove', function (e) {
-    if (!dragging || mode !== 'pick' || !source) return;
-    picked = pointFrom(e);
-    refresh();
+    var p = iPtr[e.pointerId];
+    if (!p) return;
+    var dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    if (iPinch && Object.keys(iPtr).length === 2) { izPinchMove(); return; }
+    if (dragging && !p.pan) { picked = pointFrom(e); refresh(); return; }   // pipette : on affine le point
+    if (!p.pan) return;
+    if (!p.moved && Math.hypot(e.clientX - p.sx, e.clientY - p.sy) < 5) return;   // petit tremblement : toujours un clic
+    p.moved = true; suppressClick = true;
+    if (iz > 1) { itx += dx; ity += dy; izApply(); }
   });
-  function endDrag() { dragging = false; }
+  function endDrag(e) {
+    delete iPtr[e.pointerId];
+    if (Object.keys(iPtr).length < 2) iPinch = null;
+    if (!Object.keys(iPtr).length) dragging = false;
+  }
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
 
   // Au clavier : flèches pour déplacer le viseur d'un pixel (Maj : dix pixels).
   canvas.addEventListener('keydown', function (e) {
-    if (mode !== 'pick' || !source) return;
+    if (!source) return;
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); izZoomCenter(1.5); return; }
+    if (e.key === '-' || e.key === '_') { e.preventDefault(); izZoomCenter(1 / 1.5); return; }
+    if (e.key === '0') { e.preventDefault(); izReset(); return; }
+    if (mode !== 'pick') return;
     var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
     if (!d) return;
     e.preventDefault();
@@ -701,7 +747,140 @@
       y: Math.min(canvas.height - 1, Math.max(0, from.y + d[1] * k))
     };
     refresh();
+    izReveal(picked);
   });
+
+  /* ---------- Zoom et déplacement dans l'image, tuile Navigation ---------- */
+
+  // L'image tient entière dans sa zone (cadre dimensionné ici) ; zoomer agrandit le canvas dans ce cadre par une transformation :
+  // aucun pixel de l'image n'est recalculé, la pipette lit toujours l'image d'origine.
+  var imgFrame = $('imgFrame'), navMap = $('navMap'), navThumb = $('navThumb');
+  var FIT = window.matchMedia ? window.matchMedia('(min-width: 641px) and (min-height: 560px)') : { matches: false };
+  var iz = 1, itx = 0, ity = 0, izDrawn = 1, thumbKey = '';
+  var IZ_MAX = 16;
+
+  function fitFrame() {
+    imgFrame.hidden = canvas.hidden;
+    if (canvas.hidden) { imgFrame.style.width = imgFrame.style.height = ''; updateNav(); return; }
+    var availW = drop.clientWidth, availH = FIT.matches ? drop.clientHeight : Math.round(window.innerHeight * 0.8);
+    var ar = canvas.width / canvas.height, w = Math.max(1, Math.min(availW, availH * ar));
+    imgFrame.style.width = Math.floor(w) + 'px';
+    imgFrame.style.height = Math.floor(w / ar) + 'px';
+    izApply();
+  }
+  function izApply() {
+    var fw = imgFrame.clientWidth, fh = imgFrame.clientHeight;
+    iz = Math.min(IZ_MAX, Math.max(1, iz));
+    itx = Math.min(0, Math.max(fw - fw * iz, itx));   // l'image ne quitte jamais le cadre
+    ity = Math.min(0, Math.max(fh - fh * iz, ity));
+    canvas.style.transform = iz === 1 ? '' : 'translate(' + itx + 'px,' + ity + 'px) scale(' + iz + ')';
+    canvas.zoom = iz;
+    // au-delà de la résolution de l'image, on montre les vrais pixels plutôt qu'un flou
+    canvas.style.imageRendering = iz * fw / Math.max(1, canvas.width) > 2 ? 'pixelated' : '';
+    imgFrame.classList.toggle('zoomed', iz > 1);
+    if (iz !== izDrawn) { izDrawn = iz; render(); }   // traits de la grille et viseur gardent leur taille à l'écran
+    updateNav();
+  }
+  function izReset() { iz = 1; itx = ity = 0; izApply(); }
+  // Change le zoom en gardant fixe le point (fx, fy) du cadre
+  function izZoomAt(z, fx, fy) {
+    z = Math.min(IZ_MAX, Math.max(1, z));
+    var k = z / iz;
+    itx = fx - (fx - itx) * k; ity = fy - (fy - ity) * k; iz = z;
+    izApply();
+  }
+  function izZoomCenter(f) { izZoomAt(iz * f, imgFrame.clientWidth / 2, imgFrame.clientHeight / 2); }
+  // Ramène dans le cadre le point pt de l'image (viseur déplacé au clavier)
+  function izReveal(pt) {
+    if (iz === 1) return;
+    var fw = imgFrame.clientWidth, fh = imgFrame.clientHeight, m = 24;
+    var sx = (pt.x + 0.5) / canvas.width * fw * iz + itx, sy = (pt.y + 0.5) / canvas.height * fh * iz + ity;
+    if (sx < m) itx += m - sx; else if (sx > fw - m) itx -= sx - (fw - m);
+    if (sy < m) ity += m - sy; else if (sy > fh - m) ity -= sy - (fh - m);
+    izApply();
+  }
+  function izPinchStart() {
+    var ids = Object.keys(iPtr), a = iPtr[ids[0]], b = iPtr[ids[1]], r = imgFrame.getBoundingClientRect();
+    var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    return { d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), z: iz, ux: (mx - r.left - itx) / iz, uy: (my - r.top - ity) / iz };
+  }
+  function izPinchMove() {
+    var ids = Object.keys(iPtr), a = iPtr[ids[0]], b = iPtr[ids[1]], r = imgFrame.getBoundingClientRect();
+    var z = Math.min(IZ_MAX, Math.max(1, iPinch.z * Math.hypot(a.x - b.x, a.y - b.y) / iPinch.d));
+    iz = z;   // le point de l'image qui était entre les doigts le reste, même quand les doigts se déplacent
+    itx = (a.x + b.x) / 2 - r.left - iPinch.ux * z; ity = (a.y + b.y) / 2 - r.top - iPinch.uy * z;
+    izApply();
+  }
+  // Molette : zoom autour du curseur (la page ne défile pas) ; sur téléphone, la page défile : Ctrl + molette zoome.
+  imgFrame.addEventListener('wheel', function (e) {
+    if (!source) return;
+    var r = imgFrame.getBoundingClientRect();
+    if (e.ctrlKey || e.metaKey || FIT.matches) {
+      e.preventDefault();
+      izZoomAt(iz * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0025)), e.clientX - r.left, e.clientY - r.top);
+    } else if (iz > 1) {
+      e.preventDefault();
+      itx -= e.deltaX; ity -= e.deltaY; izApply();
+    }
+  }, { passive: false });
+
+  // Tuile Navigation : niveau de zoom, miniature et cadre de la partie visible
+  function updateNav() {
+    var has = !!source && !canvas.hidden;
+    navMap.hidden = !has; $('navEmpty').hidden = has;
+    $('izLevel').textContent = '×' + String(Math.round(iz * 10) / 10).replace('.', ',');
+    $('izLevel').disabled = !has || iz === 1;
+    $('izOut').disabled = !has || iz <= 1;
+    $('izIn').disabled = !has || iz >= IZ_MAX;
+    if (!has) return;
+    var fw = imgFrame.clientWidth, fh = imgFrame.clientHeight, box = $('navBox');
+    if (!fw || !fh) return;
+    box.style.left = (-itx / (fw * iz) * 100) + '%';
+    box.style.top = (-ity / (fh * iz) * 100) + '%';
+    box.style.width = (100 / iz) + '%';
+    box.style.height = (100 / iz) + '%';
+  }
+  // Miniature : l'image affichée (couleur ou valeurs), sans grille ni viseur ; redessinée seulement quand elle change
+  var thumbSeq = 0;
+  function drawThumb(base) {
+    var tile = $('tileNav');
+    if (!source || tile.hidden) return;
+    var maxW = Math.max(60, tile.clientWidth - 32), ar = source.width / source.height;
+    var w = Math.round(Math.min(maxW, 150 * ar)), hh = Math.round(w / ar);
+    var key = thumbSeq + '|' + mode + '|' + w;
+    if (key === thumbKey) return;
+    thumbKey = key;
+    navMap.style.width = w + 'px'; navMap.style.height = hh + 'px';
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    navThumb.width = Math.round(w * dpr); navThumb.height = Math.round(hh * dpr);
+    var x = navThumb.getContext('2d');
+    x.imageSmoothingQuality = 'high';
+    x.drawImage(base, 0, 0, navThumb.width, navThumb.height);
+    updateNav();
+  }
+  // Toucher ou glisser sur la miniature : la vue se centre sur ce point (à l'échelle 1, on zoome d'abord ×2)
+  var navDrag = false;
+  function navGo(e) {
+    var r = navMap.getBoundingClientRect(), fw = imgFrame.clientWidth, fh = imgFrame.clientHeight;
+    var fx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), fy = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    if (iz === 1) iz = 2;
+    itx = fw / 2 - fx * fw * iz; ity = fh / 2 - fy * fh * iz;
+    izApply();
+  }
+  navMap.addEventListener('pointerdown', function (e) {
+    if (!source || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    navDrag = true;
+    try { navMap.setPointerCapture(e.pointerId); } catch (_) { /* sans importance */ }
+    navGo(e);
+  });
+  navMap.addEventListener('pointermove', function (e) { if (navDrag) navGo(e); });
+  navMap.addEventListener('pointerup', function () { navDrag = false; });
+  navMap.addEventListener('pointercancel', function () { navDrag = false; });
+  $('izIn').addEventListener('click', function () { izZoomCenter(1.5); });
+  $('izOut').addEventListener('click', function () { izZoomCenter(1 / 1.5); });
+  $('izLevel').addEventListener('click', izReset);
+  if (window.ResizeObserver) new ResizeObserver(afterFrame(fitFrame)).observe(drop);
+  if (FIT.addEventListener) FIT.addEventListener('change', fitFrame);
 
   /* ---------- Importation de l'image ---------- */
 
@@ -718,7 +897,10 @@
     canvas.hidden = false;
     dropMsg.hidden = true;
     drop.classList.add('has-image');
+    iz = 1; itx = ity = 0; thumbSeq++; thumbKey = '';
+    fitFrame();
     exportBtn.disabled = false;
+    $('ppBtn').disabled = false;
 
     info.textContent = name + ' — ' + w + ' × ' + h + ' px' + (k < 1 ? ' (réduite à ' + cw + ' × ' + ch + ')' : '');
     pick.textContent = 'Changer d’image';
@@ -733,7 +915,11 @@
     canvas.hidden = true;
     dropMsg.hidden = false;
     drop.classList.remove('has-image');
+    iz = 1; itx = ity = 0;
+    canvas.style.transform = '';
+    fitFrame();
     exportBtn.disabled = true;
+    $('ppBtn').disabled = true;
     info.textContent = '';
     pick.textContent = 'Choisir une image';
     showError('');
@@ -802,13 +988,20 @@
   (function () { var o = readJSON(KEY_OPTS); opts.chromaticBlack = !(o && o.chromaticBlack === false); opts.noEffects = !(o && o.noEffects === false); })();
   function saveOpts() { writeJSON(KEY_OPTS, opts); }
   var blackCache = {};
+  // Un tube noir : son nom le dit (black, noir…), ou son pigment n'est fait que de noirs (PBk), ou sa couleur est très sombre et
+  // sans teinte. Un pigment noir mélangé à d'autres (terre d'ombre, gris de Payne en mélange…) ne suffit pas : ce n'est pas un noir.
+  var BLACK_WORDS = /(^|[^a-z])(black|noir|nero|negro|schwarz|zwart|preto)([^a-z]|$)/;
   function isBlackTube(t) {
-    var k = t.hex + '|' + t.pigment;
+    var k = t.name + '|' + t.hex + '|' + t.pigment;
     if (blackCache.hasOwnProperty(k)) return blackCache[k];
-    var black = /(^|[^a-z])PBk/i.test(t.pigment || '');
-    if (!black && window.MelangeMoteur) {
+    var name = String(t.name || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    var codes = String(t.pigment || '').split(/[\/,+\s]+/).filter(Boolean);
+    // un métallisé à base de pigment noir (graphite, étain, argent) est d'abord un métallisé : seul son nom peut en faire un noir
+    var effect = !!Nuancier.effectKind(t);
+    var black = BLACK_WORDS.test(name) || (!effect && codes.length > 0 && codes.every(function (c) { return /^PBk\d*$/i.test(c); }));
+    if (!black && !effect && window.MelangeMoteur) {
       var lab = window.MelangeMoteur.rgbToLab(parseHex(t.hex));
-      black = lab[0] <= 25 && Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]) <= 12;   // sombre et sans teinte
+      black = lab[0] <= 25 && Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]) <= 8;   // très sombre et sans teinte
     }
     return (blackCache[k] = black);
   }
@@ -854,17 +1047,21 @@
       b.setAttribute('aria-pressed', String(k === listFilter));
     });
     $('wantCopy').hidden = !cnt.want;
+    $('haveCopy').hidden = !cnt.have;
   }
   Array.prototype.forEach.call(document.querySelectorAll('#tubeFilter [data-filter]'), function (b) {
     b.addEventListener('click', function () { listFilter = b.dataset.filter; renderTubes(); });
   });
-  $('wantCopy').addEventListener('click', function () {
-    var list = tubes.filter(function (t) { return t.want; });
-    var lines = ['À acquérir (' + list.length + ')'].concat(list.map(function (t) {
+  // Copie d'une liste de peintures (je les ai / à acquérir) : marque, nom, pigments, couleur
+  function copyStatusList(st, title) {
+    var list = tubes.filter(function (t) { return statusOf(t) === st; });
+    var lines = [title + ' (' + list.length + ')'].concat(list.map(function (t) {
       return (t.group ? t.group + ' · ' : '') + t.name + (t.pigment ? ' (' + t.pigment + ')' : '') + ' · ' + t.hex.toUpperCase();
     }));
     copyText(lines.join('\n'), $('wantCopyMsg'));
-  });
+  }
+  $('wantCopy').addEventListener('click', function () { copyStatusList('want', 'À acquérir'); });
+  $('haveCopy').addEventListener('click', function () { copyStatusList('have', 'Je les ai'); });
 
   // Pastilles « ASTM I » et « Opaque » d'un tube (null si rien n'est indiqué).
   function tubeTags(t) {
@@ -907,6 +1104,7 @@
       if ((hadWant && t.active) || listFilter !== 'all') { renderTubes(); return; }   // l'étiquette ou la liste filtrée change
       li.classList.toggle('off', !t.active);
       wantBtn.hidden = t.active;
+      rebuy.hidden = !t.active;
       updateCount(); updateGroupStates();
     });
     use.appendChild(cb);
@@ -939,7 +1137,13 @@
       if (editingId === t.id) closeForm();
       saveTubes(); renderTubes();
     });
-    acts.appendChild(wantBtn); acts.appendChild(edit); acts.appendChild(del);
+    // Peinture qu'on a : quand le tube est terminé, elle repart dans la liste à acquérir
+    var rebuy = el('button', 'tbtn rebuy', 'À racheter'); rebuy.type = 'button';
+    rebuy.hidden = !t.active;
+    rebuy.title = 'Tube terminé : le mettre dans la liste à acquérir';
+    rebuy.setAttribute('aria-label', '« ' + t.name + ' » est terminé : le mettre à acquérir');
+    rebuy.addEventListener('click', function () { setStatus(t, 'want'); saveTubes(); renderTubes(); });
+    acts.appendChild(copyButton(t)); acts.appendChild(wantBtn); acts.appendChild(rebuy); acts.appendChild(edit); acts.appendChild(del);
 
     li.appendChild(use); li.appendChild(chip); li.appendChild(meta); li.appendChild(acts);
     return li;
@@ -1132,18 +1336,39 @@
   $('nmClose').addEventListener('click', function () { nmEl.close(); });
   $('nmOpen').addEventListener('click', function () { openNuancierModal('imp'); });
 
-  function copyText(text, msgEl) {
-    function done() { msgEl.textContent = 'Copié'; setTimeout(function () { msgEl.textContent = ''; }, 1600); }
+  // Copie dans le presse-papiers ; cb(true) seulement si elle a vraiment eu lieu
+  function writeClip(text, cb) {
     function fallback() {
-      var ta = document.createElement('textarea');
+      var ta = document.createElement('textarea'), ok = false;
       ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
       document.body.appendChild(ta); ta.select();
-      try {
-        if (document.execCommand('copy')) done(); else msgEl.textContent = 'Copie impossible';   // on n'annonce « Copié » que si c'est vrai
-      } catch (e) { msgEl.textContent = 'Copie impossible'; }
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
       ta.remove();
+      cb(ok);
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { cb(true); }, fallback); else fallback();
+  }
+  function copyText(text, msgEl) {
+    writeClip(text, function (ok) {
+      msgEl.textContent = ok ? 'Copié' : 'Copie impossible';   // on n'annonce « Copié » que si c'est vrai
+      if (ok) setTimeout(function () { msgEl.textContent = ''; }, 1600);
+    });
+  }
+  // Petit bouton « copier » à côté d'une peinture : copie son nom (et sa marque)
+  var IC_COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>';
+  var IC_COPIED = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
+  function copyButton(t) {
+    var b = el('button', 'tbtn copybtn'); b.type = 'button'; b.innerHTML = IC_COPY;
+    b.title = 'Copier le nom'; b.setAttribute('aria-label', 'Copier « ' + tubeLabel(t) + ' »');
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      writeClip(tubeLabel(t), function (ok) {
+        if (!ok) return;
+        b.innerHTML = IC_COPIED; b.classList.add('done'); b.title = 'Copié';
+        setTimeout(function () { b.innerHTML = IC_COPY; b.classList.remove('done'); b.title = 'Copier le nom'; }, 1200);
+      });
+    });
+    return b;
   }
 
   /* Importer */
@@ -1206,17 +1431,24 @@
   var nmTimer = null;
   $('nmPaste').addEventListener('input', function () { clearTimeout(nmTimer); nmTimer = setTimeout(nmPreview, 150); });
   ['nmActivate', 'nmReplace'].forEach(function (id) { $(id).addEventListener('change', nmPreview); });
+  // Fichier JSON choisi ou déposé : son texte va dans la zone « Ou collez le JSON », puis l'aperçu
+  $('nmPick').addEventListener('click', function () { $('nmFile').click(); });
+  bindDrop($('nmDrop'), nmReadFile);
   $('nmFile').addEventListener('change', function () {
     var f = this.files[0];
     this.value = '';
+    nmReadFile(f);
+  });
+  function nmReadFile(f) {
     if (!f) return;
+    $('nmFileName').textContent = f.name;
     if (f.size > 4 * 1024 * 1024) { $('nmPaste').value = ''; nmPreview(); $('nmPreview').hidden = false; $('nmPreview').className = 'err'; $('nmPreview').textContent = 'Fichier trop volumineux (4 Mo au maximum).'; return; }
     var rd = new FileReader();
     rd.onload = function () { $('nmPaste').value = String(rd.result); nmPreview(); };
     rd.onerror = function () { $('nmPreview').hidden = false; $('nmPreview').className = 'err'; $('nmPreview').textContent = 'Impossible de lire ce fichier.'; };
     rd.readAsText(f);
-  });
-  $('nmClear').addEventListener('click', function () { $('nmPaste').value = ''; nmPreview(); });
+  }
+  $('nmClear').addEventListener('click', function () { $('nmPaste').value = ''; $('nmFileName').textContent = 'ou déposez-le ici'; nmPreview(); });
   $('nmDoImport').addEventListener('click', function () {
     if (!nmParsed) return;
     var plan = computeImport(nmParsed, { activate: $('nmActivate').checked, replace: $('nmReplace').checked });
@@ -1466,6 +1698,8 @@
   }
 
   $('chartPick').addEventListener('click', function () { $('chartFile').click(); });
+  $('chartDrop').addEventListener('click', function () { if (!chartSrc) $('chartFile').click(); });
+  drop.addEventListener('click', function () { if (!source) file.click(); });
   $('chartFile').addEventListener('change', function () { loadChart(this.files[0]); this.value = ''; });
   bindDrop($('chartDrop'), loadChart);
 
@@ -1995,6 +2229,7 @@
       if (t.group) nm.appendChild(el('span', 'gname-inline', t.group));
       var tg = tubeTags(t);
       if (tg) nm.appendChild(tg);
+      nm.appendChild(copyButton(t));
       var pc = el('span', 'pc', Math.round(it.weight * 100) + ' %');
       var bar = el('span', 'bar2'); var fill = document.createElement('i');
       fill.style.width = Math.round(it.weight * 100) + '%'; bar.appendChild(fill);
@@ -2108,6 +2343,7 @@
       de.appendChild(el('span', 'muted', '−' + fmtDe(base.de - x.res.de)));
       // Deux façons de s'en servir : je l'ai (elle entre dans la recette) ou je dois l'acquérir (marquée, hors calcul)
       var acts = el('span', 'sgacts');
+      acts.appendChild(copyButton(x.t));
       var add = el('button', 'tbtn', 'Ajouter inventaire'); add.type = 'button';
       add.setAttribute('aria-label', 'Ajouter « ' + tubeLabel(x.t) + ' » à l’inventaire : l’utiliser dans la recette');
       add.addEventListener('click', function () { setStatus(x.t, 'have'); saveTubes(); renderTubes(); });
@@ -2125,6 +2361,175 @@
     body.appendChild(ul);
     body.appendChild(el('p', 'muted note', 'Indicatif : même calcul que la recette, avec une peinture de plus.'));
   }
+
+  /* ---------- Peintures de l'image : ce qu'on a, et ce qu'on pourrait ajouter (plusieurs propositions) ---------- */
+
+  // Précision : nombre de couleurs de l'image prises en compte ; au maximum, tous ses points (image réduite à 128 px de côté).
+  var PP_LEVELS = [8, 16, 32, 64, 128, 'all'];
+  var ppEl = $('ppModal'), ppOpener = null, ppSel = null, ppRes = null, ppPick = 0, ppToken = 0, ppCache = {};
+
+  function ppLevelLabel(i) { return PP_LEVELS[i] === 'all' ? 'tous les points' : PP_LEVELS[i] + ' couleurs'; }
+  function ppGroups() {
+    var names = [];
+    tubes.forEach(function (t) { if (t.group && names.indexOf(t.group) === -1) names.push(t.group); });
+    names.sort(function (a, b) { return a.localeCompare(b, 'fr'); });
+    if (tubes.some(function (t) { return !t.group; })) names.push('');
+    return names;
+  }
+  // Collections étudiées : toutes cochées au départ ; vos peintures cochées comptent toujours
+  function ppFillColls() {
+    var box = $('ppColls'), names = ppGroups();
+    if (!ppSel) ppSel = {};
+    box.textContent = '';
+    names.forEach(function (g) {
+      if (!ppSel.hasOwnProperty(g)) ppSel[g] = true;
+      var lab = el('label', 'coll'), cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.checked = !!ppSel[g];
+      cb.addEventListener('change', function () { ppSel[g] = cb.checked; ppCompute(); });
+      lab.appendChild(cb); lab.appendChild(el('span', null, g || 'Sans groupe'));
+      box.appendChild(lab);
+    });
+    if (!names.length) box.appendChild(el('span', 'muted', 'Aucune collection.'));
+  }
+  // Couleurs de l'image au niveau de précision choisi (gardées tant que l'image ne change pas)
+  function ppTargets(i) {
+    var key = thumbSeq + '|' + i;
+    if (ppCache[key]) return ppCache[key];
+    var side = PP_LEVELS[i] === 'all' ? 128 : 64, k = Math.min(1, side / Math.max(source.width, source.height));
+    var w = Math.max(1, Math.round(source.width * k)), hh = Math.max(1, Math.round(source.height * k));
+    var c = document.createElement('canvas'); c.width = w; c.height = hh;
+    var cx = c.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(source, 0, 0, w, hh);
+    var data = cx.getImageData(0, 0, w, hh).data;
+    ppCache = {};
+    return (ppCache[key] = PP_LEVELS[i] === 'all' ? Moteur.allPoints(data) : Moteur.palette(data, PP_LEVELS[i]));
+  }
+  function ppCompute() {
+    var body = $('ppBody'), token = ++ppToken, i = +$('ppLevel').value;
+    $('ppLevelOut').textContent = ppLevelLabel(i);
+    ppRes = null; $('ppProps').textContent = ''; $('ppKey').hidden = true;
+    $('ppCopyAll').hidden = $('ppWantAll').hidden = true;
+    body.textContent = '';
+    if (!source || !Moteur) { body.appendChild(el('p', 'muted', 'Choisissez d’abord une image.')); return; }
+    var pool = tubes.filter(function (t) { return (t.active || ppSel[t.group]) && !excludedTube(t); });
+    if (!pool.length) { body.appendChild(el('p', 'muted', tubes.length ? 'Cochez au moins une collection.' : 'Aucune peinture : importez un nuancier ou ajoutez des tubes.')); return; }
+    body.appendChild(el('p', 'muted', 'Calcul…'));
+    setTimeout(function () {   // laisse s'afficher « Calcul… »
+      if (token !== ppToken) return;
+      var targets = ppTargets(i);
+      var res = Moteur.propose(targets, pool.map(function (t) { return { id: t.id, rgb: parseHex(t.hex), owned: t.active }; }), { maxExtra: 6 });
+      if (token !== ppToken) return;
+      res.points = targets.length;
+      ppRes = res;
+      // proposition retenue d'abord : chaque achat doit faire gagner au moins 1 ΔE en moyenne
+      var best = -1, bv = Infinity;
+      res.proposals.forEach(function (p, k) { if (p.mean == null) return; var v = p.mean + p.n; if (v < bv) { bv = v; best = k; } });
+      ppPick = Math.max(0, best);
+      ppRender();
+    }, 30);
+  }
+  function ppTube(id) { for (var i = 0; i < tubes.length; i++) if (tubes[i].id === id) return tubes[i]; return null; }
+  function ppLists() {
+    var p = ppRes.proposals[ppPick];
+    var have = ppRes.have.filter(function (id) { return ppTube(id) && (p.use[id] || 0) > 0; });
+    var buy = ppRes.adds.slice(0, p.n).filter(function (id) { return ppTube(id); });
+    return { p: p, have: have, buy: buy };
+  }
+  function ppRender() {
+    var props = $('ppProps'), body = $('ppBody');
+    props.textContent = ''; body.textContent = '';
+    if (!ppRes) return;
+    if (!ppRes.have.length && !ppRes.adds.length) { body.appendChild(el('p', 'muted', 'Aucune peinture ne rapproche les couleurs de l’image.')); return; }
+    ppRes.proposals.forEach(function (p, k) {
+      if (p.mean == null) return;   // rien de possédé : pas de proposition « sans achat »
+      var b = el('button', 'tbtn'); b.type = 'button';
+      // ΔE moyen, son appréciation (même échelle que la recette), et part de l'image rendue presque à l'identique (gain sur la précédente)
+      var prev = k > 0 ? ppRes.proposals[k - 1] : null, gain = prev && prev.mean != null ? Math.round((p.cover - prev.cover) * 100) : null;
+      b.appendChild(el('b', null, p.n === 0 ? 'Sans achat' : '+' + p.n + (p.n > 1 ? ' tubes' : ' tube')));
+      b.appendChild(el('span', null, 'ΔE ' + fmtDe(p.mean) + ' · ' + quality(p.mean)[0]));
+      b.appendChild(el('span', null, Math.round(p.cover * 100) + ' % fidèle' + (gain ? ' (+' + gain + ' %)' : '')));
+      b.title = 'Écart moyen avec l’image : ΔE ' + fmtDe(p.mean);
+      b.setAttribute('aria-pressed', String(k === ppPick));
+      b.addEventListener('click', function () { ppPick = k; ppRender(); });
+      props.appendChild(b);
+    });
+    $('ppKey').hidden = false;
+    var L = ppLists();
+    // Bilan de la proposition choisie, présenté comme dans la tuile Recette : ΔE, appréciation, barre ; puis la phrase qui l'explique
+    var q = quality(L.p.mean), sum = el('div', 'de pp-de ' + q[1]);
+    sum.appendChild(el('span', 'de-val', 'ΔE ' + fmtDe(L.p.mean)));
+    sum.appendChild(el('span', 'de-lab', q[0]));
+    var bar = el('span', 'de-bar'), fill = document.createElement('i');
+    fill.style.width = Math.max(4, Math.round((1 - Math.min(L.p.mean, 20) / 20) * 100)) + '%';
+    bar.setAttribute('aria-hidden', 'true'); bar.appendChild(fill); sum.appendChild(bar);
+    body.appendChild(sum);
+    body.appendChild(el('p', 'pp-why', 'Avec ces peintures, chaque couleur de l’image est obtenue en moyenne à ΔE ' + fmtDe(L.p.mean) +
+      ' près (' + q[0].toLowerCase() + ') ; ' + Math.round(L.p.cover * 100) + ' % de l’image est reproduite presque à l’identique (ΔE sous 3). ' +
+      'Même échelle que la recette : sous 1 excellent, sous 2,5 très bon, sous 5 bon, sous 10 approximatif, au-delà éloigné.'));
+    function section(title, ids, buying) {
+      if (!ids.length) return;
+      body.appendChild(el('h3', null, title + ' · ' + ids.length));
+      var ul = el('ul', 'pplist');
+      ids.forEach(function (id) {
+        var t = ppTube(id), li = el('li', 'ppitem');
+        var chip = el('span', 'chip'); chip.style.background = t.hex;
+        var nm = el('span', 'nm', t.name);
+        if (t.group) nm.appendChild(el('span', 'gname-inline', t.group));
+        var tg = tubeTags(t); if (tg) nm.appendChild(tg);
+        var u = Math.round((L.p.use[id] || 0) * 100);
+        var acts = el('span', 'sgacts');
+        acts.appendChild(copyButton(t));
+        if (buying && !t.active) {
+          var add = el('button', 'tbtn', 'Ajouter inventaire'); add.type = 'button';
+          add.setAttribute('aria-label', 'Ajouter « ' + tubeLabel(t) + ' » à l’inventaire');
+          add.addEventListener('click', function () { setStatus(t, 'have'); saveTubes(); renderTubes(); ppRender(); });
+          acts.appendChild(add);
+          if (!t.want) {
+            var want = el('button', 'tbtn', 'Ajouter à la liste de courses'); want.type = 'button';
+            want.setAttribute('aria-label', 'Ajouter « ' + tubeLabel(t) + ' » à la liste de courses');
+            want.addEventListener('click', function () { setStatus(t, 'want'); saveTubes(); renderTubes(); ppRender(); });
+            acts.appendChild(want);
+          }
+        }
+        li.appendChild(chip); li.appendChild(nm);
+        li.appendChild(el('span', 'muted ppuse', 'Sert pour ' + (u < 1 ? 'moins de 1' : u) + ' % de l’image'));
+        li.appendChild(acts);
+        ul.appendChild(li);
+      });
+      body.appendChild(ul);
+    }
+    section('Je les ai', L.have, false);
+    section('À acquérir', L.buy, true);
+    if (!L.buy.length) body.appendChild(el('p', 'muted note', L.p.n === 0 ? 'Rien à acheter pour cette proposition.' : ''));
+    body.appendChild(el('p', 'muted note', ppRes.points + ' couleurs de l’image prises en compte (' + ppLevelLabel(+$('ppLevel').value) + ').'));
+    $('ppCopyAll').hidden = false;
+    $('ppWantAll').hidden = !L.buy.some(function (id) { var t = ppTube(id); return !t.active && !t.want; });
+  }
+  function ppText() {
+    var L = ppLists();
+    function line(id) { var t = ppTube(id); return '- ' + tubeLabel(t) + (t.pigment ? ' (' + t.pigment + ')' : ''); }
+    return ['Peintures de l’image' + (imageName ? ' — ' + imageName : '') + ' · ΔE ' + fmtDe(L.p.mean) + ' (' + quality(L.p.mean)[0] + '), ' + Math.round(L.p.cover * 100) + ' % fidèle', '', 'Je les ai (' + L.have.length + ')']
+      .concat(L.have.map(line), ['', 'À acquérir (' + L.buy.length + ')'], L.buy.map(line)).join('\n');
+  }
+  function openPp() {
+    if (!source) return;
+    ppOpener = document.activeElement;
+    ppFillColls();
+    if (!ppEl.open) ppEl.showModal();
+    ppCompute();
+  }
+  ppEl.addEventListener('close', function () { ppToken++; if (ppOpener && ppOpener.focus && document.contains(ppOpener)) ppOpener.focus(); });
+  ppEl.addEventListener('click', function (e) { if (e.target === ppEl) ppEl.close(); });
+  $('ppClose').addEventListener('click', function () { ppEl.close(); });
+  $('ppBtn').addEventListener('click', openPp);
+  $('ppLevel').addEventListener('input', function () { $('ppLevelOut').textContent = ppLevelLabel(+this.value); });
+  $('ppLevel').addEventListener('change', ppCompute);
+  $('ppCopyAll').addEventListener('click', function () { if (ppRes) copyText(ppText(), $('ppMsg')); });
+  $('ppWantAll').addEventListener('click', function () {
+    if (!ppRes) return;
+    ppLists().buy.forEach(function (id) { var t = ppTube(id); if (t && !t.active) setStatus(t, 'want'); });
+    saveTubes(); renderTubes(); ppRender();
+  });
 
   $('goCouleurs').addEventListener('click', function () { setView('couleurs'); tabs.couleurs.focus(); });
 
@@ -2243,6 +2648,7 @@
     clearImage();
     clearChart();
     setLayout('below', true, true);
+    setTheme('site', true);
     renderTubes(); syncGridUI(); scheduleRecipe();
     updateStorageInfo();
     say('Données supprimées sur cet appareil.', false);

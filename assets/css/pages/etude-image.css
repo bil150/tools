@@ -2,9 +2,11 @@
 
 .wrap { max-width: 1500px; }
 
-/* Surfaces neutres (gris sans teinte) : autour d'une image dont on juge les couleurs, aucun fond coloré ne doit
-   influencer la perception. Ces variables remplacent celles de base.css pour cette page seulement. */
-:root {
+/* Thèmes de la page (sélecteur sous la disposition). Par défaut : les couleurs du site, comme les autres pages.
+   Les autres thèmes remplacent les variables de base.css pour cette page seulement ; « Gris neutre » et « Contraste » n'ont
+   aucune teinte, pour ne pas influencer la perception des couleurs d'une image. Tous suivent le mode clair / sombre du site. */
+:root { --bt: var(--paper-2); }
+:root[data-palette="gris"] {
   --paper: light-dark(#F4F4F4, #1B1B1B);
   --paper-2: light-dark(#FFFFFF, #262626);
   --ink: light-dark(#1D1D1D, #ECECEC);
@@ -13,6 +15,25 @@
   --hi: light-dark(#E6E6E6, #353535);
   --bt: light-dark(#E9E9E9, #2D2D2D);
 }
+:root[data-palette="papier"] {
+  --paper: light-dark(#F3EEE3, #1D1A15);
+  --paper-2: light-dark(#FBF8F1, #26221C);
+  --ink: light-dark(#2B261E, #EEE8DC);
+  --muted: light-dark(#6D6455, #AAA190);
+  --line: light-dark(#DCD3C2, #3C362C);
+  --hi: light-dark(#EAE2D1, #39332A);
+  --bt: light-dark(#ECE5D6, #2D2922);
+}
+:root[data-palette="contraste"] {
+  --paper: light-dark(#FFFFFF, #000000);
+  --paper-2: light-dark(#FFFFFF, #0B0B0B);
+  --ink: light-dark(#000000, #FFFFFF);
+  --muted: light-dark(#363636, #CFCFCF);
+  --line: light-dark(#8C8C8C, #6A6A6A);
+  --hi: light-dark(#E2E2E2, #2E2E2E);
+  --bt: light-dark(#F0F0F0, #161616);
+}
+body { background: var(--paper); }
 
 /* Menu latéral d'icônes (sections, puis disposition rapide) + zone de contenu */
 .app { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; align-items: start; }
@@ -24,6 +45,9 @@
   padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2);
 }
 .rail-tabs, .rail-layout, .rail-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+/* Pastille d'un thème : son fond et son encre */
+.rail .swatch { width: 18px; height: 18px; fill: initial; stroke: none; }
+.rail .swatch circle { stroke: currentColor; stroke-width: 1; }
 .rail button {
   position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
   border: 0; border-radius: 8px; background: transparent; color: var(--muted);
@@ -70,8 +94,12 @@
 .drop.over { border-color: var(--ink); background: var(--hi); }
 .drop.has-image { border-style: solid; padding: 0; min-height: 0; overflow: hidden; }
 .drop-msg { text-align: center; display: grid; gap: 4px; }
-/* L'image remplit la largeur de la zone (grand format), sans dépasser 80 % de la hauteur de l'écran ; --ar = largeur / hauteur */
-.drop canvas { display: block; width: min(100%, calc(80vh * var(--ar, 1))); height: auto; max-width: 100%; }
+/* Cadre de l'image : le script lui donne la plus grande taille qui tient dans la zone (image entière) ; zoom et déplacement
+   par transformation du canvas. Au repos, un doigt fait défiler la page ; zoomé (ou en pipette), il agit sur l'image. */
+.imgframe { position: relative; overflow: hidden; flex: none; touch-action: pan-x pan-y; }
+.imgframe canvas { display: block; width: 100%; height: 100%; transform-origin: 0 0; }
+.imgframe.zoomed, .drop.mode-pick .imgframe { touch-action: none; }
+.drop.mode-values .imgframe.zoomed canvas { cursor: grab; }
 
 /* Tuiles « bento » */
 .bt { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px 16px; border-radius: 18px; background: var(--bt); }
@@ -219,9 +247,9 @@ input[type="number"] {
 /* Mobile : le menu devient une rangée d'icônes en haut */
 @media (max-width: 640px) {
   .app { grid-template-columns: minmax(0, 1fr); }
-  .rail-col { top: 0; flex-direction: row; gap: 8px; }
+  .rail-col { top: 0; flex-direction: row; flex-wrap: wrap; gap: 8px; }
   .rail { flex-direction: row; justify-content: space-between; }
-  .rail:not(.rail-layout) { flex: 1 1 auto; }
+  .rail:not(.rail-layout):not(.rail-theme) { flex: 1 1 auto; }
   .rail-tabs, .rail-layout, .rail-group { flex-direction: row; }
   .rail-sep { width: 1px; height: 24px; margin: 0 4px; }
   .rail button::after { display: none; }
@@ -289,15 +317,14 @@ input[type="number"] {
 }
 
 /* Écrans dont la barre d'adresse change de hauteur (mobile) : hauteur dynamique du viewport quand elle existe */
-@supports (height: 1dvh) {
-  .drop canvas { width: min(100%, calc(80dvh * var(--ar, 1))); }
-}
 
 /* Petits écrans : les icônes du menu se resserrent plutôt que de faire déborder la page */
 @media (max-width: 640px) {
   .rail-col { min-width: 0; }
   .rail { min-width: 0; padding: 4px; }
-  .rail:not(.rail-layout) { flex: 1 1 0; }
+  .rail:not(.rail-layout):not(.rail-theme) { flex: 1 1 0; }
+  .rail-col > .rail:first-child { flex: 1 1 100%; }   /* menu sur sa rangée ; disposition et thèmes sur la suivante */
+  .views [id] { scroll-margin-top: 130px; }   /* un élément amené à l’écran ne passe pas sous le menu collé en haut */
   .rail-tabs { flex: 1 1 auto; min-width: 0; width: 100%; justify-content: space-between; gap: 2px; }
   .rail-tabs button { flex: 1 1 0; min-width: 0; width: auto; max-width: 44px; }
   .rail-group { gap: 2px; }
@@ -367,7 +394,7 @@ input[type="number"] {
 .modal h3 { font: 600 15px/1.3 var(--body); margin-top: 4px; }
 .modal .field { flex: none; }
 .modal textarea { min-height: 120px; }
-.modal input[type="file"] { min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); width: 100%; }
+.modal input[type="file"]:not([hidden]) { min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); width: 100%; }
 .fields { display: grid; gap: 8px; margin: 0; }
 .fields div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .fields dt { font-weight: 600; }
@@ -424,7 +451,7 @@ body:has(dialog[open]) { overflow: hidden; }
 /* Mode pipette, tuiles sous l'image : la recette est la priorité, elle prend plus de place que la couleur cible (3 parts contre 2) ;
    la hauteur reste la même. Disposition « à droite » (une seule colonne) et petits écrans : inchangés. */
 @media (min-width: 861px) {
-  .dash[data-mode="pick"]:not([data-layout="right"]) .panels { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .dash[data-mode="pick"]:not([data-layout="right"]) .panels { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr); }
 }
 
 /* Conseil : tuile pleine largeur, fermée par défaut ; sa ligne de titre porte déjà le conseil */
@@ -509,3 +536,90 @@ body:has(dialog[open]) { overflow: hidden; }
 .combo-check { margin-left: 6px; }
 .combo-empty { padding: 10px 8px; color: var(--muted); font-size: 14px; }
 .medit-head .combo-btn { flex: 1 1 auto; }
+
+/* Tout tient à l'écran (tablette, ordinateur) : la page ne défile pas. L'image s'ajuste à la place disponible ;
+   une zone trop longue (liste de tubes, tuiles, paramètres) défile seule. Téléphone : la page défile normalement. */
+@media (min-width: 641px) and (min-height: 560px) {
+  body { padding-bottom: 16px; }
+  .wrap { height: calc(100dvh - 36px); gap: 14px; }
+  .app { flex: 1 1 auto; min-height: 0; }
+  .views { height: 100%; min-height: 0; overflow-y: auto; }
+  .views > section:not([hidden]) { height: 100%; min-height: 0; }
+  #viewMix .dash { height: 100%; grid-template-rows: minmax(0, 1fr) auto; align-items: stretch; }
+  .pane-image { display: flex; flex-direction: column; min-height: 0; }
+  .pane-image .drop { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }   /* flex : la hauteur maximale de l’image se calcule (pas en grille) */
+  /* Tuiles sous l'image : une bande de hauteur fixe, la même dans les trois vues (l'image garde sa taille) ; elle défile seule */
+  #viewMix .dash[data-layout="below"], #viewMix .dash[data-layout="right"] { grid-template-rows: minmax(0, 1fr) clamp(170px, 32dvh, 340px); }
+  .dash[data-layout="below"] .panels, .dash[data-layout="right"] .panels { height: 100%; max-height: none; overflow-y: auto; }
+  .dash[data-layout="below"] .panels { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }   /* les 4 tuiles de la grille sur une rangée */
+  .couleurs { height: 100%; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+  .couleurs > .card { min-height: 0; overflow-y: auto; }
+  .couleurs .chart { position: static; }
+}
+@media (min-width: 861px) and (min-height: 560px) {
+  #viewMix .dash[data-layout="right"] { grid-template-rows: minmax(0, 1fr); }
+  .dash[data-layout="right"] .panels { position: static; height: 100%; max-height: none; overflow-y: auto; }
+}
+/* Écran peu haut : le titre (déjà dans le fil d'Ariane) laisse sa place à l'image ; il reste lu par les lecteurs d'écran */
+@media (min-width: 641px) and (min-height: 560px) and (max-height: 900px) {
+  .wrap > header { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+/* Navigation : miniature (dimensionnée par le script, aux proportions de l'image) et cadre de la partie visible */
+.navmap { position: relative; align-self: center; touch-action: none; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+.navmap canvas { display: block; width: 100%; height: 100%; }
+.navbox { position: absolute; pointer-events: none; border: 2px solid var(--ink); box-shadow: 0 0 0 1px var(--paper), inset 0 0 0 1px var(--paper); }
+#tileNav .zoombar { justify-content: center; }
+#izLevel { font: 600 13px/1 var(--mono); min-width: 56px; }
+.zoombar .tbtn { min-height: 44px; min-width: 44px; }
+
+/* Fenêtre « Nuanciers » : onglets lisibles, zone de fichier, cases alignées */
+.modal .seg { display: flex; width: 100%; }
+.modal .seg button { flex: 1 1 0; min-height: 44px; }
+.modal .seg button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.filedrop { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px; border: 2px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.filedrop.over { border-color: var(--ink); background: var(--hi); }
+.filedrop .muted { font-size: 14px; overflow-wrap: anywhere; }
+.modal label.switch { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; }
+
+/* Nuancier du fabricant : la zone de dépôt occupe toute la carte, et le nuancier s'y ajuste (unités de conteneur) */
+.drop:not(.has-image) { cursor: pointer; }
+@media (min-width: 641px) and (min-height: 560px) {
+  .couleurs:not(.wide) .chart .drop { flex: 1 1 auto; min-height: 220px; container-type: size; }
+  .couleurs:not(.wide) .chart .zoomwrap { width: min(100%, calc(100cqh * var(--ar, 1))); }
+  .couleurs.wide { height: auto; grid-template-rows: none; }
+  .couleurs.wide > .card { overflow: visible; }
+}
+
+/* Bouton « copier » discret (à côté d'une peinture) */
+.copybtn { display: inline-grid; place-items: center; min-width: 36px; min-height: 36px; padding: 0; border-color: transparent; background: transparent; color: var(--muted); vertical-align: middle; }
+.copybtn:hover { color: var(--ink); border-color: var(--line); }
+.copybtn.done { color: var(--ink); }
+.copybtn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mixitem .nm .copybtn { min-width: 28px; min-height: 28px; margin-left: 4px; }
+
+/* Fenêtre « Peintures de l'image » */
+.lbl { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.colls { display: flex; flex-wrap: wrap; gap: 6px; }
+.coll { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 14px; cursor: pointer; }
+.coll input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+.coll:has(input:checked) { border-color: var(--ink); }
+#ppLevel { width: 100%; accent-color: var(--ink); }
+.pp-props { display: flex; flex-wrap: wrap; gap: 8px; }
+.pp-props .tbtn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding: 6px 12px; text-align: left; }
+.pp-props .tbtn b { font-size: 14px; }
+.pp-props .tbtn span { font: 500 12px/1.2 var(--mono); color: var(--muted); }
+.pp-props .tbtn[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.pp-body { display: flex; flex-direction: column; gap: 10px; }
+.pp-body h3 { margin: 0; }
+.pplist { display: flex; flex-direction: column; list-style: none; margin: 0; padding: 0; }
+.ppitem { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: start; gap: 2px 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.ppitem:last-child { border-bottom: 0; }
+.ppitem .chip { grid-row: span 3; width: 28px; height: 28px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+.ppitem .nm { font-weight: 600; overflow-wrap: anywhere; }
+.ppitem .nm .gname-inline { margin-left: 8px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.ppitem .nm .tags { display: inline-flex; margin-left: 8px; vertical-align: middle; }
+.ppuse { font-size: 12px; }
+.ppitem .sgacts { grid-column: 2; }
+.pp-de { margin-top: 0; }
+.pp-why { font-size: 14px; color: var(--muted); }

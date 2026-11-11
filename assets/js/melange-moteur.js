@@ -289,9 +289,190 @@
     return { mixRgb: { r: toSrgb8(tmp[0]), g: toSrgb8(tmp[1]), b: toSrgb8(tmp[2]) }, de: deltaE2000(lab, rgbToLab(target)) };
   }
 
+  /* ---------- Peintures pour toute une image ---------- */
+
+  /* Couleurs dominantes d'une image : data = pixels RGBA (Uint8ClampedArray d'un ImageData), k couleurs au plus.
+     Découpe médiane dans L*a*b* puis quelques passes de k-moyennes. Retourne [{ rgb, weight }] (somme des poids : 1). */
+  function palette(data, k) {
+    var px = [], i, n = data.length / 4;
+    for (i = 0; i < n; i++) {
+      if (data[i * 4 + 3] < 128) continue;
+      var lr = LIN[data[i * 4]], lg = LIN[data[i * 4 + 1]], lb = LIN[data[i * 4 + 2]];
+      px.push({ lin: [lr, lg, lb], lab: labFromLinear(lr, lg, lb) });
+    }
+    if (!px.length) return [];
+    function spread(b) {
+      var m = [0, 0, 0], v = [0, 0, 0], j, a;
+      for (j = 0; j < b.length; j++) for (a = 0; a < 3; a++) m[a] += b[j].lab[a];
+      for (a = 0; a < 3; a++) m[a] /= b.length;
+      for (j = 0; j < b.length; j++) for (a = 0; a < 3; a++) v[a] += Math.pow(b[j].lab[a] - m[a], 2);
+      return { axis: v[0] >= v[1] && v[0] >= v[2] ? 0 : v[1] >= v[2] ? 1 : 2, total: v[0] + v[1] + v[2] };
+    }
+    var boxes = [px];
+    while (boxes.length < k) {
+      var bi = -1, bs = 1e-9, bax = 0;
+      for (i = 0; i < boxes.length; i++) {
+        if (boxes[i].length < 2) continue;
+        var s = spread(boxes[i]);
+        if (s.total > bs) { bs = s.total; bi = i; bax = s.axis; }
+      }
+      if (bi < 0) break;
+      var box = boxes[bi].slice().sort(function (p, q) { return p.lab[bax] - q.lab[bax]; });
+      boxes.splice(bi, 1, box.slice(0, box.length >> 1), box.slice(box.length >> 1));
+    }
+    function centre(list) {
+      var t = [0, 0, 0];
+      list.forEach(function (p) { t[0] += p.lin[0]; t[1] += p.lin[1]; t[2] += p.lin[2]; });
+      var m = [t[0] / list.length, t[1] / list.length, t[2] / list.length];
+      return { lin: m, lab: labFromLinear(m[0], m[1], m[2]) };
+    }
+    var cs = boxes.map(centre), pass, groups;
+    for (pass = 0; pass < 5; pass++) {
+      groups = cs.map(function () { return []; });
+      px.forEach(function (p) {
+        var b = 0, bd = Infinity;
+        for (var c = 0; c < cs.length; c++) { var d = deltaE76(p.lab, cs[c].lab); if (d < bd) { bd = d; b = c; } }
+        groups[b].push(p);
+      });
+      cs = cs.map(function (c, q) { return groups[q].length ? centre(groups[q]) : c; });
+    }
+    return cs.map(function (c, q) {
+      return { rgb: { r: toSrgb8(c.lin[0]), g: toSrgb8(c.lin[1]), b: toSrgb8(c.lin[2]) }, weight: groups[q].length / px.length };
+    }).filter(function (c) { return c.weight > 0; }).sort(function (a, b) { return b.weight - a.weight; });
+  }
+
+  /* Tous les points d'une image : chaque pixel compte. Les pixels identiques à 4 niveaux près par canal sont réunis
+     (moyenne exacte, poids = leur part de l'image) pour que le calcul reste rapide. Retourne [{ rgb, weight }]. */
+  function allPoints(data) {
+    var bins = {}, n = 0, i;
+    for (i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      n++;
+      var key = (data[i] >> 2) + ',' + (data[i + 1] >> 2) + ',' + (data[i + 2] >> 2), b = bins[key];
+      if (!b) b = bins[key] = { r: 0, g: 0, b: 0, n: 0 };
+      b.r += data[i]; b.g += data[i + 1]; b.b += data[i + 2]; b.n++;
+    }
+    return Object.keys(bins).map(function (k) {
+      var b = bins[k];
+      return { rgb: { r: Math.round(b.r / b.n), g: Math.round(b.g / b.n), b: Math.round(b.b / b.n) }, weight: b.n / n };
+    }).sort(function (a, b) { return b.weight - a.weight; });
+  }
+
+  /* Propositions de peintures pour reproduire une liste de couleurs (targets : [{ rgb, weight }]).
+     pool : [{ id, rgb, owned }]. D'abord les peintures possédées utiles, puis, une à une, celle qui améliore le plus l'ensemble ;
+     chaque ajout est une proposition (« sans achat », « +1 », « +2 »…). On s'arrête quand un ajout n'apporte presque plus rien :
+     inutile d'acheter une peinture que d'autres permettent déjà d'obtenir.
+     Pour chaque proposition : écart moyen (ΔE2000, mélanges de 1 ou 2 peintures, pondéré par la part de l'image), part de l'image
+     à moins de ΔE 3, et part de l'image où sert chaque peinture. Retourne { have: [ids], adds: [ids], proposals: [...] }. */
+  function propose(targets, pool, opts) {
+    opts = opts || {};
+    var maxExtra = opts.maxExtra == null ? 6 : opts.maxExtra, MAXSET = 14, MIN_GAIN = opts.minGain || 0.3;
+    var T = targets.length, wsum = targets.reduce(function (s, t) { return s + t.weight; }, 0) || 1;
+    var W = targets.map(function (t) { return t.weight / wsum; });
+    var tLab = targets.map(function (t) { return rgbToLab(t.rgb); });
+    var P = pool.map(function (t) { return prepareTube(t.rgb); });
+    var tmp = [0, 0, 0], q;
+    var STEPS = 19;
+
+    function singleLab(p) { mix(P, [p], [1], tmp); return labFromLinear(tmp[0], tmp[1], tmp[2]); }
+    function pairLabs(p, m) {
+      var out = [];
+      for (var s = 1; s <= STEPS; s++) { mix(P, [p, m], [s / (STEPS + 1), 1 - s / (STEPS + 1)], tmp); out.push(labFromLinear(tmp[0], tmp[1], tmp[2])); }
+      return out;
+    }
+    function bestOver(labs) {   // écart rapide minimal, par couleur, sur une liste de mélanges
+      var out = new Float64Array(T).fill(Infinity);
+      for (var j = 0; j < labs.length; j++) { var l = labs[j]; for (q = 0; q < T; q++) { var e = deltaE76(l, tLab[q]); if (e < out[q]) out[q] = e; } }
+      return out;
+    }
+    var sing = pool.map(function (_, p) { return bestOver([singleLab(p)]); });
+    var cur = new Float64Array(T);
+    for (q = 0; q < T; q++) cur[q] = deltaE76([100, 0, 0], tLab[q]);   // sans peinture : le support blanc
+    var chosen = [], inSet = {}, withSet = {};
+
+    // candidates : proches d'une couleur importante de l'image, plus les plus claires, sombres et vives
+    function shortlist(ids) {
+      if (ids.length <= 60) return ids.slice();
+      var score = {}, labs = {};
+      ids.forEach(function (p) { score[p] = 0; labs[p] = singleLab(p); });
+      var top = T > 100 ? 3 : 8;
+      for (q = 0; q < T; q++) ids.slice().sort(function (a, b) { return sing[a][q] - sing[b][q]; }).slice(0, top).forEach(function (p) { score[p] += W[q]; });
+      var keep = ids.filter(function (p) { return score[p] > 0; }).sort(function (a, b) { return score[b] - score[a]; }).slice(0, 60);
+      var byL = ids.slice().sort(function (a, b) { return labs[a][0] - labs[b][0]; });
+      var byC = ids.slice().sort(function (a, b) { return Math.hypot(labs[b][1], labs[b][2]) - Math.hypot(labs[a][1], labs[a][2]); });
+      byL.slice(0, 4).concat(byL.slice(-4), byC.slice(0, 8)).forEach(function (p) { if (keep.indexOf(p) === -1) keep.push(p); });
+      return keep;
+    }
+    function bestWith(c) {
+      if (withSet[c]) return withSet[c];
+      var b = Float64Array.from(sing[c]);
+      chosen.forEach(function (m) { var pb = bestOver(pairLabs(c, m)); for (q = 0; q < T; q++) if (pb[q] < b[q]) b[q] = pb[q]; });
+      return (withSet[c] = b);
+    }
+    function score(c) { var b = bestWith(c), s = 0; for (q = 0; q < T; q++) s += W[q] * Math.min(cur[q], b[q]); return s; }
+    function mean() { var s = 0; for (q = 0; q < T; q++) s += W[q] * cur[q]; return s; }
+    function take(c) {
+      var b = bestWith(c);
+      for (q = 0; q < T; q++) if (b[q] < cur[q]) cur[q] = b[q];
+      chosen.push(c); inSet[c] = true;
+      Object.keys(withSet).forEach(function (k) {
+        var kk = +k; if (inSet[kk]) return;
+        var pb = bestOver(pairLabs(kk, c)), arr = withSet[kk];
+        for (q = 0; q < T; q++) if (pb[q] < arr[q]) arr[q] = pb[q];
+      });
+    }
+    function greedy(ids, limit, minGain) {
+      var picked = [], cands = shortlist(ids);
+      while (picked.length < limit && chosen.length < MAXSET) {
+        var base = mean(), bc = -1, bs = Infinity;
+        for (var i = 0; i < cands.length; i++) {
+          if (inSet[cands[i]]) continue;
+          var s = score(cands[i]);
+          if (s < bs) { bs = s; bc = cands[i]; }
+        }
+        if (bc < 0 || base - bs < minGain) break;
+        take(bc); picked.push(bc);
+      }
+      return picked;
+    }
+
+    var ownedIds = [], otherIds = [];
+    pool.forEach(function (p, k) { (p.owned ? ownedIds : otherIds).push(k); });
+    var haveIdx = greedy(ownedIds, MAXSET, MIN_GAIN / 2);
+    var addIdx = maxExtra > 0 ? greedy(otherIds, maxExtra, MIN_GAIN) : [];
+
+    // Bilan de chaque proposition : meilleur mélange de 1 ou 2 peintures pour chaque couleur (ΔE2000)
+    function assess(idxList) {
+      var mixes = [];
+      idxList.forEach(function (p, a) {
+        mixes.push({ lab: singleLab(p), ids: [p], w: [1] });
+        for (var b = a + 1; b < idxList.length; b++) {
+          var m = idxList[b], labs = pairLabs(p, m);
+          labs.forEach(function (l, s) { mixes.push({ lab: l, ids: [p, m], w: [(s + 1) / (STEPS + 1), 1 - (s + 1) / (STEPS + 1)] }); });
+        }
+      });
+      var tot = 0, cover = 0, use = {};
+      for (q = 0; q < T; q++) {
+        var best = null, be = Infinity;
+        for (var j = 0; j < mixes.length; j++) { var e = deltaE76(mixes[j].lab, tLab[q]); if (e < be) { be = e; best = mixes[j]; } }
+        if (!best) continue;
+        var de = deltaE2000(best.lab, tLab[q]);
+        tot += W[q] * de; if (de < 3) cover += W[q];
+        best.ids.forEach(function (p, i) { if (best.w[i] >= 0.05) use[pool[p].id] = (use[pool[p].id] || 0) + W[q]; });
+      }
+      return { mean: idxList.length ? tot : null, cover: idxList.length ? cover : 0, use: use };
+    }
+    var proposals = [];
+    for (var n = 0; n <= addIdx.length; n++) {
+      var a = assess(haveIdx.concat(addIdx.slice(0, n)));
+      proposals.push({ n: n, mean: a.mean, cover: a.cover, use: a.use });
+    }
+    return { have: haveIdx.map(function (k) { return pool[k].id; }), adds: addIdx.map(function (k) { return pool[k].id; }), proposals: proposals };
+  }
+
   var api = {
     rgbToLab: rgbToLab, deltaE76: deltaE76, deltaE2000: deltaE2000,
-    prepareTube: prepareTube, solve: solve, evaluate: evaluate, parts: parts
+    prepareTube: prepareTube, solve: solve, evaluate: evaluate, parts: parts, palette: palette, allPoints: allPoints, propose: propose
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else g.MelangeMoteur = api;

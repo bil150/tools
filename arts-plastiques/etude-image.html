@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
 <script src="../assets/js/app.js"></script>
+<script>try { var p = JSON.parse(localStorage.getItem('tools:arts:melangeur:theme')); if (p === 'gris' || p === 'papier' || p === 'contraste') document.documentElement.setAttribute('data-palette', p); } catch (e) {}</script>
 <title>Étude d’image</title>
 <link rel="stylesheet" href="../assets/css/base.css">
 <link rel="stylesheet" href="../assets/css/pages/etude-image.css">
@@ -63,6 +64,15 @@
         </button>
       </div>
     </div>
+    <!-- Thème de la page : celui du site par défaut, ou un thème neutre pour juger les couleurs -->
+    <div class="rail rail-theme" id="themeBox">
+      <div class="rail-group" role="group" aria-label="Thème">
+        <button type="button" data-palette="site" aria-pressed="true" aria-label="Thème du site" title="Thème du site" data-label="Thème du site"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#E8ECF4"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#14213D"/></svg></button>
+        <button type="button" data-palette="gris" aria-pressed="false" aria-label="Gris neutre" title="Gris neutre" data-label="Gris neutre"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#D2D2D2"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#6A6A6A"/></svg></button>
+        <button type="button" data-palette="papier" aria-pressed="false" aria-label="Papier" title="Papier" data-label="Papier"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#EADFC8"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#8A6D45"/></svg></button>
+        <button type="button" data-palette="contraste" aria-pressed="false" aria-label="Contraste" title="Contraste" data-label="Contraste"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#FFFFFF"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#000000"/></svg></button>
+      </div>
+    </div>
     </div>
 
     <div class="views">
@@ -71,7 +81,10 @@
         <div class="dash" id="dash">
           <section class="card pane-image" aria-label="Image de référence">
             <div class="drop" id="drop">
-              <canvas id="canvas" hidden aria-label="Image de référence"></canvas>
+              <!-- Cadre de l'image : elle y tient entière ; le zoom et le déplacement se font par une transformation, sans redessin -->
+              <div class="imgframe" id="imgFrame" hidden>
+                <canvas id="canvas" hidden aria-label="Image de référence"></canvas>
+              </div>
               <div class="drop-msg" id="dropMsg">
                 <p><strong>Déposez une image</strong></p>
               </div>
@@ -82,6 +95,7 @@
               <input type="file" id="file" accept="image/*" hidden>
               <button type="button" class="btn" id="pick">Choisir une image</button>
               <button type="button" class="btn ghost" id="exportBtn" disabled>Exporter en PNG</button>
+              <button type="button" class="btn ghost" id="ppBtn" disabled>Peintures de l’image</button>
               <span class="muted info" id="info" aria-live="polite"></span>
             </div>
           </section>
@@ -105,8 +119,8 @@
             <div class="bt" id="tileLine">
               <h2>Trait</h2>
               <div class="rowline">
-                <input type="range" id="gridWidth" min="0.5" max="8" step="0.5" value="1.5" aria-label="Épaisseur du trait">
-                <output id="gridWidthVal" for="gridWidth">1,5 px</output>
+                <input type="range" id="gridWidth" min="0.5" max="8" step="0.5" value="1" aria-label="Épaisseur du trait">
+                <output id="gridWidthVal" for="gridWidth">1 px</output>
               </div>
               <div class="rowline">
                 <div class="seg dashes" role="group" aria-label="Style du trait">
@@ -172,6 +186,20 @@
                 </dl>
               </div>
               <p class="muted note" id="tNote" hidden>CMJ et CMJN : repères indicatifs.</p>
+            </div>
+            <!-- Navigation : zoom, et miniature de l'image avec le cadre de la partie visible -->
+            <div class="bt" id="tileNav" hidden>
+              <h2>Navigation</h2>
+              <p class="muted note" id="navEmpty">Aucune image.</p>
+              <div class="navmap" id="navMap" hidden>
+                <canvas id="navThumb" role="img" aria-label="Miniature : touchez ou glissez pour vous déplacer dans l’image"></canvas>
+                <div class="navbox" id="navBox"></div>
+              </div>
+              <div class="zoombar" role="group" aria-label="Zoom de l’image">
+                <button type="button" class="tbtn" id="izOut" aria-label="Zoom arrière" title="Zoom arrière (−)" disabled>−</button>
+                <button type="button" class="tbtn" id="izLevel" aria-label="Image entière" title="Image entière (0)" disabled>×1</button>
+                <button type="button" class="tbtn" id="izIn" aria-label="Zoom avant" title="Zoom avant (+, molette ou deux doigts)" disabled>+</button>
+              </div>
             </div>
             <!-- Conseil : fermé par défaut ; il faut l'ouvrir pour le voir (la recherche ne se fait qu'à l'ouverture) -->
             <details class="bt" id="tileSuggest" hidden>
@@ -256,6 +284,7 @@
               <button type="button" data-filter="want" aria-pressed="false">À acquérir</button>
               <button type="button" data-filter="cat" aria-pressed="false">Catalogue</button>
             </div>
+            <button type="button" class="tbtn" id="haveCopy" hidden>Copier mes peintures</button>
             <button type="button" class="tbtn" id="wantCopy" hidden>Copier la liste à acquérir</button>
             <span class="muted note" id="wantCopyMsg" aria-live="polite"></span>
           </div>
@@ -357,7 +386,7 @@
             <div><dt>Écart entre deux couleurs</dt><dd>Les couleurs sont converties en CIE L*a*b* (blanc D65), puis comparées par l’écart ΔE CIEDE2000. Vers 1, la différence est à peine visible ; au-delà de 5, elle se voit nettement.</dd></div>
             <div><dt>Mélange de peinture</dt><dd>Modèle de Kubelka-Munk, calculé séparément pour le rouge, le vert et le bleu. Un tube n’est connu que par sa couleur de référence : on en déduit son absorption (K/S), et sa diffusion (S) est estimée d’après sa clarté. Le calcul ignore les spectres réels, la transparence et l’opacité, le liant, l’épaisseur de la couche, et le changement de teinte au séchage.</dd></div>
             <div><dt>Recherche de la recette</dt><dd>Parmi les tubes cochés, l’outil teste les combinaisons de 1 à 3 tubes et cherche les proportions qui minimisent l’écart ΔE. La recette proposée est celle qui a le meilleur ΔE ; si plusieurs l’égalent (à 0,3 près, invisible), il garde celle qui contient le moins de peintures. Les proportions sont des parts relatives. D’autres compositions sont proposées ensuite.</dd></div>
-            <div><dt>Pas de tubes noirs (noir chromatique)</dt><dd>Par défaut, les tubes noirs (pigment PBk, ou couleur neutre très sombre) sont écartés du calcul et du Conseil : le noir se fabrique en mélangeant des couleurs, comme on le fait à l’atelier. Le réglage se change dans Paramètres, section Calcul.</dd></div>
+            <div><dt>Pas de tubes noirs (noir chromatique)</dt><dd>Par défaut, les tubes noirs (nom « black », « noir »…, pigment uniquement noir PBk, ou couleur neutre très sombre) sont écartés du calcul et du Conseil : le noir se fabrique en mélangeant des couleurs, comme on le fait à l’atelier. Le réglage se change dans Paramètres, section Calcul.</dd></div>
             <div><dt>Pas de tubes métallisés, irisés ni fluorescents</dt><dd>Par défaut, les peintures métallisées, irisées, nacrées ou fluorescentes sont écartées du calcul et du Conseil : leur aspect dépend de la lumière (angle pour les métallisés et irisés, lumière émise pour les fluorescents), ce qu’une couleur unique ne peut pas représenter. Le réglage se change dans Paramètres, section Calcul.</dd></div>
             <div><dt>Durabilité et transparence / opacité</dt><dd>Informations saisies d’après la fiche du fabricant (durabilité sur l’échelle ASTM, transparence ou opacité). Elles ne servent pas au calcul : elles s’affichent à côté des tubes et de la recette. La durabilité d’un mélange est celle de son tube le moins durable.</dd></div>
             <div><dt>CMJ et CMJN</dt><dd>Simple conversion à partir du RVB (1 − valeur), sans profil d’impression.</dd></div>
@@ -383,8 +412,13 @@
   </div>
 
   <section id="nmImp" role="tabpanel" aria-labelledby="nmTabImp" class="modal-body">
-    <div class="field"><label for="nmFile">Fichier JSON</label><input type="file" id="nmFile" accept=".json,application/json,text/plain"></div>
-    <div class="field"><label for="nmPaste">… ou coller le JSON</label><textarea id="nmPaste" rows="6" spellcheck="false" placeholder='{ "group": "Ma marque", "tubes": [ { "name": "…", "hex": "#RRGGBB" } ] }'></textarea></div>
+    <!-- Fichier : un bouton, ou le fichier déposé sur la zone -->
+    <div class="filedrop" id="nmDrop">
+      <input type="file" id="nmFile" accept=".json,application/json,text/plain" hidden>
+      <button type="button" class="btn" id="nmPick">Choisir un fichier JSON</button>
+      <span class="muted" id="nmFileName">ou déposez-le ici</span>
+    </div>
+    <div class="field"><label for="nmPaste">Ou collez le JSON</label><textarea id="nmPaste" rows="6" spellcheck="false" placeholder='{ "group": "Ma marque", "tubes": [ { "name": "…", "hex": "#RRGGBB" } ] }'></textarea></div>
     <label class="switch"><input type="checkbox" id="nmActivate"><span>Cocher les tubes importés</span></label>
     <label class="switch"><input type="checkbox" id="nmReplace"><span>Remplacer les tubes de ces groupes</span></label>
     <div id="nmPreview" class="notice" role="status" hidden></div>
@@ -440,6 +474,31 @@
       <span class="muted note" id="nmDocMsg" aria-live="polite"></span>
     </div>
   </section>
+</dialog>
+
+<!-- Fenêtre « Peintures de l'image » : les tubes qu'il faut pour peindre toute l'image, ce qu'on a et ce qu'on pourrait ajouter -->
+<dialog id="ppModal" class="modal" aria-labelledby="ppTitle">
+  <div class="modal-head">
+    <h2 id="ppTitle">Peintures de l’image</h2>
+    <button type="button" class="tbtn" id="ppClose" aria-label="Fermer">✕</button>
+  </div>
+  <p class="muted note">Vos peintures d’abord, puis celles qui amélioreraient le plus l’image. Calcul indicatif.</p>
+  <div class="field">
+    <label for="ppLevel">Précision : <b id="ppLevelOut"></b></label>
+    <input type="range" id="ppLevel" min="0" max="5" step="1" value="2">
+  </div>
+  <div class="field">
+    <span class="lbl" id="ppCollLbl">Collections</span>
+    <div class="colls" id="ppColls" role="group" aria-labelledby="ppCollLbl"></div>
+  </div>
+  <div class="pp-props" id="ppProps" role="group" aria-label="Propositions"></div>
+  <p class="muted note" id="ppKey" hidden>Chaque proposition : ΔE moyen (plus il est bas, mieux c’est) et part de l’image reproduite presque à l’identique ; entre parenthèses, ce qu’elle gagne sur la précédente.</p>
+  <div id="ppBody" class="pp-body" aria-live="polite"></div>
+  <div class="bar">
+    <button type="button" class="btn ghost" id="ppCopyAll" hidden>Copier la liste</button>
+    <button type="button" class="btn ghost" id="ppWantAll" hidden>Tout ajouter à la liste de courses</button>
+    <span class="muted note" id="ppMsg" aria-live="polite"></span>
+  </div>
 </dialog>
 
 </main>
