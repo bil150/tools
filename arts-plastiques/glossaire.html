@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<title>Glossaire</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/arts-atelier.css">
+<link rel="stylesheet" href="../assets/css/pages/glossaire.css?v=1">
+<script type="module" src="../assets/js/pages/glossaire.js?v=1"></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="arts-plastiques.html">Arts plastiques</a></li><li aria-current="page">Glossaire</li></ol></nav>
+  <header>
+    <h1 class="title">Glossaire</h1>
+  </header>
+
+  <!-- Recherche et thèmes : restent en haut pendant le défilement -->
+  <div class="gl-bar">
+    <div class="gl-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input type="search" id="glQ" placeholder="Rechercher un terme ou une définition" autocomplete="off" spellcheck="false" aria-label="Rechercher dans le glossaire">
+    </div>
+    <div class="gl-themes" id="glThemes" role="group" aria-label="Thèmes"></div>
+    <p class="muted note" id="glCount" aria-live="polite"></p>
+  </div>
+
+  <div class="gl-list" id="glList"></div>
+  <footer>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>

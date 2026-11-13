@@ -129,16 +129,20 @@
 
   /* ---------- Réglages de la grille ---------- */
 
-  // La grille est toujours carrée : seul le nombre de colonnes se règle, la taille du carreau en découle
-  // et le nombre de lignes suit la hauteur de l'image.
-  var GRID_DEFAULT = { cols: 4, color: '#000000', width: 1, dash: 'solid', letters: false };
+  // La grille est toujours carrée. Le nombre de colonnes donne la taille du carreau ; on peut ensuite l'affiner
+  // (cell : côté du carreau en fraction de la largeur de l'image) et déplacer la grille (ox, oy : position d'un croisement,
+  // en fraction de la largeur). Ces fractions valent pour toute résolution de l'image. Le nombre de lignes suit la hauteur.
+  var GRID_DEFAULT = { cols: 4, cell: 0.25, ox: 0, oy: 0, color: '#000000', width: 1, dash: 'solid', letters: false };
   var DASHES = ['solid', 'dash', 'dot'];
 
   function cleanGrid(g) {
     g = g && typeof g === 'object' ? g : {};
-    var d = GRID_DEFAULT;
+    var d = GRID_DEFAULT, cols = clampInt(g.cols, 1, 100, d.cols);
     return {
-      cols: clampInt(g.cols, 1, 40, d.cols),
+      cols: cols,
+      cell: clampNum(g.cell, 1 / 100, 1, 1 / cols),
+      ox: clampNum(g.ox, -1, 1, 0),
+      oy: clampNum(g.oy, -1, 10, 0),
       color: typeof g.color === 'string' && parseHex(g.color) ? toHex(parseHex(g.color)) : d.color,
       // 1,5 px était l'ancien trait par défaut : il passe à 1 px (le nouveau défaut) tant qu'on ne l'a pas réglé depuis (v2)
       width: g.v !== 2 && g.width === 1.5 ? d.width : clampNum(g.width, 0.5, 8, d.width),
@@ -152,8 +156,19 @@
 
   var gridCols = $('gridCols'), gridColor = $('gridColor'), gridWidth = $('gridWidth');
 
+  // La grille a-t-elle été ajustée (carreau affiné ou décalage) ? Sinon, rien à réinitialiser.
+  function gridAdjusted() {
+    var n = 1 / grid.cell, eps = 1e-6;
+    return Math.abs(n - Math.round(n)) > 0.005 || normOff(grid.ox) > eps && grid.cell - normOff(grid.ox) > eps || normOff(grid.oy) > eps && grid.cell - normOff(grid.oy) > eps;
+  }
   function syncGridUI() {
-    gridCols.value = grid.cols;
+    if (document.activeElement !== gridCols) gridCols.value = String(+(1 / grid.cell).toFixed(2));
+    fitColsInput();
+    $('gridReset').hidden = !gridAdjusted();
+    // Seul repère chiffré : le côté du carreau, en pixels de l'image d'origine (au demi-pixel) ; sans image, rien à ajuster
+    var on = !!(source && origWidth);
+    $('cellOut').textContent = on ? String(Math.round(grid.cell * origWidth * 2) / 2).replace('.', ',') + ' px' : '';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-fine]'), function (b) { b.disabled = !on; });
     gridColor.value = grid.color;
     gridWidth.value = grid.width;
     $('gridLetters').checked = grid.letters;
@@ -171,29 +186,82 @@
   gridWidth.addEventListener('input', function () { grid.width = clampNum(gridWidth.value, 0.5, 8, 1.5); gridChanged(); });
   $('gridLetters').addEventListener('change', function () { grid.letters = this.checked; gridChanged(); });
 
-  // Colonnes : saisie directe, ou boutons − et + aux deux bouts du champ
+  var origWidth = 0;   // largeur de l'image d'origine : les pas d'ajustement sont des pixels réels
+  // Le champ prend la largeur de son chiffre : « 4 colonnes » reste centré d'un seul tenant
+  function fitColsInput() { gridCols.style.width = Math.max(1, String(gridCols.value).length) + 0.6 + 'ch'; }
+  gridCols.addEventListener('input', fitColsInput);
+  // Décalage ramené entre 0 et un carreau (une grille décalée d'un carreau entier est la même grille)
+  function normOff(o) { var c = grid.cell; return ((o % c) + c) % c; }
+
+  // Colonnes : saisie directe (décimales permises), ou − et + d'une colonne entière. Changer les colonnes recale la grille au coin.
+  function setCols(n) {
+    n = clampNum(n, 1, 100, 1 / grid.cell);
+    grid.cols = Math.max(1, Math.min(100, Math.round(n)));
+    grid.cell = 1 / n; grid.ox = 0; grid.oy = 0;
+  }
   gridCols.addEventListener('input', function () {
-    grid.cols = clampInt(gridCols.value, 1, 40, grid.cols); // sans réécrire le champ pendant la frappe
-    saveGrid(); render();
+    var n = parseFloat(String(gridCols.value).replace(',', '.'));
+    if (!(n >= 1 && n <= 40)) return;      // sans réécrire le champ pendant la frappe
+    setCols(n); saveGrid(); syncGridUI(); render();
   });
-  gridCols.addEventListener('change', function () {   // valeur relue et ramenée aux limites
-    grid.cols = clampInt(gridCols.value, 1, 40, grid.cols);
-    gridChanged();
-  });
+  gridCols.addEventListener('change', function () { gridChanged(); });   // valeur relue et ramenée aux limites
   document.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('.stepper button') : null;
     if (!b) return;
-    grid.cols = clampInt(grid.cols + parseInt(b.dataset.step, 10), 1, 40, grid.cols);
+    var cur = 1 / grid.cell, d = parseInt(b.dataset.step, 10);
+    // depuis une valeur décimale, − et + vont d'abord à l'entier voisin
+    setCols(Math.abs(cur - Math.round(cur)) < 0.005 ? Math.round(cur) + d : d > 0 ? Math.ceil(cur) : Math.floor(cur));
     gridChanged();
   });
 
-  // Nombre de lignes qui en résulte (peut être fractionnaire : la dernière rangée est alors coupée par le bord)
+  // Réglage fin : carreau au demi-pixel, décalage au pixel (Maj : ×10), en pixels de l'image d'origine
+  function fineStep(b, mult) {
+    if (!source || !origWidth) return;
+    var d = parseInt(b.dataset.d, 10) * mult, px = 1 / origWidth;
+    if (b.dataset.fine === 'size') {
+      // le carreau grandit ou rétrécit autour du croisement de référence, qui reste en place
+      grid.cell = clampNum(grid.cell + d * 0.5 * px, Math.max(1 / 100, 4 * px), 1, grid.cell);
+    } else if (b.dataset.fine === 'x') grid.ox += d * px;
+    else grid.oy += d * px;
+    grid.ox = normOff(grid.ox); grid.oy = normOff(grid.oy);
+    syncGridUI(); render();
+  }
+  // Appui maintenu : l'action se répète, de plus en plus vite (pause de 350 ms, puis 110 ms → 25 ms entre deux pas),
+  // et après 1,5 s chaque pas compte double, après 3 s quintuple. On enregistre au relâchement.
+  var hold = null;
+  function holdStop() {
+    if (!hold) return;
+    clearTimeout(hold.t); hold = null; saveGrid();
+  }
+  function holdTick() {
+    var el = Date.now() - hold.t0;
+    fineStep(hold.b, hold.mult * (el > 3000 ? 5 : el > 1500 ? 2 : 1));
+    hold.t = setTimeout(holdTick, Math.max(25, 110 - el / 20));
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-fine]'), function (b) {
+    b.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0 || b.disabled) return;
+      e.preventDefault();          // pas de sélection de texte ni de menu pendant l'appui
+      holdStop();
+      hold = { b: b, mult: e.shiftKey ? 10 : 1, t0: Date.now() + 350 };
+      fineStep(b, hold.mult);
+      hold.t = setTimeout(function () { if (hold) { hold.t0 = Date.now(); holdTick(); } }, 350);
+      try { b.setPointerCapture(e.pointerId); } catch (_) { /* sans importance */ }
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { b.addEventListener(ev, holdStop); });
+    b.addEventListener('contextmenu', function (e) { e.preventDefault(); });   // appui long au doigt : pas de menu
+    // Clavier (Entrée, Espace) : un pas par appui ; la souris et le doigt passent par pointerdown
+    b.addEventListener('click', function (e) { if (e.detail === 0) { fineStep(b, e.shiftKey ? 10 : 1); saveGrid(); } });
+  });
+  window.addEventListener('blur', holdStop);
+  $('gridReset').addEventListener('click', function () { setCols(grid.cols); gridChanged(); });
+
+  // Nombre de colonnes et de lignes (bords coupés compris)
   function updateRowsInfo() {
     var info = $('rowsInfo');
     if (!source) { info.textContent = ''; return; }
-    var n = source.height / (source.width / grid.cols);
-    var txt = Math.abs(n - Math.round(n)) < 0.05 ? String(Math.round(n)) : n.toFixed(1).replace('.', ',');
-    info.textContent = '× ' + txt + (n > 1.05 ? ' lignes' : ' ligne') + ', carreaux carrés';
+    var g = geom();
+    info.textContent = '× ' + g.rows + (g.rows > 1 ? ' lignes' : ' ligne');
   }
 
   /* ---------- Carreaux : repères (lettres), sélection et export ---------- */
@@ -202,7 +270,8 @@
   // Les carreaux sont carrés, comptés depuis le coin haut gauche ; la dernière rangée peut être coupée par le bord.
   var MAX_CHUNKS = 1500;
   var selected = {};         // carreaux choisis : { 'colonne,ligne': true }
-  var selectedCols = 0;      // nombre de colonnes pour lequel la sélection a été faite (elle n'a plus de sens si on le change)
+  var selectedCols = '';     // grille (taille et position) pour laquelle la sélection a été faite (elle n'a plus de sens si on la change)
+  function gridKey() { return grid.cell + '|' + grid.ox + '|' + grid.oy; }
 
   function colLabel(c) {
     var s = '';
@@ -215,14 +284,26 @@
     return n - 1;
   }
   function chunkName(c, r) { return colLabel(c) + (r + 1); }
-  function cellSize() { return source.width / grid.cols; }
-  // Même règle que le tracé des traits : une rangée existe tant que son bord haut est dans l'image.
-  function gridRowCount() { return Math.max(1, Math.ceil((source.height - 0.5) / cellSize())); }
+  // Géométrie de la grille dans l'image (pixels du canvas) : côté du carreau, bord gauche / haut du premier carreau
+  // (négatif si la grille est décalée : ce carreau est alors coupé par le bord), nombre de colonnes et de lignes.
+  function geom() {
+    var W = source.width, H = source.height, cell = grid.cell * W;
+    var fx = normOff(grid.ox) * W, fy = normOff(grid.oy) * W;
+    if (fx > 0.5) fx -= cell;   // le premier carreau commence avant le bord : il est coupé
+    if (fy > 0.5) fy -= cell;
+    return {
+      cell: cell, fx: fx, fy: fy,
+      cols: Math.max(1, Math.ceil((W - fx - 0.5) / cell)),
+      rows: Math.max(1, Math.ceil((H - fy - 0.5) / cell))
+    };
+  }
+  function gridRowCount() { return geom().rows; }
+  function gridColCount() { return geom().cols; }
 
   function cellRect(c, r) {
-    var cell = cellSize();
-    var x0 = Math.round(cell * c), x1 = Math.min(source.width, Math.round(cell * (c + 1)));
-    var y0 = Math.round(cell * r), y1 = Math.min(source.height, Math.round(cell * (r + 1)));
+    var g = geom();
+    var x0 = Math.max(0, Math.round(g.fx + g.cell * c)), x1 = Math.min(source.width, Math.round(g.fx + g.cell * (c + 1)));
+    var y0 = Math.max(0, Math.round(g.fy + g.cell * r)), y1 = Math.min(source.height, Math.round(g.fy + g.cell * (r + 1)));
     return { x0: x0, y0: y0, w: Math.max(1, x1 - x0), h: Math.max(1, y1 - y0) };
   }
 
@@ -233,7 +314,7 @@
 
   // « A1, B2 » → carreaux ; accepte aussi les blocs « A1:C2 ». Retourne { set, bad } (bad : références refusées).
   function parseRefs(text) {
-    var set = {}, bad = [], cols = grid.cols, rows = source ? gridRowCount() : 0;
+    var set = {}, bad = [], cols = source ? gridColCount() : grid.cols, rows = source ? gridRowCount() : 0;
     text.toUpperCase().split(/[\s,;]+/).filter(Boolean).forEach(function (tok) {
       var m = /^([A-Z]{1,2})(\d{1,4})(?::([A-Z]{1,2})(\d{1,4}))?$/.exec(tok);
       if (!m) { bad.push(tok); return; }
@@ -249,18 +330,18 @@
 
   function updateChunkUI() {
     var has = !!source, n = has ? selectedList().length : 0;
-    if (has && gridRowCount() * grid.cols > MAX_CHUNKS) $('chunkAll').title = 'Trop de carreaux (' + MAX_CHUNKS + ' au maximum) : réduisez le nombre de colonnes.';
+    if (has && gridRowCount() * gridColCount() > MAX_CHUNKS) $('chunkAll').title = 'Trop de carreaux (' + MAX_CHUNKS + ' au maximum) : réduisez le nombre de colonnes.';
     else $('chunkAll').removeAttribute('title');
     $('chunkCount').textContent = has ? (n ? n + (n > 1 ? ' carreaux choisis' : ' carreau choisi') : 'Aucun carreau choisi')
-      + ' sur ' + gridRowCount() * grid.cols : '';
+      + ' sur ' + gridRowCount() * gridColCount() : '';
     if (document.activeElement !== chunkRefs) chunkRefs.value = selectedList().map(function (p) { return chunkName(p[0], p[1]); }).join(', ');
     chunkRefs.classList.remove('bad');
     $('chunkClear').disabled = !n || chunkBusy;
     $('chunkSel').disabled = !n || chunkBusy;
-    $('chunkAll').disabled = !has || chunkBusy || gridRowCount() * grid.cols > MAX_CHUNKS;
+    $('chunkAll').disabled = !has || chunkBusy || gridRowCount() * gridColCount() > MAX_CHUNKS;
   }
 
-  function resetSelection() { selected = {}; selectedCols = grid.cols; }
+  function resetSelection() { selected = {}; selectedCols = gridKey(); }
 
   chunkRefs.addEventListener('change', function () {
     if (!source) { chunkRefs.value = ''; return; }
@@ -288,8 +369,9 @@
   canvas.addEventListener('click', function (e) {
     if (suppressClick) { suppressClick = false; return; }   // c'était un déplacement de l'image, pas un choix de carreau
     if (mode !== 'grid' || !source) return;
-    var p = pointFrom(e), cell = cellSize(), c = Math.min(grid.cols - 1, Math.floor(p.x / cell)), r = Math.floor(p.y / cell);
-    if (r >= gridRowCount()) return;
+    var p = pointFrom(e), g = geom();
+    var c = Math.floor((p.x + 0.5 - g.fx) / g.cell), r = Math.floor((p.y + 0.5 - g.fy) / g.cell);
+    if (c < 0 || r < 0 || c >= g.cols || r >= g.rows) return;
     var k = c + ',' + r;
     if (selected[k]) delete selected[k]; else selected[k] = true;
     render();
@@ -370,7 +452,7 @@
   $('chunkSel').addEventListener('click', function () { exportChunks(selectedList()); });
   $('chunkAll').addEventListener('click', function () {
     var rows = gridRowCount(), all = [];
-    for (var r = 0; r < rows; r++) for (var c = 0; c < grid.cols; c++) all.push([c, r]);
+    for (var r = 0; r < rows; r++) for (var c = 0; c < gridColCount(); c++) all.push([c, r]);
     exportChunks(all);
   });
 
@@ -409,20 +491,20 @@
     if (grid.dash === 'dash') dash = [Math.max(lw * 4, 6 * s), Math.max(lw * 3, 4 * s)];
     else if (grid.dash === 'dot') { dash = [0.01, Math.max(lw * 2.2, 4 * s)]; cap = 'round'; }
 
-    // Carreaux carrés, comptés depuis le coin haut gauche : le côté se déduit du nombre de colonnes.
-    var cell = w / grid.cols;
+    // Carreaux carrés : côté et position donnés par geom() (le premier carreau peut être coupé par le bord).
+    var g = geom(), cell = g.cell;
     ctx.save();
     ctx.lineCap = cap;
     ctx.setLineDash(dash);
     ctx.strokeStyle = grid.color;
     ctx.lineWidth = lw;
     ctx.beginPath();
-    for (i = 1; i < grid.cols; i++) { p = Math.round(cell * i); ctx.moveTo(p, 0); ctx.lineTo(p, h); }
-    for (i = 1; cell * i < h - 0.5; i++) { p = Math.round(cell * i); ctx.moveTo(0, p); ctx.lineTo(w, p); }
+    for (i = 0; i <= g.cols; i++) { p = Math.round(g.fx + cell * i); if (p > 0.5 && p < w - 0.5) { ctx.moveTo(p, 0); ctx.lineTo(p, h); } }
+    for (i = 0; i <= g.rows; i++) { p = Math.round(g.fy + cell * i); if (p > 0.5 && p < h - 0.5) { ctx.moveTo(0, p); ctx.lineTo(w, p); } }
     ctx.stroke();
     ctx.restore();
 
-    var rows = gridRowCount(), c, r;
+    var rows = g.rows, c, r;
 
     // Lettres : le nom du carreau (A1, B1…) dans son coin haut gauche, dans la couleur de la grille.
     if (grid.letters && cell / s >= 28) {
@@ -431,8 +513,11 @@
       ctx.font = '700 ' + fs + 'px system-ui, -apple-system, "Segoe UI", sans-serif';
       ctx.textBaseline = 'top';
       ctx.fillStyle = grid.color;
-      for (r = 0; r < rows; r++) for (c = 0; c < grid.cols; c++) {
-        ctx.fillText(chunkName(c, r), Math.round(cell * c) + pad, Math.round(cell * r) + pad);
+      for (r = 0; r < rows; r++) for (c = 0; c < g.cols; c++) {
+        // carreau coupé par le bord : pas de lettres s'il ne reste pas la place de les écrire (elles chevaucheraient le voisin)
+        var rc = cellRect(c, r);
+        if (rc.h < fs + 2 * pad || rc.w < fs * 1.8 + 2 * pad) continue;
+        ctx.fillText(chunkName(c, r), rc.x0 + pad, rc.y0 + pad);
       }
       ctx.restore();
     }
@@ -473,7 +558,7 @@
   function drawSight(pt) { drawSightOn(ctx, canvas, pt); }
 
   function render() {
-    if (source && selectedCols !== grid.cols) resetSelection(); // les carreaux ont changé de taille : l'ancienne sélection n'a plus de sens
+    if (source && selectedCols !== gridKey()) resetSelection(); // les carreaux ont changé de taille : l'ancienne sélection n'a plus de sens
     updateRowsInfo();
     updateChunkUI();
     if (!source) return;
@@ -889,6 +974,7 @@
     source = shrinkToCanvas(img);
     sourceCtx = source.getContext('2d', { willReadFrequently: true });
     var cw = source.width, ch = source.height, k = cw / w;
+    origWidth = w; syncGridUI();
 
     gray = null; picked = null; resetSelection();
     imageName = (name.replace(/\.[^.]*$/, '').replace(/[^\w\-]+/g, '-').replace(/^-+|-+$/g, '') || 'image').slice(0, 60);

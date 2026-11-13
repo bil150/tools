@@ -104,14 +104,31 @@
           <!-- Tuiles : sous l'image par défaut, ou à droite selon la disposition choisie -->
           <div class="panels" id="panels">
             <div class="bt" id="tileCols">
-              <label for="gridCols">Colonnes</label>
-              <div class="stepper">
-                <button type="button" data-for="gridCols" data-step="-1" aria-label="Moins de colonnes">−</button>
-                <input type="number" id="gridCols" min="1" max="40" step="1" value="4" inputmode="numeric">
-                <button type="button" data-for="gridCols" data-step="1" aria-label="Plus de colonnes">+</button>
+              <h2>Mise en grille</h2>
+              <div class="stepper" role="group" aria-label="Colonnes">
+                <button type="button" data-step="-1" aria-label="Moins de colonnes">−</button>
+                <span class="stepper-mid"><input type="number" id="gridCols" min="1" max="100" step="any" value="4" inputmode="decimal" aria-label="Colonnes"><span class="unit" aria-hidden="true">colonnes</span></span>
+                <button type="button" data-step="1" aria-label="Plus de colonnes">+</button>
               </div>
               <span class="muted note" id="rowsInfo" aria-live="polite"></span>
-              <label class="switch"><input type="checkbox" id="gridLetters"><span>Lettres</span></label>
+              <!-- Ajuster à l'œil : taille du carreau (½ px) et décalage (1 px) ; Maj : ×10 -->
+              <div class="fine" role="group" aria-label="Taille du carreau">
+                <span class="fine-l">Carreau</span>
+                <button type="button" class="mini" data-fine="size" data-d="-1" aria-label="Carreau plus petit" title="Carreau plus petit (Maj : ×10)">−</button>
+                <output id="cellOut" class="px">—</output>
+                <button type="button" class="mini" data-fine="size" data-d="1" aria-label="Carreau plus grand" title="Carreau plus grand (Maj : ×10)">+</button>
+              </div>
+              <div class="fine" role="group" aria-label="Décaler la grille">
+                <span class="fine-l">Décalage</span>
+                <button type="button" class="mini" data-fine="x" data-d="-1" aria-label="Décaler à gauche" title="Décaler à gauche (Maj : ×10)">←</button>
+                <button type="button" class="mini" data-fine="x" data-d="1" aria-label="Décaler à droite" title="Décaler à droite (Maj : ×10)">→</button>
+                <button type="button" class="mini" data-fine="y" data-d="-1" aria-label="Décaler vers le haut" title="Décaler vers le haut (Maj : ×10)">↑</button>
+                <button type="button" class="mini" data-fine="y" data-d="1" aria-label="Décaler vers le bas" title="Décaler vers le bas (Maj : ×10)">↓</button>
+              </div>
+              <div class="fine end">
+                <label class="switch"><input type="checkbox" id="gridLetters"><span>Lettres</span></label>
+                <button type="button" class="linkbtn" id="gridReset" hidden>Réinitialiser</button>
+              </div>
             </div>
             <div class="bt" id="tileColor">
               <label for="gridColor">Couleur</label>

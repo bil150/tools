@@ -1,0 +1,44 @@
+/* Glossaire : barre de recherche et thèmes collée en haut, termes en liste de définitions par thème.
+   S'appuie sur base.css et arts-atelier.css (survol neutre, pas de surbrillance inutile). */
+.wrap { max-width: 980px; }
+
+.gl-bar {
+  position: sticky; top: 0; z-index: 10; display: flex; flex-direction: column; gap: 10px;
+  padding: 12px 0; background: var(--paper);
+}
+.gl-search {
+  display: flex; align-items: center; gap: 10px; padding: 0 14px; min-height: 48px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2);
+}
+.gl-search:focus-within { border-color: var(--ink); }
+.gl-search svg { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; opacity: .55; }
+.gl-search input { flex: 1; min-width: 0; min-height: 44px; border: 0; padding: 0; background: transparent; font-size: 16px; outline: none; }
+.gl-themes { display: flex; flex-wrap: wrap; gap: 6px; }
+.gl-themes button {
+  min-height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper-2); color: var(--ink); font-size: 13px; font-weight: 600;
+}
+.gl-themes button:hover { background: var(--hi); }
+.gl-themes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.gl-bar .note { margin: 0; font-size: 13px; }
+
+.gl-list { display: flex; flex-direction: column; gap: 22px; }
+.gl-sec h2 { margin: 0 0 8px; font-size: 18px; }
+.gl-sec dl { margin: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.gl-item {
+  display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 4px 18px;
+  padding: 10px 6px; border-bottom: 1px solid var(--line); border-radius: 6px; scroll-margin-top: 170px;
+}
+.gl-item dt { font-weight: 700; }
+.gl-item dd { margin: 0; line-height: 1.5; }
+.gl-ref { color: inherit; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.gl-ref:hover { text-decoration-style: solid; }
+.gl-tool { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.gl-item.flash { animation: gl-flash 1.6s ease-out; }
+@keyframes gl-flash { from { background: color-mix(in srgb, var(--ink) 14%, transparent); } to { background: transparent; } }
+.gl-empty { opacity: .7; }
+
+@media (max-width: 640px) {
+  .gl-item { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .gl-item.flash { animation: none; } }

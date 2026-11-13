@@ -98,3 +98,15 @@ body { background: var(--paper); }
   .rail-group button { width: 32px; height: 36px; }
   .rail-sep { margin: 0 2px; }
 }
+
+/* Pas de surbrillance inutile.
+   - Survol neutre : dans le thème du site, la couleur de survol est jaune ; ici elle devient un gris tiré de l'encre,
+     sans teinte, pour ne pas colorer l'interface d'outils où l'on juge des couleurs.
+   - Écran tactile : pas de survol qui reste affiché après un toucher, pas de flash au toucher.
+   - Pas de texte sélectionné en maintenant un bouton ou en faisant glisser sur le cercle, la bande, l'image. */
+:root:not([data-palette]) { --hi: color-mix(in srgb, var(--ink) 10%, var(--paper-2)); }
+button, [role="slider"], [role="tab"], .seg, .rail, svg, canvas { -webkit-tap-highlight-color: transparent; }
+button, .seg, .rail, .toolbar, [role="slider"], #wheel, #mixChart, .parts, .stepper button, .fine, canvas { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+@media (hover: none) {
+  :root, :root[data-palette] { --hi: transparent; }
+}

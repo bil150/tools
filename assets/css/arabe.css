@@ -1,6 +1,13 @@
 /* Arabe : styles communs aux pages d'arabe (syllabes, cartes, dictée, écriture).
    S'appuie sur base.css. Les styles propres à chaque page sont dans pages/. */
 
+/* Police arabe hébergée sur le site (aucun appel extérieur). Noto Naskh Arabic, variable 400–700,
+   partie arabe seulement. Licence SIL OFL 1.1 : voir assets/fonts/OFL.txt. */
+@font-face {
+  font-family: 'Noto Naskh Arabic'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url('../fonts/noto-naskh-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
 :root { --ar: 'Noto Naskh Arabic', 'Geeza Pro', 'Traditional Arabic', Tahoma, serif; }
 .ar { font-family: var(--ar); font-weight: 500; line-height: 1.7; direction: rtl; unicode-bidi: isolate; }
 .lv { color: var(--accent); }

@@ -472,7 +472,7 @@
 
   var api = {
     rgbToLab: rgbToLab, deltaE76: deltaE76, deltaE2000: deltaE2000,
-    prepareTube: prepareTube, solve: solve, evaluate: evaluate, parts: parts, palette: palette, allPoints: allPoints, propose: propose
+    prepareTube: prepareTube, mix: mix, solve: solve, evaluate: evaluate, parts: parts, palette: palette, allPoints: allPoints, propose: propose
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else g.MelangeMoteur = api;

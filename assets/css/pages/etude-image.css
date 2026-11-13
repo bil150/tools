@@ -39,7 +39,7 @@
   display: flex; align-items: stretch; overflow: hidden; border-radius: 14px; background: var(--paper-2);
   border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
 }
-.stepper:focus-within { border-color: var(--ink); }
+.stepper:has(input:focus) { border-color: var(--ink); }   /* seulement en tapant dans le champ, pas après un clic sur − ou + */
 .stepper button {
   flex: none; width: 52px; min-height: 52px; border: 0; background: transparent; color: var(--ink);
   font-size: 24px; line-height: 1;
@@ -54,6 +54,31 @@
   appearance: textfield; -moz-appearance: textfield;
 }
 .stepper input[type="number"]::-webkit-outer-spin-button, .stepper input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Mise en grille : réglage fin (carreau, position) */
+/* Le nombre de colonnes et son unité, centrés ensemble entre − et + */
+.stepper-mid { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.stepper-mid input[type="number"] { flex: none; width: 2ch; text-align: center; }   /* largeur ajustée au chiffre par le script */
+.stepper-mid .unit { font-size: 14px; font-weight: 600; opacity: .7; }
+
+/* Carreau et Décalage sur une même grille : intitulé, puis 4 colonnes de boutons alignées d'une ligne à l'autre */
+.fine { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, 34px); align-items: center; gap: 6px; font-size: 14px; }
+.fine .px { grid-column: span 2; }
+.fine.end { display: flex; }
+.fine-l { font-weight: 600; opacity: .7; font-size: 13px; }
+.fine .px { text-align: center; font: 600 14px/1 var(--body); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fine .mini:disabled { opacity: .4; cursor: default; }
+.fine .mini { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.fine .mini {
+  display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper-2); color: var(--ink); font: 600 17px/1 var(--body);
+}
+.fine .mini svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.linkbtn[hidden] { display: none; }
+.fine .mini:hover { background: var(--hi); }
+.fine.end { justify-content: space-between; }
+.linkbtn { border: 0; background: none; padding: 6px 2px; color: inherit; text-decoration: underline; opacity: .7; font-size: 13px; }
+.linkbtn:hover { opacity: 1; }
 
 /* Couleur de la grille : un seul sélecteur */
 .colorbar {

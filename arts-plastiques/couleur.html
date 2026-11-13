@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F141D" media="(prefers-color-scheme: dark)">
+<script src="../assets/js/app.js"></script>
+<script>try { var p = JSON.parse(localStorage.getItem('tools:arts:couleur:theme')); if (p === 'gris' || p === 'papier' || p === 'contraste') document.documentElement.setAttribute('data-palette', p); } catch (e) {}</script>
+<title>Couleur</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/pages/arts-atelier.css">
+<link rel="stylesheet" href="../assets/css/pages/couleur.css?v=30">
+<script src="../assets/js/melange-moteur.js?v=30" defer></script>
+<script type="module" src="../assets/js/pages/couleur.js?v=31"></script>
+</head>
+<body>
+<main class="wrap">
+  <nav class="topbar" aria-label="Fil d’Ariane"><ol class="crumbs"><li><a href="../index.html">Tools</a></li><li><a href="arts-plastiques.html">Arts plastiques</a></li><li aria-current="page">Couleur</li></ol></nav>
+
+  <header>
+    <h1 class="title">Couleur</h1>
+  </header>
+
+  <div class="app">
+    <!-- Menu latéral : une icône par outil, puis disposition et thème (comme Étude d'image et Pantin) -->
+    <div class="rail-col">
+    <div class="rail">
+    <div class="rail-tabs" role="tablist" aria-orientation="vertical" aria-label="Sections">
+      <button type="button" role="tab" id="tabCercle" aria-controls="viewCercle" aria-selected="true" aria-label="Cercle chromatique" title="Cercle chromatique" data-label="Cercle chromatique">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabMelange" aria-controls="viewMelange" aria-selected="false" tabindex="-1" aria-label="Simulateur de mélange" title="Simulateur de mélange" data-label="Simulateur de mélange">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3.5c2.6 3.2 4 5.4 4 7.2a4 4 0 0 1-8 0c0-1.8 1.4-4 4-7.2z"/><path d="M16 9.5c2.6 3.2 4 5.4 4 7.2a4 4 0 0 1-8 0c0-1.8 1.4-4 4-7.2z"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabTemp" aria-controls="viewTemp" aria-selected="false" tabindex="-1" aria-label="Températures et neutres" title="Températures et neutres" data-label="Températures et neutres">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13.5V5a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0z"/><path d="M12 9v6"/></svg>
+      </button>
+      <button type="button" role="tab" id="tabTheorie" aria-controls="viewTheorie" aria-selected="false" tabindex="-1" aria-label="Théorie des couleurs" title="Théorie des couleurs" data-label="Théorie des couleurs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7h8M8 11h6"/></svg>
+      </button>
+    </div>
+    </div>
+    <div class="rail rail-layout" id="layoutBox">
+      <div class="rail-group" role="group" aria-label="Disposition">
+        <button type="button" data-layout="below" aria-pressed="true" aria-label="Réglages sous le cercle" title="Réglages sous le cercle" data-label="Réglages dessous">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15h18"/></svg>
+        </button>
+        <button type="button" data-layout="right" aria-pressed="false" aria-label="Réglages à droite du cercle" title="Réglages à droite" data-label="Réglages à droite">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg>
+        </button>
+        <button type="button" data-layout="focus" aria-pressed="false" aria-label="Cercle seul" title="Cercle seul" data-label="Cercle seul">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="rail rail-theme" id="themeBox">
+      <div class="rail-group" role="group" aria-label="Thème">
+        <button type="button" data-palette="site" aria-pressed="true" aria-label="Thème du site" title="Thème du site" data-label="Thème du site"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#E8ECF4"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#14213D"/></svg></button>
+        <button type="button" data-palette="gris" aria-pressed="false" aria-label="Gris neutre" title="Gris neutre" data-label="Gris neutre"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#D2D2D2"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#6A6A6A"/></svg></button>
+        <button type="button" data-palette="papier" aria-pressed="false" aria-label="Papier" title="Papier" data-label="Papier"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#EADFC8"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#8A6D45"/></svg></button>
+        <button type="button" data-palette="contraste" aria-pressed="false" aria-label="Contraste" title="Contraste" data-label="Contraste"><svg class="swatch" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#FFFFFF"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#000000"/></svg></button>
+      </div>
+    </div>
+    </div>
+
+    <div class="views">
+      <section id="viewCercle" role="tabpanel" aria-labelledby="tabCercle">
+        <div class="dash" data-layout="below">
+          <!-- Le cercle : glisser un repère (ou cliquer sur l'anneau) pour tourner l'harmonie -->
+          <section class="card pane-stage" aria-label="Cercle chromatique">
+            <div class="stage-frame">
+              <svg id="wheel" viewBox="-110 -110 220 220" tabindex="0" role="img" aria-label="Cercle chromatique : glissez sur l’anneau ou utilisez les flèches pour tourner l’harmonie"></svg>
+            </div>
+            <!-- Barre du cercle : type, style, découpage, valeurs — tout sur une ligne, sans texte superflu -->
+            <div class="toolbar" role="toolbar" aria-label="Réglages du cercle">
+              <div class="seg" id="modeSeg" role="group" aria-label="Type de cercle">
+                <button type="button" data-v="ryb" title="Peintre : synthèse soustractive">RYB</button>
+                <button type="button" data-v="rgb" title="Lumière : synthèse additive">RGB</button>
+              </div>
+              <div class="seg icons" id="styleSeg" role="group" aria-label="Style">
+                <button type="button" data-v="anneau" aria-label="Anneau" title="Anneau"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></svg></button>
+                <button type="button" data-v="centre" aria-label="Primaires au centre" title="Primaires au centre"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6.5l4.8 8.3H7.2z"/></svg></button>
+                <button type="button" data-v="disques" aria-label="Disques superposés" title="Disques superposés"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="5"/><circle cx="8.8" cy="14" r="5"/><circle cx="15.2" cy="14" r="5"/></svg></button>
+              </div>
+              <div class="seg" id="pasSeg" role="group" aria-label="Découpage">
+                <button type="button" data-v="12" title="12 secteurs">12</button>
+                <button type="button" data-v="24" title="24 secteurs">24</button>
+                <button type="button" data-v="0" aria-label="Continu" title="Continu">∞</button>
+              </div>
+              <button type="button" class="tog" id="optGris" aria-pressed="false" aria-label="Voir en valeurs (gris)" title="Voir en valeurs (gris)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+            </div>
+          </section>
+
+          <div class="panels" id="panels">
+            <div class="bt" id="tileHarmonie">
+              <h2>Harmonie</h2>
+              <select id="harmSel" aria-label="Harmonie">
+                <option value="comp">Complémentaire</option>
+                <option value="fausse">Fausse complémentaire (une)</option>
+                <option value="split">Fausses complémentaires (deux)</option>
+                <option value="triade">Triade</option>
+                <option value="analogue">Analogue</option>
+                <option value="carre">Carré</option>
+                <option value="rect">Rectangle</option>
+              </select>
+              <label for="hue">Couleur de départ</label>
+              <input type="range" id="hue" min="0" max="359" step="1" value="0">
+              <label for="sat">Saturation <b id="satOut">100 %</b></label>
+              <input type="range" id="sat" min="25" max="100" step="25" value="100">
+            </div>
+            <div class="bt" id="tileCouleurs">
+              <h2>Couleurs <span class="h-sub">et valeurs vers le blanc (indicatif)</span></h2>
+              <ul class="swatches" id="swatches" aria-live="polite"></ul>
+            </div>
+            <div class="bt" id="tileSynthese">
+              <h2 id="synthTitle"></h2>
+              <div class="synth">
+                <p id="synthText"></p>
+                <p class="muted note">Sur écran : les relations entre couleurs, pas la teinte exacte d’un tube.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Simulateur de mélange : 2 ou 3 couleurs, leurs parts, le résultat et toute la gamme des mélanges possibles -->
+      <section id="viewMelange" role="tabpanel" aria-labelledby="tabMelange" hidden>
+        <div class="dash" data-layout="below">
+          <section class="card pane-stage" aria-label="Mélange">
+            <!-- Mode : deux grandes options, un fond qui glisse sous l’option choisie -->
+            <div class="modetabs" id="modeMix" role="group" aria-label="Mode du simulateur" data-mode="mix">
+              <button type="button" data-v="mix">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3.5c2.6 3.2 4 5.4 4 7.2a4 4 0 0 1-8 0c0-1.8 1.4-4 4-7.2z"/><path d="M16 9.5c2.6 3.2 4 5.4 4 7.2a4 4 0 0 1-8 0c0-1.8 1.4-4 4-7.2z"/></svg>
+                <span><b>Un mélange</b><small>Doser une teinte précise</small></span>
+              </button>
+              <button type="button" data-v="pal">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.6-1-2.6 0-.9.7-1.5 1.7-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10.5" cy="7" r="1.3"/><circle cx="15.5" cy="7.5" r="1.3"/></svg>
+                <span><b>Toute la palette</b><small>Ce que vos tubes permettent</small></span>
+              </button>
+            </div>
+            <!-- Mode « Un mélange » : le résultat et la bande (ou le triangle) à faire glisser -->
+            <div class="stage-frame mixframe" id="frameMix">
+              <div class="mixres" id="mixRes" role="img" aria-label="Résultat du mélange">
+                <span class="mixres-ratio" id="mixRatio"></span>
+              </div>
+              <div class="gamut">
+                <svg id="mixChart" viewBox="-104 -24 208 64" role="slider" tabindex="0" aria-label="Proportions du mélange"></svg>
+                <p class="muted note gamut-help" id="gamutHelp">Glissez sur la bande pour doser.</p>
+              </div>
+            </div>
+            <!-- Mode « Toute la palette » : planche des mélanges deux à deux (et au blanc), zone atteignable sur le cercle -->
+            <div class="stage-frame mixframe palframe" id="framePal" hidden>
+              <div class="gamut">
+                <svg id="palPlanche" viewBox="0 0 380 300" role="img" aria-label="Planche des mélanges de la palette"></svg>
+                <p class="muted note gamut-help">Chaque bande mélange deux couleurs ; dessous, de plus en plus de blanc.</p>
+              </div>
+              <div class="gamut">
+                <svg id="palWheel" viewBox="-110 -110 220 220" role="img" aria-label="Zone atteignable sur le cercle"></svg>
+                <p class="muted note gamut-help">Les points : tout ce que la palette permet. Hors de la forme : hors d’atteinte.</p>
+              </div>
+            </div>
+            <div class="toolbar" role="toolbar" aria-label="Réglages du mélange">
+              <div class="seg" id="nSeg" role="group" aria-label="Nombre de couleurs">
+                <button type="button" data-k="0">2 couleurs</button>
+                <button type="button" data-k="1">3 couleurs</button>
+              </div>
+              <div class="palN" id="palN" role="group" aria-label="Nombre de couleurs de la palette" hidden>
+                <button type="button" id="palMinus" aria-label="Une couleur de moins">−</button>
+                <output id="palNOut" aria-live="polite">3 couleurs</output>
+                <button type="button" id="palPlus" aria-label="Une couleur de plus">+</button>
+              </div>
+              <button type="button" class="tog txt" id="palBlanc" aria-pressed="true" title="Ajouter le blanc à la palette" hidden>+ blanc</button>
+              <button type="button" class="tog" id="mixGris" aria-pressed="false" aria-label="Voir en valeurs (gris)" title="Voir en valeurs (gris)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+            </div>
+          </section>
+
+          <div class="panels">
+            <div class="bt" id="tileMixCouleurs">
+              <div class="seg srcseg" id="srcSeg" role="group" aria-label="Source des couleurs">
+                <button type="button" data-v="gen">Couleurs génériques</button>
+                <button type="button" data-v="inv">Mon inventaire</button>
+              </div>
+              <div class="presets" id="presets" role="group" aria-label="Palettes connues" hidden>
+                <button type="button" data-p="cmj" title="Cyan, magenta et jaune primaires + blanc">Primaires CMJ</button>
+                <button type="button" data-p="rjb" title="Jaune, rouge et bleu primaires + blanc">Primaires RJB</button>
+                <button type="button" data-p="terres" title="Ocre jaune, terre de Sienne brûlée, outremer + blanc">Terres</button>
+              </div>
+              <ul class="slots" id="slots"></ul>
+              <p class="muted note" id="genNote" hidden>Couleurs courantes, nom générique et code pigment ; teintes approximatives.</p>
+              <p class="muted note" id="noTubes" hidden>Vos tubes de <a href="etude-image.html#couleurs">Couleurs physiques</a> apparaîtront ici.</p>
+            </div>
+            <div class="bt" id="tileMixRes">
+              <h2>Résultat</h2>
+              <ul class="mixparts" id="mixParts"></ul>
+              <p class="mixval">Valeur <b id="mixVal">—</b></p>
+              <p class="muted note">Indicatif : modèle de mélange simplifié, à vérifier sur la palette.</p>
+            </div>
+            <div class="bt" id="tilePal" hidden>
+              <h2>Palette limitée</h2>
+              <p class="synth-p">Peu de tubes, toutes les teintes par mélange : le tableau reste harmonieux, car tout vient des mêmes couleurs.</p>
+              <p class="synth-p" id="palReach"></p>
+              <p class="muted note">Indicatif : modèle de mélange simplifié, à vérifier sur la palette.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Températures et neutres : une couleur, plus froide ← → plus chaude, et vers le gris par sa complémentaire -->
+      <section id="viewTemp" role="tabpanel" aria-labelledby="tabTemp" hidden>
+        <div class="dash" data-layout="below">
+          <section class="card pane-stage" aria-label="Températures et neutres">
+            <!-- Une action à la fois : réchauffer, refroidir ou griser -->
+            <div class="modetabs three" id="tAct" role="group" aria-label="Action" data-i="0">
+              <button type="button" data-v="warm">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.4 1.2-3.8 2.4-5 .2 1.6.9 2.6 2 3 0-3 0-5.5.6-8z"/></svg>
+                <span><b>Réchauffer</b><small>Vers l’orange</small></span>
+              </button>
+              <button type="button" data-v="cool">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>
+                <span><b>Refroidir</b><small>Vers le bleu</small></span>
+              </button>
+              <button type="button" data-v="grey">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>
+                <span><b>Griser</b><small>Par la complémentaire</small></span>
+              </button>
+            </div>
+
+            <div class="stage-frame tempframe">
+              <!-- Couleur + ajout = résultat, en grand -->
+              <div class="t-eq big" id="tEq"></div>
+              <!-- Dose : de « un peu » à « beaucoup » ; chaque case montre le résultat -->
+              <div class="t-dose">
+                <div class="t-dose-steps" id="tDose" role="radiogroup" aria-label="Dose"></div>
+                <p class="t-dose-l"><span>Un peu</span><span>Beaucoup</span></p>
+              </div>
+              <!-- Température : avant → après -->
+              <div class="t-gwrap">
+                <div class="t-gauge" aria-hidden="true"><span class="t-gauge-bar"></span><span class="t-gauge-mark ghost" id="tMark0"></span><span class="t-gauge-mark" id="tMark"></span></div>
+                <p class="t-gauge-l"><span>Froide</span><b id="tTemp">—</b><span>Chaude</span></p>
+              </div>
+            </div>
+            <div class="toolbar" role="toolbar" aria-label="Réglages">
+              <div class="seg" id="tSrcSeg" role="group" aria-label="Source des couleurs">
+                <button type="button" data-v="gen">Couleurs génériques</button>
+                <button type="button" data-v="inv">Mon inventaire</button>
+              </div>
+              <button type="button" class="tog" id="tGris" aria-pressed="false" aria-label="Voir en valeurs (gris)" title="Voir en valeurs (gris)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+            </div>
+          </section>
+
+          <div class="panels">
+            <div class="bt" id="tileTBase">
+              <h2>Votre couleur</h2>
+              <button type="button" class="slot-pick t-pick" id="tPick" aria-haspopup="dialog"></button>
+              <p class="synth-p" id="tSentence"></p>
+            </div>
+            <div class="bt" id="tileTInfo">
+              <h2>Chaud, froid, neutre</h2>
+              <p class="synth-p">Réchauffer, c’est pousser la couleur vers l’orange ; la refroidir, vers le bleu. Pour la griser sans la salir, on ajoute un peu de sa complémentaire.</p>
+              <p class="muted note">Indicatif : modèle de mélange simplifié, à vérifier sur la palette.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Théorie des couleurs : notions courtes, chacune avec une illustration à manipuler.
+           Textes et illustrations originaux ; les 7 contrastes sont cités d'après J. Itten (1961), sans reprise de ses planches. -->
+      <section id="viewTheorie" role="tabpanel" aria-labelledby="tabTheorie" hidden>
+        <div class="theory">
+          <article class="bt th-card" id="thPrim">
+            <h2>Primaires, secondaires, tertiaires</h2>
+            <p class="synth-p">En peinture, trois couleurs ne s’obtiennent pas par mélange : le jaune, le rouge et le bleu, les <b>primaires</b>. Deux primaires mélangées donnent une <b>secondaire</b> (orange, violet, vert) ; une primaire et sa secondaire voisine, une <b>tertiaire</b>.</p>
+            <div class="seg wrapseg" id="thPrimSeg" role="group" aria-label="Rang à montrer">
+              <button type="button" data-v="0">Primaires</button>
+              <button type="button" data-v="2">Secondaires</button>
+              <button type="button" data-v="1">Tertiaires</button>
+            </div>
+            <svg class="th-fig" id="thPrimFig" viewBox="-105 -105 210 210" role="img"></svg>
+          </article>
+
+          <article class="bt th-card" id="thComp">
+            <h2>Le dilemme des complémentaires</h2>
+            <p class="synth-p">Face à une couleur, du contraste le plus fort au plus doux :</p>
+            <ul class="th-list">
+              <li><b>Complémentaire</b> : la couleur opposée. Contraste maximal, parfois criard.</li>
+              <li><b>Fausse complémentaire</b> : sa voisine. Contraste fort, mais plus doux.</li>
+              <li><b>Décalée</b> : encore plus loin, en pastel ou grisée. Contraste léger, harmonieux.</li>
+            </ul>
+            <p class="muted note">Rayures et damier : plus les couleurs s’entremêlent finement, plus elles vibrent.</p>
+            <label for="thCompHue">Couleur</label>
+            <input type="range" id="thCompHue" min="0" max="330" step="30" value="120">
+            <div class="th-ctrl">
+              <div class="th-ctrl-row"><span class="th-ctrl-l">Motif</span>
+                <div class="seg" id="thCompMode" role="group" aria-label="Motif">
+                  <button type="button" data-v="carre">Carré</button>
+                  <button type="button" data-v="rayures">Rayures</button>
+                  <button type="button" data-v="damier">Damier</button>
+                </div>
+              </div>
+              <div class="th-ctrl-row"><span class="th-ctrl-l">Décalage</span>
+                <div class="seg" id="thCompGap" role="group" aria-label="Décalage de la fausse complémentaire décalée">
+                  <button type="button" data-v="45">45°</button>
+                  <button type="button" data-v="60">60°</button>
+                  <button type="button" data-v="75">75°</button>
+                </div>
+              </div>
+              <div class="th-ctrl-row"><span class="th-ctrl-l">Nuance</span>
+                <div class="seg" id="thCompNu" role="group" aria-label="Nuance de la fausse complémentaire décalée">
+                  <button type="button" data-v="pure">Pure</button>
+                  <button type="button" data-v="pastel">Pastel</button>
+                  <button type="button" data-v="rompue">Rompue</button>
+                </div>
+              </div>
+            </div>
+            <div class="th-pair three">
+              <figure><div class="th-box" id="thCompA"><span></span></div><figcaption>Complémentaire<br><small id="thCompAn"></small></figcaption></figure>
+              <figure><div class="th-box" id="thCompB"><span></span></div><figcaption>Fausse complémentaire<br><small id="thCompBn"></small></figcaption></figure>
+              <figure><div class="th-box" id="thCompC"><span></span></div><figcaption>Fausse complémentaire décalée<br><small id="thCompCn"></small></figcaption></figure>
+            </div>
+          </article>
+
+          <article class="bt th-card" id="thTemp">
+            <h2>Chaud et froid, une affaire de voisinage</h2>
+            <p class="synth-p">Les couleurs proches de l’orange sont <b>chaudes</b>, celles proches du bleu <b>froides</b>. Mais la température est relative : la même couleur paraît plus froide à côté d’une plus chaude, et plus chaude à côté d’une plus froide.</p>
+            <label for="thTempHue">Couleur du milieu</label>
+            <input type="range" id="thTempHue" min="0" max="330" step="30" value="210">
+            <div class="th-rows" id="thTempFig"></div>
+          </article>
+
+          <article class="bt th-card" id="thVal">
+            <h2>Valeur et saturation</h2>
+            <p class="synth-p">Une couleur a une <b>teinte</b> (rouge, bleu…), une <b>valeur</b> (claire ou foncée) et une <b>saturation</b> (vive ou terne). Deux couleurs de même valeur se confondent en noir et blanc : c’est la valeur qui construit un tableau.</p>
+            <label for="thValHue">Teinte</label>
+            <input type="range" id="thValHue" min="0" max="330" step="30" value="0">
+            <div class="th-grid" id="thValFig" role="img" aria-label="Valeur de haut en bas, saturation de gauche à droite"></div>
+            <p class="th-axes"><span>↑ plus clair · ↓ plus foncé</span><span>← plus terne · plus vive →</span></p>
+            <label class="switch"><input type="checkbox" id="thValGris"><span>Voir en valeurs (gris)</span></label>
+          </article>
+
+          <article class="bt th-card th-wide" id="thItten">
+            <h2>Les 7 contrastes de couleur</h2>
+            <p class="synth-p">Sept façons de faire dialoguer les couleurs.</p>
+            <div class="th-seven" id="thSeven"></div>
+          </article>
+          <p class="muted note th-source">Pour aller plus loin : Johannes Itten, <i>L’Art de la couleur</i> (1961), dont s’inspirent les 7 contrastes. Textes et illustrations de cette page originaux.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- Sélecteur de couleur du simulateur : panneau qui glisse sous la couleur choisie (en bas de l'écran sur téléphone) -->
+  <div class="picker" id="picker" role="dialog" aria-modal="false" aria-label="Choisir une couleur" hidden>
+    <div class="picker-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input type="search" id="pickerQ" placeholder="Rechercher : nom, pigment, groupe" autocomplete="off" spellcheck="false" aria-controls="pickerList">
+    </div>
+    <ul class="picker-list" id="pickerList" role="listbox" aria-label="Couleurs"></ul>
+  </div>
+  <footer>bil150 — <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> — 2026</footer>
+</main>
+</body>
+</html>
